@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 
 function ResetPassword() {
 
-    const { handleSubmit,reset,register } = useForm();
+    const { handleSubmit,reset,register,formState } = useForm();
     const nav = useNavigate();
 
     const submit = async(data)=>{
@@ -35,7 +35,7 @@ function ResetPassword() {
 
 
     return (
-        <div className="flex items-center justify-center min-h-[80vh] bg-gray-50">
+        <div className="flex items-center justify-center bg-gray-50">
             <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-sm border border-gray-200 text-center">
                 <h2 className="text-2xl font-bold mb-2">Reset Password</h2>
                 <p className="text-gray-600 text-sm mb-6">
@@ -55,8 +55,9 @@ function ResetPassword() {
                             type="password"
                             placeholder="Enter new password"
                             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
-                            {...register("newpassword")}
+                            {...register("newpassword",{required:"filed is required"})}
                         />
+                        <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.newpassword?.message ? `${formState.errors.newpassword?.message}` : null}</p>
                     </div>
 
                     <div className="text-left">
@@ -71,8 +72,9 @@ function ResetPassword() {
                             type="password"
                             placeholder="Confirm new password"
                             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
-                            {...register("confirmpassword")}
+                            {...register("confirmpassword",{required:"field is required"})}
                         />
+                        <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.confirmpassword?.message ? `${formState.errors.confirmpassword?.message}` : null}</p>
                     </div>
 
                     <button

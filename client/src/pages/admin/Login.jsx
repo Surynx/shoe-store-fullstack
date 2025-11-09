@@ -31,7 +31,7 @@ export default function Login() {
 
         localStorage.setItem("adminToken",res.data.token);
 
-        nav("/admin",{replace:true});
+        nav("/admin/dashboard",{replace:true});
 
         }else{
             toast.error("Invalid Credentials", {

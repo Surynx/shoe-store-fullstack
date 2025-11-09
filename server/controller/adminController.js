@@ -1,5 +1,6 @@
-import { compare } from "bcrypt";
 import { addAdminService, verifyAdminService } from "../services/adminService.js"
+import User from "../models/userModel.js";
+
 
 
 const addAdmin = async(req,res)=>{
@@ -23,5 +24,20 @@ const verifyAdmin=async (req,res) => {
    }
 }
 
+const fetchUsers= async(req,res)=>{
+    
+    let usersInfo= await User.find();
+    return res.status(200).json(usersInfo);
+}
 
-export { addAdmin,verifyAdmin }
+const blockUser= async(req,res)=>{
+    const {id,isBlock}= req.body;
+
+    await User.updateOne({_id:id},{isBlock:!isBlock});
+
+    return res.status(200).send({success:true});
+    
+}
+
+
+export { addAdmin,verifyAdmin,fetchUsers,blockUser }

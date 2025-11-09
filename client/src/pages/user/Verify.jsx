@@ -7,7 +7,7 @@ import { generateOtp } from '../../API/OtpApi';
 
 function Verify() {
 
-    const { register, handleSubmit } = useForm();
+    const { register, handleSubmit,reset } = useForm();
     const nav = useNavigate();
 
     let [timer,setTimer]=useState(99);
@@ -47,6 +47,7 @@ function Verify() {
 
         let email=localStorage.getItem("verifyEmail");
         await generateOtp({email});
+        reset();
     }
 
     useEffect(()=>{
@@ -61,7 +62,7 @@ function Verify() {
     }
 
     return (
-        <div className="flex items-center justify-center min-h-[70vh]">
+        <div className="flex items-center justify-center">
             <div className="bg-white shadow-sm rounded-lg p-8 w-[90%] max-w-md text-center border border-gray-200">
                 <h2 className="text-2xl font-semibold mb-2">Verify Your Email</h2>
                 <p className="text-gray-600 mb-6">
