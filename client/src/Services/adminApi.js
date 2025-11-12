@@ -1,0 +1,66 @@
+import { data } from "react-router-dom";
+import api from "./config/Api";
+
+
+const verifyAdmin=async(data)=>{
+    const res = await api.post("/admin/verify",data);
+    return res;
+}
+
+const getAllusers= async (search,page)=>{
+    const res=await api.get("/admin/users",{
+        params:{
+            search:search,
+            page:page
+        }
+    });
+    return res;
+}
+
+const blockUser= async(data)=> {
+    let res= await api.patch('/admin/block-user',data);
+    return res;
+}
+
+const addCategory= async(data)=> {
+    let res= await api.post('/admin/category/add',data);
+    return res;
+}
+
+const getAllCategory= async(search,page)=> {
+    let res= await api.get("/admin/category",{
+        params:{
+            search:search,
+            page:page
+        }
+    });
+    return res;
+}
+
+const editCategory= async(id,data)=> {
+    let res= await api.patch("/admin/category/edit",{id,data});
+    return res;
+}
+
+const addBrand= async(data)=> {
+    let res= await api.post("/admin/brand/add",data);
+    return res;
+}
+
+const getAllbrand= async(search,page)=> {
+    let res= await api.get("/admin/brand",{
+        params:{
+            search:search,
+            page:page
+        }
+    });
+    return res;
+}
+
+const editBrand= async(formData,id)=> {
+    console.log(id);
+    let res=await api.patch(`/admin/brand/edit/${id}`,formData);
+    return res;
+}
+
+export { verifyAdmin,getAllusers,blockUser,addCategory,getAllCategory,editCategory,addBrand,getAllbrand,editBrand }

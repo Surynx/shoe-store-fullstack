@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { registerApi } from "../../API/userApi";
+import { registerApi } from "../../Services/userApi";
 import toast from "react-hot-toast";
-import { generateOtp } from "../../API/OtpApi";
+import { generateOtp } from "../../Services/OtpApi";
 
 export default function Signup() {
 
@@ -38,7 +38,7 @@ export default function Signup() {
 
     return (
         <div className="flex justify-center items-center bg-gray-50 px-4">
-            <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+            <div className="bg-white p-8 rounded-lg border text-sm font-bold w-full max-w-sm">
                 <h2 className="text-2xl font-bold text-center mb-8">Sign Up</h2>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

@@ -1,5 +1,4 @@
-import React from 'react'
-import { Home, icons, LogOut, User } from 'lucide-react'
+import { BoxIcon, Home, icons, LogOut, TagIcon, User } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast';
 
@@ -11,6 +10,10 @@ function Sidebar() {
         name: "Dashboard", icon: <Home color='black' size={20} />, path: "/admin/dashboard"
     }, {
         name: "Users", icon: <User color='black' size={20} />, path: "/admin/users"
+    },{
+        name:"Category" , icon: <BoxIcon color='black' size={20}/> , path:"/admin/category"
+    },{
+        name:"Brand", icon:<TagIcon color='black' size={20}/>, path:"/admin/brand"
     }]
 
     const logout=()=>{

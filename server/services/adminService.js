@@ -38,7 +38,7 @@ const verifyAdminService=async({email,password})=>{
         let valid=await compare(password,admin.password);
 
         let payload={admin_email:admin.email}
-        const token=jwt.sign(payload,process.env.Jwt_Key);
+        const token=jwt.sign(payload,process.env.Jwt_Key_Admin);
 
         return {valid,token};
 

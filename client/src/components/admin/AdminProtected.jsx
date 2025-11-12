@@ -1,8 +1,6 @@
-import React from 'react'
-import Login from '../../pages/admin/Login'
 import { Navigate } from 'react-router-dom'
 
-function Protected({children}) {
+function AdminProtected({children}) {
   
     if(localStorage.getItem("adminToken")) {
         return children
@@ -11,4 +9,4 @@ function Protected({children}) {
     }
 }
 
-export default Protected
+export default AdminProtected;

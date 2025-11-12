@@ -2,6 +2,7 @@ import { compare, hash } from "bcrypt";
 import User from "../models/userModel.js"
 import otpGenerator from "otp-generator"
 import Otp from "../models/otpModel.js";
+import jwt from "jsonwebtoken";
 
 const register = async (req, res) => {
 
@@ -73,6 +74,7 @@ const verifyEmail = async (req, res) => {
 
         if (doc?.code == otp) {
             res.status(200).send({ success: true, message: "Email Verified" });
+            await Otp.deleteOne({email});
         } else {
             res.status(200).send({ success: false, message: "Wrong Otp" });
         }
@@ -112,8 +114,17 @@ const userLogin = async (req,res) => {
             return res.status(401).send({success:false,message:"Invalid password"});
         }
 
+        if(doc.isBlock) {
+            return res.status(403).send({success:false,message:"Blocked By Admin"});
+        }
+
         if(doc.isVerified) {
-            return res.status(200).send({success:true,message:"Login Success"});
+
+            const payload= {email:doc.email};
+            const token= jwt.sign(payload,process.env.Jwt_Key_User);
+
+            return res.status(200).send({success:true,message:"Login Success",token});
+
         }else {
             return res.status(403).send({success:false,message:"notVerified"});
         }
@@ -140,4 +151,17 @@ const resetPassword= async(req,res)=>{
     return res.status(200).send({success:true,message:"Reset Success"});
 }
 
-export { register, verifyEmail, verifyUser,userLogin,generateOtp,resetPassword }
+const googleAuth= async(req,res)=>{
+
+    const user = req.user;
+    
+    if(user) {
+
+        const payload = {email:user.email};
+        const token= await jwt.sign(payload,process.env.Jwt_Key_User);
+
+        return res.redirect(`http://localhost:5173/auth/google/success/${token}`);
+    }
+}
+
+export { register, verifyEmail, verifyUser,userLogin,generateOtp,resetPassword,googleAuth }

@@ -2,8 +2,7 @@ import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Search, Heart, User, ShoppingBag } from "lucide-react";
 
 export default function Navbar() {
-
-  const nav=useNavigate();
+  const nav = useNavigate();
 
   return (
     <header className="border-b">
@@ -11,13 +10,11 @@ export default function Navbar() {
         SIGN UP TO GET A 15% DISCOUNT NEWSLETTER
       </div>
       <nav className="flex items-center justify-between px-8 py-4 bg-white shadow-sm">
-    
-        <Link to="/" className="text-2xl font-bold">
+        <Link to="/" className="ml-5 text-2xl font-bold">
           Slick
         </Link>
 
-       
-        <div className="flex gap-8 text-gray-700">
+        <div className="ml-15 flex gap-8 text-gray-700">
           <NavLink to="/" className="hover:text-black" end>
             Home
           </NavLink>
@@ -35,8 +32,18 @@ export default function Navbar() {
         <div className="flex items-center gap-4 text-gray-700">
           <Search className="cursor-pointer hover:text-black" />
           <Heart className="cursor-pointer hover:text-black" />
-          <User className="cursor-pointer hover:text-black" onClick={()=>nav("/login")}/>
-          <ShoppingBag className="cursor-pointer hover:text-black" />
+          <User
+            className="cursor-pointer hover:text-black"
+            onClick={() =>
+              localStorage.getItem("userToken")
+                ? nav("/profile")
+                : nav("/login")
+            }
+          />
+          <ShoppingBag
+            className="cursor-pointer hover:text-black"
+            onClick={() => nav("/cart")}
+          />
         </div>
       </nav>
     </header>

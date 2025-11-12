@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-import { verifyEmail, verifyUser } from '../../API/userApi';
+import { verifyEmail, verifyUser } from '../../Services/userApi';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { generateOtp } from '../../API/OtpApi';
+import { generateOtp } from '../../Services/OtpApi';
 
 function Verify() {
 
@@ -63,7 +63,7 @@ function Verify() {
 
     return (
         <div className="flex items-center justify-center">
-            <div className="bg-white shadow-sm rounded-lg p-8 w-[90%] max-w-md text-center border border-gray-200">
+            <div className="bg-white rounded-lg p-8 w-[90%] max-w-md text-center border text-xs font-bold">
                 <h2 className="text-2xl font-semibold mb-2">Verify Your Email</h2>
                 <p className="text-gray-600 mb-6">
                     We've sent a verification code to your email address. Please enter the code below.

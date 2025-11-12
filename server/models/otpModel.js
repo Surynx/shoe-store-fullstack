@@ -3,7 +3,8 @@ import mongoose from "mongoose";
 const OtpSchema=new mongoose.Schema({
     email:{
         type:String,
-        required:true
+        required:true,
+        unique:true
     },
     code:{
         type:String,
@@ -12,7 +13,7 @@ const OtpSchema=new mongoose.Schema({
     createdAt:{
         type:Date,
         default:Date.now,
-        expires:100
+        expires:50
     }
 });
 

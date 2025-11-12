@@ -2,9 +2,10 @@ import React from 'react'
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from 'react-router-dom';
-import { userLogin } from '../../API/userApi';
+import { googleAuth, userLogin } from '../../Services/userApi';
 import toast from 'react-hot-toast';
-import { generateOtp } from '../../API/OtpApi';
+import { generateOtp } from '../../Services/OtpApi';
+import { AwardIcon } from 'lucide-react';
 
 export default function UserLogin() {
 
@@ -18,8 +19,11 @@ export default function UserLogin() {
       let res=await userLogin(data);
 
       if(res.data.success) {
+
+        localStorage.setItem("userToken",res.data.token);
         toast.success(res.data.message);
-        nav("/");
+        nav("/",{replace:true});
+
       }
 
     }catch(err) {
@@ -41,14 +45,20 @@ export default function UserLogin() {
     }
   }
 
+  const handleGoogleAuth= async()=>{
+
+     window.location.href = `${import.meta.env.VITE_BASE_URL}/user/auth/google`;
+
+  }
+
   return (
     <div className="flex justify-center items-center bg-gray-50 px-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
+      <div className="bg-white p-8 rounded-lg border text-sm w-2xl max-w-sm">
         <h2 className="text-2xl font-bold text-center mb-8">Login</h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-bold text-gray-700 mb-1">
               Email
             </label>
             <input
@@ -61,7 +71,7 @@ export default function UserLogin() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-bold text-gray-700 mb-1">
               Password
             </label>
             <input
@@ -71,7 +81,7 @@ export default function UserLogin() {
               className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black"
               required
             />
-            <p className="text-right text-xs text-gray-500 mt-2 cursor-pointer hover:underline" onClick={()=>nav("/forgotpassword")}>
+            <p className="text-right text-xs text-gray-500 mt-2 cursor-pointer hover:text-gray-600 font-bold focus:" onClick={()=>nav("/forgotpassword")}>
               Forgot Password?
             </p>
           </div>
@@ -92,7 +102,7 @@ export default function UserLogin() {
         </div>
 
 
-        <button className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-md hover:bg-gray-100 transition">
+        <button onClick={handleGoogleAuth} className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-md hover:bg-gray-100 transition">
           <FcGoogle className="text-xl" />
           Continue with Google
         </button>

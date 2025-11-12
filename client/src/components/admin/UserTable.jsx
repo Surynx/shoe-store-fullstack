@@ -1,21 +1,15 @@
-import { blockUser, getAllusers } from '../../API/adminApi';
+import { blockUser } from '../../Services/adminApi';
 import "@fortawesome/fontawesome-free/css/all.min.css";
-import { useQuery,useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 
 
-function User() {
+function UserTable({data,isLoading}) {
 
   const QueryClient = useQueryClient();
 
-  const { data,isLoading,isError } = useQuery({
-    queryKey:["UsersInfo"],
-    queryFn:getAllusers
-    
-  });
-
-  let userInfo=data?.data || [];
+  const userInfo= data?.data?.userDocs || [];
 
   const handleBlock= async(user)=>{
       
@@ -34,6 +28,7 @@ function User() {
             let res= await blockUser({id:user._id,isBlock:user.isBlock});
 
             if(res.data.success) {
+              console.log(res);
               QueryClient.invalidateQueries("UsersInfo");
 
               let message = (!user.isBlock) ? `${user.name}-blocked` : `${user.name}-unblocked`;
@@ -44,22 +39,12 @@ function User() {
 
   if(isLoading) {
     return (
-      <p className=' text-green-800 font-bold'>Loading...</p>
+      <p className=' text-green-800 font-bold min-h-screen'>Loading...</p>
     )
   }
 
   return (
-    <div className="p-8 bg-gray-50 min-h-screen">
-
-      <div className="mb-6">
-        <input
-          type="text"
-          placeholder="Search users..."
-          className="w-full px-4 py-2 border border-gray-300 bg-white text-sm rounded-md focus:outline-none"
-        />
-      </div>
-
-      <div className="bg-white border border-gray-200">
+      <div className="bg-white border border-gray-200 min-h-screen">
         <table className="w-full text-sm text-gray-700">
           <thead className="bg-gray-100 text-gray-600 font-medium text-xs uppercase">
             <tr>
@@ -119,11 +104,11 @@ function User() {
                   </td>
 
                   <td className="py-4 px-6 text-center">
-                    <button className='text-red-500 cursor-pointer' onClick={()=>handleBlock(user)}>
+                    <button className='text-lg cursor-pointer' onClick={()=>handleBlock(user)}>
                       {user.isBlock ? (
-                        <i className="fa-solid fa-unlock"></i>
+                        <i className="fa-solid fa-check text-green-500 cursor-pointer"></i>
                       ) : (
-                        <i className="fa-solid fa-ban"></i>
+                        <i className="fa-solid fa-ban text-red-500"></i>
                       )}
                     </button>
                   </td>
@@ -142,9 +127,7 @@ function User() {
           </tbody>
         </table>
       </div>
-    </div>
-
-  )
+  );
 }
 
-export default User
+export default UserTable;

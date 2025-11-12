@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form"
-import { generateOtp } from "../../API/OtpApi";
+import { generateOtp } from "../../Services/OtpApi";
 import { useNavigate } from "react-router-dom";
 
 
@@ -20,7 +20,7 @@ function ForgetPassword() {
 
     return (
         <div className="flex items-center justify-center bg-gray-50">
-            <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-sm border border-gray-200 text-center">
+            <div className="bg-white w-full max-w-md p-8 rounded-xl border text-xs font-bold text-center">
                 <h2 className="text-2xl font-bold mb-2">Forgot Your Password?</h2>
                 <p className="text-gray-600 text-sm mb-6">
                     Enter your email address and we'll send you a link to reset your password.

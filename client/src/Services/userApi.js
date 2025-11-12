@@ -1,4 +1,4 @@
-import api from "./axios";
+import api from "./config/Api";
 
 const registerApi=async (data) => {
     let res = await api.post("/user/register",data);
@@ -19,8 +19,6 @@ const verifyUser=async (data)=> {
 const userLogin=async (data)=> {
     let res=await api.post("/user/login",data);
     return res;
-     
-    
 }
 
 const resetPassword=async (data)=> {
@@ -29,4 +27,9 @@ const resetPassword=async (data)=> {
     return res;
 }
 
-export { registerApi,verifyEmail,verifyUser,userLogin,resetPassword }
+const googleAuth= async ()=>{
+
+
+}
+
+export { registerApi,verifyEmail,verifyUser,userLogin,resetPassword,googleAuth }
