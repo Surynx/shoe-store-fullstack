@@ -1,5 +1,5 @@
 import express from "express";
-import { addAdmin, addBrand, addcategory, blockUser, editBrand, editCategory, fetchBrands, fetchCategory, fetchUsers, verifyAdmin } from "../controller/adminController.js";
+import { addAdmin, addBrand, addcategory, blockUser, editBrand, editCategory, fetchBrands, fetchCategory, fetchUsers, verifyAdmin } from "../controller/admin.controller.js";
 import { isAdmin } from "../middleware/isAdmin.js";
 import upload from "../middleware/multer.js";
 

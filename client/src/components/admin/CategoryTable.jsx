@@ -82,9 +82,9 @@ function CategoryTable({ data, isLoading }) {
                         <tr>
                             <td
                                 colSpan="6"
-                                className="text-center py-8 text-gray-400 text-sm italic"
+                                className="py-8 text-gray-400 text-sm italic text-center"
                             >
-                                No categories found.
+                             {(isLoading) ? "Loading...." :  "No categories found."}  
                             </td>
                         </tr>
                     )}

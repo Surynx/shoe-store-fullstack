@@ -1,4 +1,4 @@
-import { BoxIcon, Home, icons, LogOut, TagIcon, User } from 'lucide-react'
+import {  Folder, Home, LogOut, Package, TagIcon, User } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast';
 
@@ -11,9 +11,11 @@ function Sidebar() {
     }, {
         name: "Users", icon: <User color='black' size={20} />, path: "/admin/users"
     },{
-        name:"Category" , icon: <BoxIcon color='black' size={20}/> , path:"/admin/category"
+        name:"Category" , icon: <Folder color='black' size={20}/> , path:"/admin/category"
     },{
         name:"Brand", icon:<TagIcon color='black' size={20}/>, path:"/admin/brand"
+    },{
+        name:"Product", icon:<Package color='black' size={20}/>,path:"/admin/product"
     }]
 
     const logout=()=>{

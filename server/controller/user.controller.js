@@ -1,7 +1,7 @@
 import { compare, hash } from "bcrypt";
-import User from "../models/userModel.js"
+import User from "../models/user.models.js"
 import otpGenerator from "otp-generator"
-import Otp from "../models/otpModel.js";
+import Otp from "../models/otp.models.js";
 import jwt from "jsonwebtoken";
 
 const register = async (req, res) => {
@@ -154,6 +154,10 @@ const resetPassword= async(req,res)=>{
 const googleAuth= async(req,res)=>{
 
     const user = req.user;
+
+    if(user.isBlock) {
+        return res.redirect("http://localhost:5173/login");
+    }
     
     if(user) {
 

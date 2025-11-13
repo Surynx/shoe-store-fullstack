@@ -62,8 +62,8 @@ function BrandTable({ data, isLoading }) {
               ))
             ) : (
               <tr>
-                <td colSpan="5" className="p-6 text-center text-gray-500">
-                  No brands found.
+                <td colSpan="5" className="p-6 text-center italic text-gray-400">
+                  {(isLoading) ? "Loading...." :  "No Brand found."}
                 </td>
               </tr>
             )}

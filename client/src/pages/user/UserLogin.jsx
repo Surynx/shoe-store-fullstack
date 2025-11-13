@@ -102,7 +102,7 @@ export default function UserLogin() {
         </div>
 
 
-        <button onClick={handleGoogleAuth} className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-md hover:bg-gray-100 transition">
+        <button onClick={handleGoogleAuth} className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-md hover:bg-gray-100 transition cursor-pointer">
           <FcGoogle className="text-xl" />
           Continue with Google
         </button>

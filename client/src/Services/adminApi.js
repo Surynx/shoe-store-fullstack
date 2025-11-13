@@ -58,7 +58,7 @@ const getAllbrand= async(search,page)=> {
 }
 
 const editBrand= async(formData,id)=> {
-    console.log(id);
+
     let res=await api.patch(`/admin/brand/edit/${id}`,formData);
     return res;
 }

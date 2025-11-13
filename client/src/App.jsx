@@ -20,6 +20,8 @@ import CategoryManagment from "./pages/admin/CategoryManagment"
 import AddCategory from "./pages/admin/AddCategory"
 import BrandManagment from "./pages/admin/BrandManagment"
 import AddBrand from "./pages/admin/AddBrand"
+import ProductManagment from "./pages/admin/ProductManagment"
+import AddProduct from "./pages/admin/AddProduct"
 
 function App() {
 
@@ -39,6 +41,8 @@ function App() {
               <Route path="brand" element={<BrandManagment/>}/>
               <Route path="brand/add" element={<AddBrand/>}/>
               <Route path="brand/edit/:id" element={<AddBrand/>}/>
+              <Route path="product" element={<ProductManagment/>}/>
+              <Route path="product/add" element={<AddProduct/>}/>
             </Route>
 
           {/* User Route */}

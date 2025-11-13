@@ -9,7 +9,7 @@ function ForgetPassword() {
     const nav = useNavigate();
 
     const submit= async (data)=>{
-
+        
         localStorage.setItem("verifyEmail",data.email);
         localStorage.setItem("userEmail",data.email);
 

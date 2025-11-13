@@ -12,7 +12,7 @@ function Pagination({ page,setPage,totalPages }) {
           <span>&lt;</span> 
         </button>
 
-        <span className="my-auto px-2 py-1 font-bold text-xs text-gray-800">
+        <span className="my-auto px-2 py-1 font-bold text-xs text-green-800 shadow-amber-200 rounded-sm">
           Page {page} of {totalPages || 1}
         </span>
 

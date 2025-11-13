@@ -1,7 +1,7 @@
 import { addAdminService, verifyAdminService } from "../services/adminService.js"
-import User from "../models/userModel.js";
-import Category from "../models/categoryModel.js";
-import Brand from "../models/brandModel.js";
+import User from "../models/user.models.js";
+import Category from "../models/category.models.js";
+import Brand from "../models/brand.models.js";
 
 
 const addAdmin = async(req,res)=>{
@@ -66,7 +66,7 @@ const addcategory= async(req,res)=> {
 
     try{
     const { name,description,status } = req.body;
-    let doc = await Category.findOne({name});
+    let doc = await Category.findOne({name:{$regex:name,$options:"i"}});
 
     if(!doc) {
         await Category.create({
@@ -109,6 +109,12 @@ const editCategory= async(req,res) =>{
     let {id,data}= req.body;
     try{
 
+        let doc= await Category.findOne({name:{$regex:data.name,$options:"i"}});
+
+        if(doc) {
+            return res.status(409).send({success:false,message:"Category already exists!"});
+        }
+
         await Category.updateOne({_id:id},{
             name:data.name,
             description:data.description,
@@ -128,7 +134,7 @@ const addBrand= async(req,res)=>{
     const {name,status} = req.body;
     const {path} = req.file;
 
-    let doc= await Brand.findOne({name});
+    let doc= await Brand.findOne({name:{$regex:name,$options:"i"}});
 
     if(doc) {
         return res.status(409).send({message:"Brand Already Exists!"});
@@ -170,6 +176,12 @@ const editBrand= async(req,res)=>{
 
     const {id}= req.params;
     const {name,status} = req.body;
+
+    let doc= await Category.findOne({name:{$regex:name,$options:"i"}});
+
+        if(doc) {
+            return res.status(409).send({success:false,message:"Brand already exists!"});
+        }
 
     if(req.file) {
 

@@ -17,7 +17,8 @@ const categorySchema=new mongoose.Schema({
         default:true
     },
     offerId:{
-        type:mongoose.Schema.ObjectId
+        type:mongoose.Schema.ObjectId,
+        ref:"offers"
     }
 },{timestamps:true});
 

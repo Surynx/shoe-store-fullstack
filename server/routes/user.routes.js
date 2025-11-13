@@ -1,5 +1,5 @@
 import express from "express";
-import { generateOtp, googleAuth, register, resetPassword, userLogin, verifyEmail, verifyUser } from "../controller/userController.js";
+import { generateOtp, googleAuth, register, resetPassword, userLogin, verifyEmail, verifyUser } from "../controller/user.controller.js";
 import passport from "passport";
 
 const route=express.Router();

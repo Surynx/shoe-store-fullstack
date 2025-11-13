@@ -1,12 +1,12 @@
 import express, { urlencoded } from "express";
 import cors from "cors"
-import adminRoute from "./routes/adminRoutes.js";
-import userRoute from "./routes/userRoutes.js";
+import adminRoute from "./routes/admin.routes.js";
+import userRoute from "./routes/user.routes.js";
 import morgan from "morgan";
 import { configDotenv } from "dotenv";
-import { connectDb } from "./config/connectDb.js";
+import { connectDb } from "./config/db.config.js";
 import passport from "passport";
-import "./config/passport.js"
+import "./config/passport.config.js"
 
 const app=express();
 
