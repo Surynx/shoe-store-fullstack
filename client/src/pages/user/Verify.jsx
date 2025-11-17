@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form';
-import { verifyEmail, verifyUser } from '../../Services/userApi';
+import { verifyEmail, verifyUser } from '../../Services/user.api';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
-import { generateOtp } from '../../Services/OtpApi';
+import { generateOtp } from '../../Services/otp.api';
 
 function Verify() {
 

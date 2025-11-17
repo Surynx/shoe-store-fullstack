@@ -1,7 +1,7 @@
 import { User } from "lucide-react"
 import { useForm } from "react-hook-form"
 import toast, { Toaster } from "react-hot-toast";
-import { verifyAdmin } from "../../Services/adminApi";
+import { verifyAdmin } from "../../Services/admin.api";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 

@@ -23,7 +23,7 @@ app.use(morgan("dev"));
 app.use(passport.initialize());
 
 app.get("/",(req,res)=>{
-    res.send("Welcome to slick server");
+    res.send("Welcome to BuyNGo server");
 });
 
 app.use("/admin",adminRoute);

@@ -4,7 +4,7 @@ import SearchBox from "../../components/admin/SearchBox";
 import Pagination from "../../components/admin/Pagination";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getAllbrand } from "../../Services/adminApi";
+import { getAllbrand } from "../../Services/admin.api";
 import { useState } from "react";
 
 function BrandManagment() {

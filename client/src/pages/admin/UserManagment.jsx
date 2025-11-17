@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import Pagination from "../../components/admin/Pagination"
 import SearchBox from "../../components/admin/SearchBox"
 import UserTable from "../../components/admin/UserTable"
-import { getAllusers } from "../../Services/adminApi";
+import { getAllusers } from "../../Services/admin.api";
 import { useState } from "react";
 
 function UserManagment() {

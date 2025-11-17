@@ -1,7 +1,7 @@
 import React from 'react'
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { resetPassword } from '../../Services/userApi';
+import { resetPassword } from '../../Services/user.api';
 import toast from 'react-hot-toast';
 
 function ResetPassword() {

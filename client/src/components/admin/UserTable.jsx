@@ -1,4 +1,4 @@
-import { blockUser } from '../../Services/adminApi';
+import { blockUser } from '../../Services/admin.api';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useQueryClient } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
@@ -37,10 +37,14 @@ function UserTable({data,isLoading}) {
         }
   }
 
-  if(isLoading) {
+  if (isLoading) {
     return (
-      <p className=' text-green-800 font-bold min-h-screen'>Loading...</p>
-    )
+      <div className="flex items-center justify-center h-screen space-x-2">
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-.2s]"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-.4s]"></div>
+      </div>
+    );
   }
 
   return (

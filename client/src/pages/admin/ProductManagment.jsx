@@ -3,10 +3,27 @@ import { FaPlus } from 'react-icons/fa'
 import SearchBox from '../../components/admin/SearchBox'
 import Pagination from '../../components/admin/Pagination'
 import { useNavigate } from 'react-router-dom'
+import { useQuery } from '@tanstack/react-query'
+import { useState } from 'react'
+import { getAllProduct } from '../../Services/admin.api'
 
 function ProductManagment() { 
 
     const nav= useNavigate();
+
+    const [ search,setSearch ] = useState("");
+    const [ page,setPage ] = useState(1);
+    
+    const { data,isLoading } = useQuery({
+        queryKey:["productInfo",search,page],
+        queryFn:()=>getAllProduct(search,page)
+    });
+
+    const docs = data?.data?.docs;
+    const total_doc = data?.data?.total_doc || 0;
+    const limit = data?.data?.limit || 1;
+
+    const totalPages=Math.ceil(total_doc/limit);
 
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
@@ -23,11 +40,11 @@ function ProductManagment() {
                 </button>
             </div>
 
-            <SearchBox/>
+            <SearchBox search={search} setSearch={setSearch}/>
 
-            <ProductTable/>
+            <ProductTable docs={docs} isLoading={isLoading}/>
 
-            <Pagination/>
+            <Pagination page={page} setPage={setPage} totalPages={totalPages}/>
         </div>
   )
 }

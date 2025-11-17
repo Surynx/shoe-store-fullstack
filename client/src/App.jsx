@@ -22,6 +22,8 @@ import BrandManagment from "./pages/admin/BrandManagment"
 import AddBrand from "./pages/admin/AddBrand"
 import ProductManagment from "./pages/admin/ProductManagment"
 import AddProduct from "./pages/admin/AddProduct"
+import AddVariant from "./pages/admin/Variants"
+
 
 function App() {
 
@@ -43,6 +45,8 @@ function App() {
               <Route path="brand/edit/:id" element={<AddBrand/>}/>
               <Route path="product" element={<ProductManagment/>}/>
               <Route path="product/add" element={<AddProduct/>}/>
+              <Route path="product/add/:id" element={<AddProduct/>}/>
+              <Route path="product/varient/:id" element={<AddVariant/>}/>
             </Route>
 
           {/* User Route */}

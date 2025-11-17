@@ -14,7 +14,7 @@ function Layout() {
                 reverseOrder={false}
             />
             <Sidebar />
-            <div className="ml-64 w-full min-h-screen bg-gray-100 p-6">
+            <div className="ml-54 w-full min-h-screen bg-gray-100 p-6">
                 <Outlet />
             </div>
         </div>

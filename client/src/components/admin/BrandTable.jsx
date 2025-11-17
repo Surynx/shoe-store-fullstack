@@ -28,7 +28,7 @@ function BrandTable({ data, isLoading }) {
                 >
                   <td className="p-4">
                     <img
-                      src={`${import.meta.env.VITE_BASE_URL}/${brand.logo}`}
+                      src={brand.logo}
                       alt={brand.name}
                       className="w-12 h-12 object-fill rounded-2xl shadow-md border"
                     />

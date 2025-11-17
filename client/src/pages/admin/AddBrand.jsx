@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { FaArrowLeft } from "react-icons/fa";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { addBrand, editBrand } from "../../Services/adminApi";
+import { addBrand, editBrand } from "../../Services/admin.api";
 import { useEffect, useState } from "react";
 
 function AddBrand() {
@@ -10,6 +10,7 @@ function AddBrand() {
   const { state } = useLocation();
 
   const { register, handleSubmit, reset, watch } = useForm();
+  const [loading, setLoading] = useState(false);
 
   let logoFile = watch("logo");
 
@@ -17,20 +18,16 @@ function AddBrand() {
 
   const navigate = useNavigate();
 
-
   //preview logic
   useEffect(() => {
-    if ( logoFile && logoFile[0]) {
-
+    if (logoFile && logoFile[0]) {
       const fileReader = new FileReader();
       fileReader.onloadend = () => setPreview(fileReader.result);
       fileReader.readAsDataURL(logoFile[0]);
-
     } else {
       setPreview(null);
     }
   }, [logoFile]);
-
 
   //brand data fetch
   useEffect(() => {
@@ -39,7 +36,7 @@ function AddBrand() {
         name: state.name,
         status: state.status,
       });
-      setPreview(`${import.meta.env.VITE_BASE_URL}/${state.logo}`);
+      setPreview(state.logo);
     }
   }, []);
 
@@ -50,25 +47,32 @@ function AddBrand() {
     formData.append("logo", data.logo[0]);
     formData.append("status", data.status);
 
-    console.log(data);
     try {
-
       let res;
-
-      if(id) {
-        res= await editBrand(formData,id);
-
-      }else {
+      setLoading(true);
+      if (id) {
+        res = await editBrand(formData, id);
+      } else {
         res = await addBrand(formData);
       }
-      
+
       toast.success(res.data.message);
       navigate("/admin/brand", { replace: true });
-
     } catch (error) {
       toast.warning(error.response.data.message);
     }
+    setLoading(false);
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen space-x-2">
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-.2s]"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-.4s]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-10 bg-gray-50 min-h-screen">
@@ -84,7 +88,7 @@ function AddBrand() {
         </div>
       </div>
 
-      <div className="max-w-2xl mx-auto bg-white rounded-md p-8 border">
+      <div className="max-w-120 mx-auto bg-white rounded-md p-8 border">
         <h1 className="text-2xl font-bold text-gray-800 mb-8 text-center">
           Add New Brand
         </h1>

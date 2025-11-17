@@ -1,58 +1,197 @@
 import { FaArrowLeft } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
-import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
-import { FcCancel } from "react-icons/fc";
-import { AwardIcon, Cross, List, X } from "lucide-react";
-import { getAllbrand, getAllCategory } from "../../Services/adminApi";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { useEffect, useRef, useState } from "react";
+import { get, useForm } from "react-hook-form";
+import { X } from "lucide-react";
+import { addProduct, editProduct, getAllbrand, getAllCategory } from "../../Services/admin.api";
+import { Cropper } from "react-cropper";
+import "cropperjs/dist/cropper.css";
+import { toast } from "react-toastify";
 
 function AddProduct() {
-  const navigate = useNavigate();
 
-  const { register, handleSubmit, reset, watch } = useForm();
+  const {state} = useLocation();
+  const {id} = useParams();
 
-  const [images, setImages] = useState([]);
-  const [preview, setPreview] = useState([]);
+  const { register, handleSubmit, reset } = useForm();
 
-  const [categoryList , setCategoryList]= useState();
-  const [brandList , setBrandList]= useState();
+  const [categoryList, setCategoryList] = useState();
+  const [brandList, setBrandList] = useState();
 
-  useEffect(()=>{
+  const [loading,setLoading] = useState(false);
+
+  const [existingImages,setExistingImages] = useState([]);
+
+  useEffect(() => {
+
     async function getData() {
+      const categoryList = await getAllCategory();
+      const brandList = await getAllbrand();
 
-        const categoryList= await getAllCategory();
-        const brandList= await getAllbrand();
+      setCategoryList(categoryList.data.docs);
+      setBrandList(brandList.data.docs);
 
-        setCategoryList(categoryList.data.docs);
-        setBrandList(brandList.data.docs);
+      //edit data fetch
+      if(id) {
+       reset({
+       category:state.category_id._id,
+       brand:state.brand_id._id,
+       name:state.name,
+       description:state.description,
+       type:state.type,
+       status:state.status,
+       gender:state.gender
+       });
+
+       setPreview(state.productImages || []);
+       setExistingImages(state.productImages);
+    }
     }
 
     getData();
-    
-  },[]);
+  }, []);
 
-  const removeImage= (i)=>{
+  const navigate = useNavigate();
 
-    let update=preview.filter((url,index)=> index != i);
+  const [blobs, setBlob] = useState([]);
+  const [preview, setPreview] = useState([]);
+
+  const [cropImage, setCropImage] = useState(null);
+  const [showCropper, setShowCropper] = useState(false);
+
+  let cropperRef = useRef(null);
+
+  const removeImage = (i) => {
+    let update = preview.filter((url, index) => index != i);
     setPreview(update);
-  }
-
-  const handleImages = (event) => {
-
-    const file = event.target.files[0];
-    const url = URL.createObjectURL(file);
-
-    setPreview([...preview, url]);
+    setExistingImages(update);
   };
 
-  const submit= (data)=>{
+  const handleImages = (event) => {
+    const file = event.target.files[0];
 
+    if (!file) {
+      return;
+    }
+
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      setCropImage(reader.result);
+      setShowCropper(true);
+    };
+
+    reader.readAsDataURL(file);
+  };
+
+  const saveCropImage = () => {
+    const cropper = cropperRef.current.cropper;
+    const cropperCanvas = cropper.getCroppedCanvas({
+      width: 600,
+      height: 600,
+    });
+
+    //setting blob
+    cropperCanvas.toBlob((blob) => {
+      setBlob([...blobs, blob]);
+    });
+
+    const imageUrl = cropperCanvas.toDataURL("image/jpeg");
+    setPreview([...preview, imageUrl]);
+    setShowCropper(false);
+  };
+
+  //handle-submit
+  const submit = async(data) => {
+
+    setLoading(true);
+    const formData = new FormData();
+    formData.append("name", data.name);
+    formData.append("category_id",data.category);
+    formData.append("brand_id",data.brand);
+    formData.append("type",data.type);
+    formData.append("description",data.description);
+    formData.append("status",data.status);
+    formData.append("gender",data.gender);
+
+    blobs.map((blob,i)=>{
+
+      formData.append("productImages",blob,`${data.name}_image${i}.jpg`);
+    });
+
+    try{
+
+      let res;
+
+      if(id) {
+
+        formData.append("existingImages",JSON.stringify(existingImages));
+        res= await editProduct(formData,id);
+
+      }else {
+        res= await addProduct(formData);
+      }
+      
+      if(res) {
+        toast.success(res.data.message);
+        navigate("/admin/product");
+        setLoading(false);
+      }
+
+    }catch(error) {
+
+      setLoading(false)
+      toast.warning(error.response?.data?.message);
+
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen space-x-2">
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-.2s]"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-.4s]"></div>
+      </div>
+    );
   }
 
-
-
   return (
-    <div className="p-10 bg-gray-50 min-h-screen">
+    <div className="p-10 bg-gray-50 min-h-screen relative">
+      {showCropper ? (
+        <div className="inset-0 z-50 flex absolute justify-center backdrop-blur-xs items-center">
+          <div className="bg-white p-6 rounded-md shadow-lg w-[90%] max-w-lg">
+            <h2 className="text-lg font-semibold mb-4 text-center">
+              Crop Product Image
+            </h2>
+            <Cropper
+              src={cropImage}
+              ref={cropperRef}
+              style={{ height: 400, width: "100%" }}
+              aspectRatio={1}
+              viewMode={1}
+              guides={true}
+              dragMode="move"
+              cropBoxResizable={true}
+            />
+            <div className="flex justify-end gap-4 mt-4">
+              <button
+                onClick={() => setShowCropper(false)}
+                className="px-2 py-2 bg-gray-300 rounded-md hover:bg-gray-400 text-sm font-bold"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={saveCropImage}
+                className="px-2 py-1 bg-green-700 text-white rounded-md hover:bg-green-800 outline-none text-sm font-bold"
+              >
+                Crop & Save
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+
       <div className="flex justify-between items-center mb-10">
         <div className="flex items-center gap-3">
           <button
@@ -71,52 +210,100 @@ function AddProduct() {
         </h1>
 
         <form className="space-y-6" onSubmit={handleSubmit(submit)}>
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Category <span className="text-red-500">*</span>
-            </label>
-            <select className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none">
-              <option value="">Select category</option>
-              {categoryList?.length > 0 ?
-              categoryList.map((item,i)=><option key={i}>{item.name}</option>) :
-              null}
-            </select>
-          </div>
+        
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Category <span className="text-red-500">*</span>
+              </label>
+              <select
+                {...register("category")}
+                className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none"
+              >
+                <option value="">Select Category</option>
+                {categoryList?.length > 0
+                  ? categoryList.map((item, i) => (
+                      <option key={i} value={item._id}>{item.name}</option>
+                    ))
+                  : null}
+              </select>
+            </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Brand <span className="text-red-500">*</span>
-            </label>
-            <select className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none">
-              <option value="">Select brand</option>
-              {brandList?.length > 0 ?
-              brandList.map((item,i)=><option key={i}>{item.name}</option>) :
-              null}
-            </select>
-          </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Brand <span className="text-red-500">*</span>
+              </label>
+              <select
+                {...register("brand")}
+                className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none"
+              >
+                <option value="">Select brand</option>
+                {brandList?.length > 0
+                  ? brandList.map((item, i) => (
+                      <option key={i} value={item._id}>{item.name}</option>
+                    ))
+                  : null}
+              </select>
+            </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Product Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="Enter product name"
-              className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none placeholder-gray-400"
-            />
-          </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Product Name <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="text"
+                {...register("name")}
+                placeholder="Enter product name"
+                className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none placeholder-gray-400"
+              />
+            </div>
 
-          <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Description <span className="text-red-500">*</span>
-            </label>
-            <textarea
-              rows="4"
-              placeholder="Enter product description"
-              className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none resize-none placeholder-gray-400"
-            ></textarea>
-          </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Type of Shoes <span className="text-red-500">*</span>
+              </label>
+              <select
+                {...register("type")}
+                className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none"
+              >
+                <option value="">Select type</option>
+                <option value="Sneakers">Sneakers</option>
+                <option value="Running">Running</option>
+                <option value="Formal">Formal</option>
+                <option value="Casual">Casual</option>
+                <option value="Loafers">Loafers</option>
+                <option value="Sandals">Sandals</option>
+              </select>
+            </div>
 
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Gender <span className="text-red-500">*</span>
+              </label>
+              <select
+                {...register("gender")}
+                className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none"
+              >
+                <option value="">Select gender</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Unisex">Unisex</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2">
+              <label className="block text-sm font-semibold text-gray-700 mb-2">
+                Description <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                {...register("description")}
+                rows="3"
+                placeholder="Enter product description"
+                className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none resize-none placeholder-gray-400"
+              ></textarea>
+            </div>
+          </div>
+          
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
               Product Images <span className="text-red-500">*</span>
@@ -158,18 +345,19 @@ function AddProduct() {
               />
             </label>
           </div>
+
           {preview.length > 0 ? (
             <div className="w-full h-50 p-3 overflow-y-auto">
               <div className="flex flex-wrap gap-3">
                 {preview.map((url, i) => (
                   <div
                     key={i}
-                    className="w-44 h-40 rounded-md border border-gray-200 shadow-sm relative overflow-hidden">
+                    className="w-44 h-40 rounded-md border border-gray-200 shadow-sm relative overflow-hidden"
+                  >
                     <img src={url} className="w-full h-full object-cover" />
-                    
                     <button
                       type="button"
-                      onClick={()=>removeImage(i)}
+                      onClick={() => removeImage(i)}
                       className="bg-red-600 m-1 cursor-pointer animate-bounce text-white rounded-full p-1 absolute top-1 right-1 hover:bg-red-700"
                     >
                       <X size={12} />
@@ -180,7 +368,7 @@ function AddProduct() {
             </div>
           ) : null}
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mt-4">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">
                 Product Status
@@ -191,7 +379,11 @@ function AddProduct() {
             </div>
 
             <label className="relative inline-flex items-center cursor-pointer">
-              <input type="checkbox" className="sr-only peer" />
+              <input
+                {...register("status")}
+                type="checkbox"
+                className="sr-only peer"
+              />
               <div className="w-11 h-6 bg-gray-300 rounded-full peer-checked:bg-green-600 transition-colors duration-300"></div>
               <span className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-transform duration-300 peer-checked:translate-x-5"></span>
             </label>

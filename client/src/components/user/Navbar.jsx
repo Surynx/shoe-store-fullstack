@@ -10,8 +10,8 @@ export default function Navbar() {
         SIGN UP TO GET A 15% DISCOUNT NEWSLETTER
       </div>
       <nav className="flex items-center justify-between px-8 py-4 bg-white shadow-sm">
-        <Link to="/" className="ml-5 text-2xl font-bold">
-          Slick
+        <Link to="/" className="ml-4 text-2xl font-bold">
+          Buy<span className="text-orange-600">N</span>Go
         </Link>
 
         <div className="ml-15 flex gap-8 text-gray-700">

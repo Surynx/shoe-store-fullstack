@@ -18,6 +18,6 @@ const OtpSchema=new mongoose.Schema({
 });
 
 
-const Otp=mongoose.model("Otp",OtpSchema);
+const Otp=mongoose.model("otps",OtpSchema);
 
 export default Otp;

@@ -28,10 +28,10 @@ function Sidebar() {
     }
 
     return (
-        <div className="fixed left-0 top-0 h-screen w-64 bg-white border-r border-gray-200 flex flex-col justify-between">
+        <div className="fixed left-0 top-0 h-screen w-54 bg-white border-r border-gray-300 flex flex-col justify-between">
             <div>
-                <div className="p-6 border-b border-gray-100">
-                    <h1 className="text-xl font-bold text-orange-500">Slick.com</h1>
+                <div className="p-6 border-b border-gray-300">
+                    <h1 className="text-xl font-bold text-black">Buy<span className='text-orange-600'>N</span>Go</h1>
                     <div className="flex items-center gap-2 text-gray-500 font-bold text-xs">
                         <span>Admin Dashboard</span>
                     </div>

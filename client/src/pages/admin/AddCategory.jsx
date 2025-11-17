@@ -1,7 +1,7 @@
 import { useForm } from "react-hook-form";
 import { FaArrowLeft } from "react-icons/fa";
 import { useLocation, useNavigate, useParams } from "react-router-dom"
-import { addCategory, editCategory } from "../../Services/adminApi";
+import { addCategory, editCategory } from "../../Services/admin.api";
 import { toast } from 'react-toastify';
 import { useEffect } from "react";
 
@@ -62,7 +62,7 @@ function AddCategory() {
                 </div>
             </div>
 
-            <div className="max-w-2xl mx-auto bg-white rounded-md p-8 border">
+            <div className="w-120 mx-auto bg-white rounded-md p-8 border">
                 <h1 className="text-2xl font-bold text-gray-800 mb-8 text-center">
                     Add New Category
                 </h1>

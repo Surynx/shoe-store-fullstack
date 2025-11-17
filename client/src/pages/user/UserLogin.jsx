@@ -2,9 +2,9 @@ import React from 'react'
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from 'react-router-dom';
-import { googleAuth, userLogin } from '../../Services/userApi';
+import { googleAuth, userLogin } from '../../Services/user.api';
 import toast from 'react-hot-toast';
-import { generateOtp } from '../../Services/OtpApi';
+import { generateOtp } from '../../Services/otp.api';
 import { AwardIcon } from 'lucide-react';
 
 export default function UserLogin() {

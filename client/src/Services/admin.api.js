@@ -63,4 +63,46 @@ const editBrand= async(formData,id)=> {
     return res;
 }
 
-export { verifyAdmin,getAllusers,blockUser,addCategory,getAllCategory,editCategory,addBrand,getAllbrand,editBrand }
+const addProduct= async(formData)=> {
+    let res=await api.post("/admin/product/add",formData);
+    return res;
+}
+
+const getAllProduct= async(search,page)=> {
+    let res= await api.get("/admin/product",{
+        params:{
+            search:search,
+            page:page
+        }
+    });
+    return res;
+}
+
+const editProduct= async(formData,id)=> {
+
+    let res= await api.put(`/admin/product/edit/${id}`,formData);
+    return res;
+}
+
+const addVariant= async(data,id)=> {
+    let res= await api.post(`/admin/variant/add/${id}`,data);
+    return res;
+}
+
+const getAllVariant= async(id)=> {
+    let res= await api.get(`/admin/variant/${id}`);
+    return res;
+}
+
+const removeVariant= async(id)=> {
+    let res= await api.delete(`/admin/variant/remove/${id}`);
+    return res;
+}
+
+const updateVariant= async(data,id)=> {
+    let res= await api.patch(`/admin/variant/edit/${id}`,data);
+    return res;
+}
+
+
+export { verifyAdmin,getAllusers,blockUser,addCategory,getAllCategory,editCategory,addBrand,getAllbrand,editBrand,addProduct,getAllProduct,editProduct,addVariant,getAllVariant,removeVariant,updateVariant }

@@ -1,8 +1,8 @@
 import { compare, hash } from "bcrypt";
-import User from "../models/user.models.js"
-import otpGenerator from "otp-generator"
-import Otp from "../models/otp.models.js";
+import User from "../models/user.model.js"
+import Otp from "../models/otp.model.js";
 import jwt from "jsonwebtoken";
+import createNewOtp from "../utils/otp.utils.js";
 
 const register = async (req, res) => {
 
@@ -40,11 +40,7 @@ const generateOtp= async(req,res)=>{
     try{
     const {email} = req.body;
 
-    const otp_generated = otpGenerator.generate(6, {
-            upperCaseAlphabets: false,
-            specialChars: false,
-            lowerCaseAlphabets: false
-        });
+    const otp_generated = createNewOtp();
 
         console.log("OTP: "+otp_generated);
 
@@ -156,7 +152,7 @@ const googleAuth= async(req,res)=>{
     const user = req.user;
 
     if(user.isBlock) {
-        return res.redirect("http://localhost:5173/login");
+        return res.redirect(`${process.env.Client_LocalHost}/login`);
     }
     
     if(user) {
@@ -164,7 +160,7 @@ const googleAuth= async(req,res)=>{
         const payload = {email:user.email};
         const token= await jwt.sign(payload,process.env.Jwt_Key_User);
 
-        return res.redirect(`http://localhost:5173/auth/google/success/${token}`);
+        return res.redirect(`${process.env.Client_LocalHost}/auth/google/success/${token}`);
     }
 }
 

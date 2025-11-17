@@ -1,8 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { registerApi } from "../../Services/userApi";
+import { registerApi } from "../../Services/user.api";
 import toast from "react-hot-toast";
-import { generateOtp } from "../../Services/OtpApi";
+import { generateOtp } from "../../Services/otp.api";
 
 export default function Signup() {
 

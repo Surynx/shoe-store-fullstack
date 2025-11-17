@@ -1,5 +1,5 @@
 import { useForm } from "react-hook-form"
-import { generateOtp } from "../../Services/OtpApi";
+import { generateOtp } from "../../Services/otp.api";
 import { useNavigate } from "react-router-dom";
 
 

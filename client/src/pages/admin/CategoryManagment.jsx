@@ -5,7 +5,7 @@ import { Outlet, useNavigate } from "react-router-dom";
 import Pagination from "../../components/admin/Pagination";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getAllCategory } from "../../Services/adminApi";
+import { getAllCategory } from "../../Services/admin.api";
 
 function CategoryManagment() {
 
