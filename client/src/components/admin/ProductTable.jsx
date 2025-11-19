@@ -43,12 +43,12 @@ function ProductTable({ docs = [] }) {
                 </td>
 
                 <td className="py-4 px-5 text-center font-semibold italic text-gray-500">
-                  {doc.category_id?.name}
+                  {doc.category?.name}
                 </td>
 
                 <td className="py-4 px-5 flex justify-center font-bold">
                   <img
-                      src={doc.brand_id.logo}
+                      src={doc.brand.logo}
                       className="w-12 h-12 object-fill rounded-2xl border border-gray-400"
                     />
                 </td>

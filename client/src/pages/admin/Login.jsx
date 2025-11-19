@@ -1,9 +1,10 @@
-import { User } from "lucide-react"
+import { LucideFileExclamationPoint, User } from "lucide-react"
 import { useForm } from "react-hook-form"
 import toast, { Toaster } from "react-hot-toast";
 import { verifyAdmin } from "../../Services/admin.api";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
+import { FaExclamationCircle, FaExclamationTriangle } from "react-icons/fa";
 
 export default function Login() {
 
@@ -53,9 +54,8 @@ export default function Login() {
                 reverseOrder={false}
             />
             <div className="bg-white rounded-md border p-8 w-full max-w-sm">
-                <div className="text-center mb-5">
-                    <h1 className="text-xl font-bold text-gray-900">slick</h1>
-                    <p className="text-xs text-green-700 font-bold">Admin Portal</p>
+                <div className="flex font-bold text-sm ml-20 gap-1 text-green-800 w-80 h-10 mb-5">
+                    <FaExclamationCircle size={20}/> Slick Admin Panel
                 </div>
 
                 <div className="mb-5">

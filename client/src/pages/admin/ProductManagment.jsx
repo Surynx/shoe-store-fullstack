@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
 import { useState } from 'react'
 import { getAllProduct } from '../../Services/admin.api'
+import useDebounce from '../../hooks/useDebounce'
 
 function ProductManagment() { 
 
@@ -13,10 +14,12 @@ function ProductManagment() {
 
     const [ search,setSearch ] = useState("");
     const [ page,setPage ] = useState(1);
+
+    const debounce= useDebounce(search);
     
     const { data,isLoading } = useQuery({
-        queryKey:["productInfo",search,page],
-        queryFn:()=>getAllProduct(search,page)
+        queryKey:["productInfo",debounce,page],
+        queryFn:()=>getAllProduct(debounce,page)
     });
 
     const docs = data?.data?.docs;
@@ -30,7 +33,7 @@ function ProductManagment() {
             <div className="flex justify-between items-center mb-6">  
                 <div>
                 <h1 className="text-2xl font-bold text-gray-800">Product Managment</h1>
-                <h6 className='text-xs font-bold mt-3 text-orange-600 animate-pulse'>Total Products:</h6>
+                <h6 className='text-xs font-md mt-2'>Total Products: <span className='font-semibold'>{docs?.length}</span></h6>
                 </div>
                 <button
                     onClick={()=>nav("/admin/product/add")}

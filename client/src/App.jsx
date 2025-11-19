@@ -23,6 +23,7 @@ import AddBrand from "./pages/admin/AddBrand"
 import ProductManagment from "./pages/admin/ProductManagment"
 import AddProduct from "./pages/admin/AddProduct"
 import AddVariant from "./pages/admin/Variants"
+import Shop from "./pages/user/Shop"
 
 
 function App() {
@@ -58,6 +59,7 @@ function App() {
             <Route path="verify" element={<Verify/>}/>
             <Route path="forgotpassword" element={<ForgetPassword/>}/>
             <Route path="resetpassword" element={<ResetPassword/>}/>
+            <Route path="shop" element={<Shop/>}/>
             <Route path="Cart" element={<UserProtected><Cart/></UserProtected>}/>
             <Route path="profile" element={<Profile/>}>
               <Route index element={<UserInfo/>}/>

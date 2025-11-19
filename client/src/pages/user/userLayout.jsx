@@ -1,14 +1,17 @@
 import React from 'react'
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import Navbar from '../../components/user/Navbar'
 import Footer from '../../components/user/Footer'
 import toast, { Toaster } from "react-hot-toast"
 
 function UserLayout() {
+
+  let {pathname}=useLocation();
+
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen">
       <Navbar />
-      <main className="flex-1 pt-12 pb-6">
+      <main className="flex-1 pb-6">
         <div className="relative">
           <Toaster
             position="top-center"
@@ -17,7 +20,7 @@ function UserLayout() {
             }}
           />
         </div>
-        <div className="mt-0px mb-0">
+        <div className={(pathname == "/" || pathname == "/shop") ? "mt-0 mb-0" : "mt-12 mb-0"}>
           <Outlet />
         </div>
       </main>

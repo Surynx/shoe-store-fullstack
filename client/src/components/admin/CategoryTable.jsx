@@ -6,6 +6,8 @@ function CategoryTable({ data, isLoading }) {
     
     let categories = data?.data?.docs || [];
 
+    console.log(categories);
+
     return (
         <div className="bg-white border border-gray-200 rounded-md">
             <table className="w-full text-sm font-bold text-gray-700">
@@ -40,8 +42,8 @@ function CategoryTable({ data, isLoading }) {
                                 </td>
 
                                 <td className="py-4 px-6 text-gray-400 text-xs">
-                                    {cat.productCount
-                                        ? `${cat.productCount} products`
+                                    {cat.total_products
+                                        ? `${cat.total_products} products`
                                         : "No products"}
                                 </td>
 

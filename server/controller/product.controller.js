@@ -1,6 +1,4 @@
-import mongoose from "mongoose";
 import Product from "../models/product.model.js";
-
 
 const addProduct= async(req,res)=>{
 
@@ -50,10 +48,49 @@ const fetchProduct= async(req,res)=> {
 
         const query= search ? {name:{ $regex:search,$options:"i" }} : {};
         const limit=10;
-        const skip= (Number(page)-1)*limit;
+        const skip= (Number(page)-1)*limit || 0;
 
         const total_doc= await Product.countDocuments(query);
-        const docs= await Product.find(query).sort({createdAt:-1}).skip(skip).limit(limit).populate("category_id","name").populate("brand_id","logo");
+        
+        const docs= await Product.aggregate([{
+            $match:query
+        },{
+            $sort:{createdAt:-1}
+        },{
+            $skip:skip
+        },{
+            $limit:limit
+        },{
+            $lookup:{
+                from:"categories",
+                localField:"category_id",
+                foreignField:"_id",
+                as:"category"
+            }
+        },{
+            $unwind:"$category"
+        },{
+            $lookup:{
+                from:"brands",
+                localField:"brand_id",
+                foreignField:"_id",
+                as:"brand"
+            }
+        },{
+            $unwind:"$brand"
+        },{
+            $lookup:{
+                from:"variants",
+                localField:"_id",
+                foreignField:"product_id",
+                as:"variantList"
+            }
+        },{
+            $addFields:{stock:{$sum:"$variantList.stock"}}
+        },{
+            $project:{variantList:0,category:{_id:0,description:0,createdAt:0,updatedAt:0,status:0},
+            brand:{_id:0,description:0,createdAt:0,updatedAt:0,status:0,name:0}}
+        }]);
 
         return res.status(200).send({docs,total_doc,limit});
 
@@ -70,7 +107,7 @@ const editProduct= async(req,res)=> {
 
         const {id}= req.params;
  
-        let doc = await Product.findOne({_id:{$ne:id},name:{$regex:name,$options:"i"},brand_id});
+        let doc = await Product.findOne({_id:{$ne:id},name:{$regex:name,$options:"i"},brand_id:brand_id});
 
         if(doc) {
         return res.status(409).send({message:"Product in this Brand exists!"});
@@ -110,4 +147,122 @@ const editProduct= async(req,res)=> {
     }
 }
 
-export { addProduct,fetchProduct,editProduct }
+const fetchLatestProduct= async(req,res)=>{
+
+    try{
+
+    const docs= await Product.aggregate([
+        {
+        $sort:{createdAt:-1}
+        },{
+            $limit:8
+        },{
+            $lookup:{
+                from:"variants",
+                localField:"_id",
+                foreignField:"product_id",
+                as:"variantsList"
+            }
+        },{
+            $addFields:{
+                variants:{
+                   $sortArray:{input:"$variantsList",sortBy:{sales_price:1}}
+                },
+                total_stock:{
+                    $sum:"$variantsList.stock"
+                }
+            }
+        },{
+            $project:{variantsList:0}
+        }]);
+
+    return res.status(200).send({data:docs});
+
+    }catch(error) {
+
+        console.log("Error in LatestProduct Fetch",error);
+    }
+}
+
+const fetchShopProducts= async(req,res)=> {
+
+    try{
+
+        const { brand,gender,type,price,size,category }= req.body;
+        
+        const actual_price= (10000-price)
+        
+        const query= {} 
+
+        if(category && category.length > 0) {
+            query.category_name={$in:[...category]}
+        }
+
+        if(gender && gender.length > 0) {
+            query.gender={$in:[...gender]}
+        }
+
+        if(brand && brand.length > 0) {
+            query.brand_name={$in:[...brand]}
+        }
+
+        if(type && type.length > 0) {
+            query.type= {$in:[...type]}
+        }
+
+        if(price) {
+            query.variant_array={$elemMatch:{sales_price:{$lte:actual_price}}}
+        }
+
+        if(size) {
+            query.variant_array={$elemMatch:{sizet:{$eq:size}}}
+        }
+
+        const docs= await Product.aggregate([{
+            $lookup:{
+                from:"categories",
+                localField:"category_id",
+                foreignField:"_id",
+                as:"category"
+            }},{
+                $unwind:"$category"
+            },{
+                $lookup:{
+                    from:"brands",
+                    localField:"brand_id",
+                    foreignField:"_id",
+                    as:"brand"
+                }
+            },{
+                $unwind:"$brand"
+            },{
+                $lookup:{
+                    from:"variants",
+                    localField:"_id",
+                    foreignField:"product_id",
+                    as:"variants"
+                }
+            },{
+                $addFields:{
+                    category_name:"$category.name",
+                    brand_name:"$brand.name",
+                    total_stock:{$sum:"$variants.stock"},
+                    variant_array:{$sortArray:{input:"$variants" ,sortBy:{sales_price:1}}},
+                }
+            },{
+                $match:query
+            },{
+                $project:{category:0,brand:0,variants:0}
+            }
+        ]);
+
+        res.status(200).send({docs});
+
+    }catch(error) {
+
+        console.log("Error in fetchShopProducts",error);
+    }
+    
+}
+
+export { addProduct,fetchProduct,editProduct,fetchLatestProduct,fetchShopProducts }

@@ -55,7 +55,7 @@ const generateOtp= async(req,res)=>{
 
     }catch(err) {
 
-        console.log("Error in Otp Gneration");
+        console.log("Error in Otp Gneration",err);
     }
 
 }

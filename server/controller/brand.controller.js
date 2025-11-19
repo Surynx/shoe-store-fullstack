@@ -1,5 +1,6 @@
 import Brand from "../models/brand.model.js";
 import Category from "../models/category.model.js";
+import Product from "../models/product.model.js";
 
 const addBrand= async(req,res)=>{
 
@@ -30,13 +31,30 @@ const addBrand= async(req,res)=>{
 const fetchBrands= async(req,res)=>{
    try {
 
-    const {search,page} = req.query;
+    const {search= '',page= 1} = req.query;
     const query= search ? {name:{$regex:search,$options:"i"}} : {};
-    const limit=5;
-    const skip= (Number(page)-1)*limit;
+    const limit=6;
+    const skip= (Number(page)-1)*limit || 0;
 
     const total_doc= await Brand.countDocuments(query);
-    const docs= await Brand.find(query).sort({createdAt:-1}).skip(skip).limit(limit);
+    const docs= await Brand.aggregate([{
+        $match:query
+    },{
+        $skip:skip
+    },{
+        $limit:limit
+    },{
+        $lookup:{
+            from:"products",
+            localField:"_id",
+            foreignField:"brand_id",
+            as:"productList"
+        }
+    },{
+        $addFields:{total_products:{$size:"$productList"}}
+    },{
+        $project:{productList:0}
+    }]);
 
     return res.status(200).send({docs,total_doc,limit});
 
@@ -66,15 +84,44 @@ const editBrand= async(req,res)=>{
             logo:path
         });
 
-        return res.status(200).send({message:"Brand Updated!"});
-    }
+    }else {
 
-    await Brand.updateOne({_id:id},{
+        await Brand.updateOne({_id:id},{
         name,
         status
     });
 
+    }
+    
+    //product list/unlist logic
+
+    const updated_brand= await Brand.findOne({_id:id});
+    const products= await Product.find({brand_id:id});
+
+    for(let product of products) {
+
+        const category= await Category.findOne({_id:product.category_id});
+
+        const final_status = category.status && updated_brand.status;
+
+        await Product.updateOne({_id:product.id},{$set:{status:final_status}});
+    }
+
     return res.status(200).send({message:"Brand Updated!"});
 }
 
-export {addBrand,fetchBrands,editBrand}
+const getAllBrandForUser= async(req,res)=> {
+
+    try{
+
+    const docs=await Brand.find({},{name:1,logo:1,status:1});
+
+    return res.status(200).send({data:docs});
+    
+    }catch(error) {
+        console.log("Error in getAllBrandForUser")
+    }
+
+}
+
+export {addBrand,fetchBrands,editBrand,getAllBrandForUser}

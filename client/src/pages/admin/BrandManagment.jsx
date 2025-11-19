@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { getAllbrand } from "../../Services/admin.api";
 import { useState } from "react";
+import useDebounce from "../../hooks/useDebounce";
 
 function BrandManagment() {
 
@@ -13,12 +14,19 @@ function BrandManagment() {
 
   const [page,setPage]= useState(1);
   const [search,setSearch] = useState("");
+
+  const debounce= useDebounce(search);
   
   const {data,isLoading} = useQuery({
-    queryKey:["BrandInfo",page,search],
-    queryFn:()=>getAllbrand(search,page),
+    queryKey:["BrandInfo",debounce,page],
+    queryFn:()=>getAllbrand(debounce,page),
     keepPreviousData:true  
   });
+
+    const limit= data?.data?.limit;
+    
+    const total= data?.data?.total_doc;
+    const totalPages = Math.ceil(total / limit);
 
   return (
     <>
@@ -36,7 +44,7 @@ function BrandManagment() {
 
         <SearchBox search={search} setSearch={setSearch}/>
         <BrandTable data={data} isLoading={isLoading}/>
-        <Pagination page={page} setPage={page} totalPages={page}/>
+        <Pagination page={page} setPage={setPage} totalPages={totalPages}/>
 
       </div>
     </>

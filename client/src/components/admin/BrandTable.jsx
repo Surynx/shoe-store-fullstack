@@ -35,8 +35,8 @@ function BrandTable({ data, isLoading }) {
                   </td>
                   <td className="p-4 font-bold text-green-800">{brand.name}</td>
                   <td className="p-3 font-bold text-xs text-gray-500">
-                    {brand.productsCount
-                      ? `${brand.productsCount} products`
+                    {brand.total_products
+                      ? `${brand.total_products} products`
                       : "No products"}
                   </td>
                   <td className="p-2">

@@ -1,11 +1,9 @@
-import React from 'react'
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from 'react-router-dom';
-import { googleAuth, userLogin } from '../../Services/user.api';
+import { userLogin } from '../../Services/user.api';
 import toast from 'react-hot-toast';
 import { generateOtp } from '../../Services/otp.api';
-import { AwardIcon } from 'lucide-react';
 
 export default function UserLogin() {
 
@@ -52,7 +50,7 @@ export default function UserLogin() {
   }
 
   return (
-    <div className="flex justify-center items-center bg-gray-50 px-4">
+    <div className="flex justify-center items-center px-4">
       <div className="bg-white p-8 rounded-lg border text-sm w-2xl max-w-sm">
         <h2 className="text-2xl font-bold text-center mb-8">Login</h2>
 

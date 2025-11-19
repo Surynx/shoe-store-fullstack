@@ -6,6 +6,7 @@ import Pagination from "../../components/admin/Pagination";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAllCategory } from "../../Services/admin.api";
+import useDebounce from "../../hooks/useDebounce";
 
 function CategoryManagment() {
 
@@ -13,9 +14,11 @@ function CategoryManagment() {
     const [page,setPage]= useState(1);
     const [search,setSearch] = useState("");
 
+    const debounce= useDebounce(search);
+
     const { data,isLoading } = useQuery({
-        queryKey:["CategoryInfo",search,page],
-        queryFn:()=> getAllCategory(search,page),
+        queryKey:["CategoryInfo",debounce,page],
+        queryFn:()=> getAllCategory(debounce,page),
         keepPreviousData:true  
     });
 

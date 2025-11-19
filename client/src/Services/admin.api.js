@@ -105,4 +105,5 @@ const updateVariant= async(data,id)=> {
 }
 
 
-export { verifyAdmin,getAllusers,blockUser,addCategory,getAllCategory,editCategory,addBrand,getAllbrand,editBrand,addProduct,getAllProduct,editProduct,addVariant,getAllVariant,removeVariant,updateVariant }
+export { verifyAdmin,getAllusers,blockUser,addCategory,getAllCategory,editCategory,addBrand,getAllbrand,editBrand,addProduct,
+    getAllProduct,editProduct,addVariant,getAllVariant,removeVariant,updateVariant}

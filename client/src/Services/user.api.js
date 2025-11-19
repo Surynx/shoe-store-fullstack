@@ -27,9 +27,28 @@ const resetPassword=async (data)=> {
     return res;
 }
 
-const googleAuth= async ()=>{
+const getAllCategoryForUser= async()=> {
 
-
+    let res= await api.get("/user/category");
+    return res;
 }
 
-export { registerApi,verifyEmail,verifyUser,userLogin,resetPassword,googleAuth }
+const getAllBrandForUser= async()=> {
+
+    let res= await api.get("/user/brand");
+    return res;
+}
+
+const getAllLatestProducts= async()=>{
+
+    const res=await api.get("/user/latest/product");
+    return res;
+}
+
+const getShopProductList= async(filterValue)=> {
+    const res= await api.post("/user/shop/product",filterValue);
+    console.log(res.data.data);
+    return res;
+}
+
+export { registerApi,verifyEmail,verifyUser,userLogin,resetPassword,getAllLatestProducts,getShopProductList,getAllCategoryForUser,getAllBrandForUser }

@@ -4,15 +4,18 @@ import SearchBox from "../../components/admin/SearchBox"
 import UserTable from "../../components/admin/UserTable"
 import { getAllusers } from "../../Services/admin.api";
 import { useState } from "react";
+import useDebounce from "../../hooks/useDebounce";
 
 function UserManagment() {
 
     const [search,setSearch] = useState("");
     const [page,setPage] = useState(1);
 
+    const debounce= useDebounce(search);
+
     const { data,isLoading,isError } = useQuery({
-    queryKey:["UsersInfo",search,page],
-    queryFn:()=>getAllusers(search,page),
+    queryKey:["UsersInfo",debounce,page],
+    queryFn:()=>getAllusers(debounce,page),
     keepPreviousData: true
     
   });

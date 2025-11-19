@@ -12,7 +12,7 @@ function AddProduct() {
 
   const {state} = useLocation();
   const {id} = useParams();
-
+  
   const { register, handleSubmit, reset } = useForm();
 
   const [categoryList, setCategoryList] = useState();
@@ -34,8 +34,8 @@ function AddProduct() {
       //edit data fetch
       if(id) {
        reset({
-       category:state.category_id._id,
-       brand:state.brand_id._id,
+       category:state.category_id,
+       brand:state.brand_id,
        name:state.name,
        description:state.description,
        type:state.type,
@@ -285,8 +285,8 @@ function AddProduct() {
                 className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none"
               >
                 <option value="">Select gender</option>
-                <option value="Male">Male</option>
-                <option value="Female">Female</option>
+                <option value="Male">Men</option>
+                <option value="Female">Women</option>
                 <option value="Unisex">Unisex</option>
               </select>
             </div>

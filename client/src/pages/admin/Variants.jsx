@@ -60,6 +60,7 @@ export default function AddVariant() {
     }
 
     if(res) {
+      
       toast.success(res.data.message);
       QueryClient.invalidateQueries("varientInfo");
       reset();
