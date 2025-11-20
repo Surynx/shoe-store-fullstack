@@ -2,7 +2,8 @@ import React from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Navbar from '../../components/user/Navbar'
 import Footer from '../../components/user/Footer'
-import toast, { Toaster } from "react-hot-toast"
+import { Toaster } from "react-hot-toast"
+
 
 function UserLayout() {
 
@@ -30,3 +31,4 @@ function UserLayout() {
 }
 
 export default UserLayout
+

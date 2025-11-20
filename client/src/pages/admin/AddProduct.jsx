@@ -167,7 +167,7 @@ function AddProduct() {
             <Cropper
               src={cropImage}
               ref={cropperRef}
-              style={{ height: 400, width: "100%" }}
+              style={{ height: 600, width: "100%" }}
               aspectRatio={1}
               viewMode={1}
               guides={true}

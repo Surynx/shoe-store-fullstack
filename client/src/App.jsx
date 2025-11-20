@@ -24,6 +24,7 @@ import ProductManagment from "./pages/admin/ProductManagment"
 import AddProduct from "./pages/admin/AddProduct"
 import AddVariant from "./pages/admin/Variants"
 import Shop from "./pages/user/Shop"
+import Product from "./pages/user/Product"
 
 
 function App() {
@@ -60,6 +61,8 @@ function App() {
             <Route path="forgotpassword" element={<ForgetPassword/>}/>
             <Route path="resetpassword" element={<ResetPassword/>}/>
             <Route path="shop" element={<Shop/>}/>
+            <Route path="shop/product/:id" element={<Product/>}/>
+            <Route path="product/:id" element={<Product/>}/>
             <Route path="Cart" element={<UserProtected><Cart/></UserProtected>}/>
             <Route path="profile" element={<Profile/>}>
               <Route index element={<UserInfo/>}/>

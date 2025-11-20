@@ -46,9 +46,16 @@ const getAllLatestProducts= async()=>{
 }
 
 const getShopProductList= async(filterValue)=> {
+
     const res= await api.post("/user/shop/product",filterValue);
-    console.log(res.data.data);
     return res;
 }
 
-export { registerApi,verifyEmail,verifyUser,userLogin,resetPassword,getAllLatestProducts,getShopProductList,getAllCategoryForUser,getAllBrandForUser }
+const getProductData= async(id)=> {
+
+    const res= await api.get(`/user/product/${id}`);
+    return res;
+}
+
+export { registerApi,verifyEmail,verifyUser,userLogin,resetPassword,getAllLatestProducts,getShopProductList,getAllCategoryForUser,
+    getAllBrandForUser,getProductData }

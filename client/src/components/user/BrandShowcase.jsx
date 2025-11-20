@@ -1,48 +1,44 @@
 import brandQuery from "../../utils/user/brandQuery";
 
 function BrandShowcase() {
-
   const { data, isLoading } = brandQuery();
 
   const brandList = data?.data?.data || [];
-  
-  const active_brands= brandList.filter((brand)=>brand.status == true);
+
+  const active_brands = brandList.filter((brand) => brand.status == true);
 
   return (
-    <section className="bg-gray-100 py-15 sm:py-16 flex items-center">
+    <section className="bg-gray-100 w-full py-16 flex items-center">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-
-        <div className="text-center mb-12">
-          <h2 className="text-4xl font-serif text-black mb-2 text-center">
+        <div className="text-center mb-14">
+          <h2 className="text-4xl font-serif font-semibold text-gray-900">
             Featured Brands
           </h2>
-          <p className="text-center text-sm font-sans mb-10">
+          <p className="mt-2 text-sm font-sans text-gray-500">
             Shop from the world's leading brands
           </p>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-9 gap-6 sm:gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 justify-center items-center">
           {active_brands.map((brand) => (
-            <div key={brand.id} className="group cursor-pointer">
-              <div className="bg-gray-700 rounded-b-full p-1 flex items-center justify-center aspect-square">
+            <div
+              key={brand.id}
+              className="mx-auto flex flex-col items-center justify-center text-center cursor-pointer"
+            >
+              <div className="w-24 h-24 bg-white rounded-full shadow-sm p-3 flex items-center justify-center overflow-hidden">
                 <img
                   src={brand.logo}
                   alt={brand.name}
-                  className="w-full h-full rounded-b-full object-contain group-hover:grayscale-0 transition-all duration-300"
+                  className="max-w-full max-h-full object-contain rounded-full"
                 />
               </div>
-              <p className="text-center mt-3 text-sm font-bold text-gray-700 group-hover:text-black transition-colors">
+
+              <p className="mt-4 text-sm font-semibold text-gray-700 group-hover:text-black transition-all">
                 {brand.name}
               </p>
             </div>
           ))}
         </div>
-
-        {brandList.length === 0 && !isLoading && (
-          <div className="text-center py-12">
-            <p className="text-gray-500">No brands available</p>
-          </div>
-        )}
       </div>
     </section>
   );

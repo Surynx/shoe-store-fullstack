@@ -1,9 +1,12 @@
 import { useQuery } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
 import { getAllLatestProducts } from "../../Services/user.api";
+import { useNavigate } from "react-router-dom";
 
 
 export default function Latestproducts() {
+
+  const nav=useNavigate();
 
   const { data, isLoading } = useQuery({
     queryKey: ["productList"],
@@ -35,8 +38,9 @@ export default function Latestproducts() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           {active_products.map((product) => (
             <div
-              key={product.id}
+              key={product._id}
               className="group cursor-pointer"
+              onClick={()=>nav(`/product/${product._id}`)}
             >
 
               <div className="relative bg-gray-100 mb-3 overflow-hidden">
@@ -48,11 +52,11 @@ export default function Latestproducts() {
                   />
                 </div>
                 
-                <button
+                {/* <button
                   className="absolute top-3 right-3 p-2 bg-white rounded-full hover:opacity-80 transition-opacity"
                 >
                   <Heart size={18}/>
-                </button>
+                </button> */}
               </div>
 
               <div className="flex flex-col px-1">

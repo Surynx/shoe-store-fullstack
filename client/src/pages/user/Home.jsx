@@ -18,7 +18,7 @@ export default function HomePage() {
         />
         <div
           className="absolute bottom-0 w-full text-center px-4 py-10
-                  bg-gradient-to-t from-black/70 to-transparent text-white"
+                  bg-gradient-to-t from-black/80 to-transparent text-white"
         >
           <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
             KICKS THAT CAN’T MISS
@@ -35,15 +35,15 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="pt-12">
+      <section className="">
         <LatestProducts/>
       </section>
 
-      <section className="">
+      <section className="flex items-center justify-center">
         <BrandShowcase/>
       </section>
 
-      <section className="p-20 mt-8 text-center">
+      <section className="p-20 mt-2 text-center">
           <h2 className="text-2xl font-serif text-black mb-4 text-center">
             Our Sevices
           </h2>

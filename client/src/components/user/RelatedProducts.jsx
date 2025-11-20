@@ -1,27 +1,18 @@
-import { useLocation, useNavigate } from 'react-router-dom';
-import Breadcrumb from './Breadcrumb';
+import { useNavigate } from "react-router-dom";
 
-function ShopProducts({ data, isLoading }) {
+export default function RelatedProducts ({data}){
 
-  const nav= useNavigate();
-  const productsList = data?.data?.docs || [];
+  const productsList = data?.data?.relatedProducts|| [];
 
   const active_products= productsList.filter((product)=> product.status == true);
-   
-  const {pathname} = useLocation();
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-      </div>
-    );
-  }
+  const nav=useNavigate();
 
   return (
-    <div>
-        <Breadcrumb location={pathname}/>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-15 p-6">
+      <div>
+        <hr className="text-gray-200"/>
+         <h2 className="text-2xl font-semibold mt-8 text-center">You Might Also Like</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 p-6">
           {active_products.map((product) => (
             <div
               key={product.id}
@@ -63,7 +54,5 @@ function ShopProducts({ data, isLoading }) {
           ))}
         </div>
     </div>
-  )
-}
-
-export default ShopProducts
+  );
+};

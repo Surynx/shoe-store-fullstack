@@ -1,4 +1,5 @@
 import Product from "../models/product.model.js";
+import Variant from "../models/variant.model.js";
 
 const addProduct= async(req,res)=>{
 
@@ -265,4 +266,38 @@ const fetchShopProducts= async(req,res)=> {
     
 }
 
-export { addProduct,fetchProduct,editProduct,fetchLatestProduct,fetchShopProducts }
+const fetchProductData= async(req,res)=> {
+
+    try{
+    const {id}= req.params;
+    
+    const productDoc=await Product.findById({_id:id});
+    const variant_array= await Variant.find({product_id:id});
+
+    const relatedProducts= await Product.aggregate([{
+        $match:{category_id:productDoc.category_id,_id:{$ne:productDoc._id}}
+    },{
+        $lookup:{
+            from:"variants",
+            localField:"_id",
+            foreignField:"product_id",
+            as:"variants"
+        }},{
+            $addFields:{
+                total_stock:{$sum:"$variants.stock"},
+                variant_array:{$sortArray:{input:"$variants",sortBy:{price:1}}}
+            }
+        },{
+            $project:{variants:0}
+        }
+    ]);
+
+    return res.status(200).send({ productDoc,variant_array,relatedProducts });
+
+    }catch(error) {
+
+    }
+
+}
+
+export { addProduct,fetchProduct,editProduct,fetchLatestProduct,fetchShopProducts,fetchProductData }
