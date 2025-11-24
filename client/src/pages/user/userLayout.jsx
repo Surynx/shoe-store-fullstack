@@ -11,7 +11,7 @@ function UserLayout() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <Navbar />
+      <Navbar/>
       <main className="flex-1 pb-6">
         <div className="relative">
           <Toaster
@@ -21,7 +21,7 @@ function UserLayout() {
             }}
           />
         </div>
-        <div className={(pathname == "/" || pathname == "/shop") ? "mt-0 mb-0" : "mt-12 mb-0"}>
+        <div className={(pathname == "/" || pathname == "/shop") ? "mt-0 mb-0" : "mt-20 mb-10"}>
           <Outlet />
         </div>
       </main>

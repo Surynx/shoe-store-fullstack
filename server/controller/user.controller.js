@@ -2,7 +2,9 @@ import { compare, hash } from "bcrypt";
 import User from "../models/user.model.js"
 import Otp from "../models/otp.model.js";
 import jwt from "jsonwebtoken";
-import createNewOtp from "../utils/otp.utils.js";
+import createNewOtp from "../utils/otp.util.js";
+import STATUS from "../constants/status.constant.js";
+import sendEmail from "../utils/send-otp-mail.js";
 
 const register = async (req, res) => {
 
@@ -13,7 +15,7 @@ const register = async (req, res) => {
         let exist = await User.findOne({ email });
 
         if (exist) {
-            return res.status(200).send({ success: false })
+            return res.status(STATUS.SUCCESS.OK).send({ success: false })
         }
 
         const saltRound = 5;
@@ -27,7 +29,7 @@ const register = async (req, res) => {
 
         await user.save();
 
-        res.status(200).send({ success: true });
+        res.status(STATUS.SUCCESS.OK).send({ success: true });
 
     } catch (error) {
 
@@ -40,9 +42,17 @@ const generateOtp= async(req,res)=>{
     try{
     const {email} = req.body;
 
+    const exist= await Otp.findOne({email});
+
+    if(exist) {
+        await Otp.deleteOne({email});
+    }
+
     const otp_generated = createNewOtp();
 
         console.log("OTP: "+otp_generated);
+
+        await sendEmail(email,otp_generated);
 
         let otp = await Otp.create({
             email,
@@ -51,7 +61,7 @@ const generateOtp= async(req,res)=>{
 
         await otp.save();
 
-        return res.status(200).send({success:true});
+        return res.status(STATUS.SUCCESS.OK).send({success:true});
 
     }catch(err) {
 
@@ -69,10 +79,10 @@ const verifyEmail = async (req, res) => {
         let doc = await Otp.findOne({ email });
 
         if (doc?.code == otp) {
-            res.status(200).send({ success: true, message: "Email Verified" });
+            res.status(STATUS.SUCCESS.OK).send({ success: true, message: "Email Verified" });
             await Otp.deleteOne({email});
         } else {
-            res.status(200).send({ success: false, message: "Wrong Otp" });
+            res.status(STATUS.ERROR.BAD_REQUEST).send({ success: false, message: "Wrong Otp" });
         }
     }catch(error) {
         console.log("Error in verifyEmail");
@@ -86,7 +96,7 @@ const verifyUser = async (req, res) => {
 
     const { email } = req.body;
     await User.updateOne({ email }, { isVerified: true });
-    return res.status(200).send({success:true,message:"User Verified..!"});
+    return res.status(STATUS.SUCCESS.OK).send({success:true,message:"User Verified..!"});
 
     }catch(error) {
         console.log("Error in verifyUser");
@@ -101,17 +111,17 @@ const userLogin = async (req,res) => {
         let doc= await User.findOne({email});
 
         if(!doc) {
-            return res.status(404).send({success:false,message:"User not found"});
+            return res.status(STATUS.ERROR.NOT_FOUND).send({success:false,message:"User not found"});
         }
 
         let isMatch=await compare(password,doc.password);
 
         if(!isMatch) {
-            return res.status(401).send({success:false,message:"Invalid password"});
+            return res.status(STATUS.ERROR.UNAUTHORIZED).send({success:false,message:"Invalid password"});
         }
 
         if(doc.isBlock) {
-            return res.status(403).send({success:false,message:"Blocked By Admin"});
+            return res.status(STATUS.ERROR.FORBIDDEN).send({success:false,message:"Blocked By Admin"});
         }
 
         if(doc.isVerified) {
@@ -119,10 +129,10 @@ const userLogin = async (req,res) => {
             const payload= {email:doc.email};
             const token= jwt.sign(payload,process.env.Jwt_Key_User);
 
-            return res.status(200).send({success:true,message:"Login Success",token});
+            return res.status(STATUS.SUCCESS.OK).send({success:true,message:"Login Success",token});
 
         }else {
-            return res.status(403).send({success:false,message:"notVerified"});
+            return res.status(STATUS.ERROR.FORBIDDEN).send({success:false,message:"notVerified"});
         }
 
     }catch(error) {
@@ -136,7 +146,7 @@ const resetPassword= async(req,res)=>{
     const doc = await User.findOne({email});
 
     if(!doc) {
-        return res.status(404).send({success:false,message:"User not found"});
+        return res.status(STATUS.ERROR.NOT_FOUND).send({success:false,message:"User not found"});
     }
 
     const saltRound = 5;
@@ -144,7 +154,7 @@ const resetPassword= async(req,res)=>{
 
     await User.updateOne({email},{password:hashed_pass});
 
-    return res.status(200).send({success:true,message:"Reset Success"});
+    return res.status(STATUS.SUCCESS.OK).send({success:true,message:"Reset Success"});
 }
 
 const googleAuth= async(req,res)=>{

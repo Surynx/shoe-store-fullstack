@@ -1,3 +1,4 @@
+import STATUS from "../constants/status.constant.js";
 import Brand from "../models/brand.model.js";
 import Category from "../models/category.model.js";
 import Product from "../models/product.model.js";
@@ -11,7 +12,7 @@ const addBrand= async(req,res)=>{
     let doc= await Brand.findOne({name:{$regex:name,$options:"i"}});
 
     if(doc) {
-        return res.status(409).send({message:"Brand Already Exists!"});
+        return res.status(STATUS.ERROR.CONFLICT).send({message:"Brand Already Exists!"});
     }
 
     await Brand.create({
@@ -20,7 +21,7 @@ const addBrand= async(req,res)=>{
         status
     });
 
-    return res.status(200).send({message:"Brand Added Successfully!"});
+    return res.status(STATUS.SUCCESS.CREATED).send({message:"Brand Added Successfully!"});
     
     }catch(error) {
         console.log("Error in Adding Brand!",error);
@@ -33,7 +34,7 @@ const fetchBrands= async(req,res)=>{
 
     const {search= '',page= 1} = req.query;
     const query= search ? {name:{$regex:search,$options:"i"}} : {};
-    const limit=6;
+    const limit=8;
     const skip= (Number(page)-1)*limit || 0;
 
     const total_doc= await Brand.countDocuments(query);
@@ -56,7 +57,7 @@ const fetchBrands= async(req,res)=>{
         $project:{productList:0}
     }]);
 
-    return res.status(200).send({docs,total_doc,limit});
+    return res.status(STATUS.SUCCESS.OK).send({docs,total_doc,limit});
 
    }catch(error) {
     console.log("Error in fetching Brands");
@@ -71,7 +72,7 @@ const editBrand= async(req,res)=>{
     let doc= await Category.findOne({name:{$regex:name,$options:"i"}});
 
         if(doc) {
-            return res.status(409).send({success:false,message:"Brand already exists!"});
+            return res.status(STATUS.ERROR.CONFLICT).send({success:false,message:"Brand already exists!"});
         }
 
     if(req.file) {
@@ -107,7 +108,7 @@ const editBrand= async(req,res)=>{
         await Product.updateOne({_id:product.id},{$set:{status:final_status}});
     }
 
-    return res.status(200).send({message:"Brand Updated!"});
+    return res.status(STATUS.SUCCESS.OK).send({message:"Brand Updated!"});
 }
 
 const getAllBrandForUser= async(req,res)=> {
@@ -116,7 +117,7 @@ const getAllBrandForUser= async(req,res)=> {
 
     const docs=await Brand.find({},{name:1,logo:1,status:1});
 
-    return res.status(200).send({data:docs});
+    return res.status(STATUS.SUCCESS.OK).send({data:docs});
     
     }catch(error) {
         console.log("Error in getAllBrandForUser")

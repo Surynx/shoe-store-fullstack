@@ -64,7 +64,7 @@ function App() {
             <Route path="shop/product/:id" element={<Product/>}/>
             <Route path="product/:id" element={<Product/>}/>
             <Route path="Cart" element={<UserProtected><Cart/></UserProtected>}/>
-            <Route path="profile" element={<Profile/>}>
+            <Route path="profile" element={<UserProtected><Profile/></UserProtected>}>
               <Route index element={<UserInfo/>}/>
             </Route>
           </Route>

@@ -1,3 +1,4 @@
+import STATUS from "../constants/status.constant.js";
 import Brand from "../models/brand.model.js";
 import Category from "../models/category.model.js";
 import Product from "../models/product.model.js";
@@ -15,10 +16,10 @@ const addcategory= async(req,res)=> {
         status
     });
        
-        return res.status(200).send({success:true,message:"New Category Added!"});
+        return res.status(STATUS.SUCCESS.CREATED).send({success:true,message:"New Category Added!"});
     }
 
-    return res.status(409).send({success:false,message:"Category already exists!"});
+    return res.status(STATUS.ERROR.CONFLICT).send({success:false,message:"Category already exists!"});
     }catch(error) {
         console.log("Error in adding category");
     }
@@ -37,6 +38,8 @@ const fetchCategory= async (req,res)=>{
 
         const total_doc= await Category.countDocuments(query);
         const docs= await Category.aggregate([{
+            $sort:{createdAt:-1}
+        },{
             $match:query
         },{
             $skip:skip
@@ -55,7 +58,7 @@ const fetchCategory= async (req,res)=>{
             $project:{productList:0}
         }]);
 
-        return res.status(200).send({docs,total_doc,limit});
+        return res.status(STATUS.SUCCESS.OK).send({docs,total_doc,limit});
 
     } catch (error) {
         console.log("Error in fetching category",error);
@@ -68,10 +71,10 @@ const editCategory= async(req,res) =>{
 
     try{
 
-        let doc= await Category.findOne({name:{$regex:data.name,$options:"i"},_id:{$ne:id}});
+        let doc= await Category.findOne({name:{$regex:`^${data.name}`,$options:"i"},_id:{$ne:id}});
 
         if(doc) {
-            return res.status(409).send({success:false,message:"Category already exists!"});
+            return res.status(STATUS.ERROR.CONFLICT).send({success:false,message:"Category already exists!"});
         }
         
 
@@ -96,7 +99,7 @@ const editCategory= async(req,res) =>{
             await Product.updateOne({_id:product.id},{$set:{status:final_status}});
         }
 
-        return res.status(200).send({success:true,message:"Category Updated"});
+        return res.status(STATUS.SUCCESS.OK).send({success:true,message:"Category Updated"});
 
     }catch(error) {
         console.log("Error in editCategory",error);
@@ -107,9 +110,9 @@ const getAllCategoryForUser= async(req,res)=> {
 
     try{
         
-    const docs=await Category.find({},{name:1});
+    const docs=await Category.find({},{name:1,status:1});
 
-    return res.status(200).send({data:docs});
+    return res.status(STATUS.SUCCESS.OK).send({data:docs});
 
     }catch(error) {
         console.log("Error in getAllCategoryForUser")

@@ -5,6 +5,7 @@ import Filter from '../../components/user/Filter'
 import ShopProducts from '../../components/user/ShopProducts'
 import { getShopProductList } from '../../Services/user.api';
 import { useQuery } from '@tanstack/react-query';
+import SearchBox from '../../components/user/SearchBox';
 
 
 
@@ -14,9 +15,11 @@ function Shop() {
 
   const [ filterCategory,setFilterCategory ]= useState([]);
 
+  let [text,setText] = useState("");
+
   useEffect(()=>{
-    filterValue.category=filterCategory;
-  },[filterCategory]);
+    setFilterValue({...filterValue,category:filterCategory,search:text});
+  },[filterCategory,text]);
 
   const { data, isLoading } = useQuery({
     queryKey: ["shopProducts",filterValue,filterCategory],
@@ -30,7 +33,8 @@ function Shop() {
       <p className="text-center text-sm font-mono mt-2">
         Discover curated styles crafted to elevate your everyday look.
       </p>
-      <CategoryList filterCategory={filterCategory} setFilterCategory={setFilterCategory}/>
+      <SearchBox text={text} setText={setText}/>
+      <CategoryList filterCategory={filterCategory} setFilterCategory={setFilterCategory} setFilterValue={setFilterValue} filterValue={filterValue}/>
       <div className="mt-10 flex gap-10">
         
         <Filter setFilterValue={setFilterValue}/>

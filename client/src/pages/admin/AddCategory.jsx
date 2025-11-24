@@ -4,12 +4,14 @@ import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { addCategory, editCategory } from "../../Services/admin.api";
 import { toast } from 'react-toastify';
 import { useEffect } from "react";
+import { values } from "lodash";
+import ErrorMessage from "../../components/admin/ErrorMessage";
 
 
 function AddCategory() {
 
     const navigate = useNavigate();
-    const { register, handleSubmit,reset } = useForm();
+    const { register, handleSubmit,reset,formState:{errors} } = useForm();
 
     const {id}= useParams();
     const {state}= useLocation();
@@ -78,8 +80,9 @@ function AddCategory() {
                             name="name"
                             placeholder="e.g., shoes, sandles"
                             className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none placeholder-gray-400"
-                            {...register("name")}
+                            {...register("name",{required:"Empty field",pattern:{value:/^[A-Za-z&\-'. ]{2,50}$/,message:"Invalid Name"}})}
                         />
+                        <ErrorMessage elem={errors?.name}/>
                     </div>
 
 
@@ -91,8 +94,9 @@ function AddCategory() {
                             name="description"
                             placeholder="Write a short description for this category..."
                             className="w-full border border-gray-300 rounded-lg p-3 h-28 text-sm  focus:outline-none placeholder-gray-400"
-                            {...register("description")}
+                            {...register("description",{required:"Empty Field"})}
                         ></textarea>
+                        <ErrorMessage elem={errors?.description}/>
                     </div>
 
                     <div className="flex items-center justify-between">

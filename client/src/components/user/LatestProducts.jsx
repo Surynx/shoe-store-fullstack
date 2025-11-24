@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
 import { getAllLatestProducts } from "../../Services/user.api";
 import { useNavigate } from "react-router-dom";
+import Loading from "./Loading";
 
 
 export default function Latestproducts() {
@@ -19,9 +20,7 @@ export default function Latestproducts() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-      </div>
+      <Loading/>
     );
   }
 

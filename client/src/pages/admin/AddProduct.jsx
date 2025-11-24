@@ -7,13 +7,14 @@ import { addProduct, editProduct, getAllbrand, getAllCategory } from "../../Serv
 import { Cropper } from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import { toast } from "react-toastify";
+import ErrorMessage from "../../components/admin/ErrorMessage";
 
 function AddProduct() {
 
   const {state} = useLocation();
   const {id} = useParams();
   
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, reset, formState:{errors} } = useForm();
 
   const [categoryList, setCategoryList] = useState();
   const [brandList, setBrandList] = useState();
@@ -29,6 +30,7 @@ function AddProduct() {
       const brandList = await getAllbrand();
 
       setCategoryList(categoryList.data.docs);
+      console.log(categoryList.data.docs);
       setBrandList(brandList.data.docs);
 
       //edit data fetch
@@ -68,6 +70,12 @@ function AddProduct() {
   };
 
   const handleImages = (event) => {
+
+    if(preview.length == 4) {
+      toast.warning("Cannot Upload More!");
+      return 0;
+    }
+
     const file = event.target.files[0];
 
     if (!file) {
@@ -103,6 +111,11 @@ function AddProduct() {
 
   //handle-submit
   const submit = async(data) => {
+
+    if(preview.length == 0) {
+      toast.error("Upload Product Image!");
+      return 0;
+    }
 
     setLoading(true);
     const formData = new FormData();
@@ -217,7 +230,7 @@ function AddProduct() {
                 Category <span className="text-red-500">*</span>
               </label>
               <select
-                {...register("category")}
+                {...register("category",{required:"field is empty!"})}
                 className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none"
               >
                 <option value="">Select Category</option>
@@ -227,6 +240,7 @@ function AddProduct() {
                     ))
                   : null}
               </select>
+              <ErrorMessage elem={errors?.category}/>
             </div>
 
             <div>
@@ -234,7 +248,7 @@ function AddProduct() {
                 Brand <span className="text-red-500">*</span>
               </label>
               <select
-                {...register("brand")}
+                {...register("brand",{required:"field is empty!"})}
                 className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none"
               >
                 <option value="">Select brand</option>
@@ -244,6 +258,7 @@ function AddProduct() {
                     ))
                   : null}
               </select>
+              <ErrorMessage elem={errors.brand}/>
             </div>
 
             <div>
@@ -252,10 +267,11 @@ function AddProduct() {
               </label>
               <input
                 type="text"
-                {...register("name")}
+                {...register("name",{required:"field is empty!",pattern:{value:/^[A-Za-z&\-'. ]{2,50}$/,message:"Invalid Name"}})}
                 placeholder="Enter product name"
                 className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none placeholder-gray-400"
               />
+              <ErrorMessage elem={errors.name}/>
             </div>
 
             <div>
@@ -263,7 +279,7 @@ function AddProduct() {
                 Type of Shoes <span className="text-red-500">*</span>
               </label>
               <select
-                {...register("type")}
+                {...register("type",{required:"field is empty!"})}
                 className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none"
               >
                 <option value="">Select type</option>
@@ -274,6 +290,7 @@ function AddProduct() {
                 <option value="Loafers">Loafers</option>
                 <option value="Sandals">Sandals</option>
               </select>
+              <ErrorMessage elem={errors.type}/>
             </div>
 
             <div>
@@ -281,7 +298,7 @@ function AddProduct() {
                 Gender <span className="text-red-500">*</span>
               </label>
               <select
-                {...register("gender")}
+                {...register("gender",{required:"field is empty!"})}
                 className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none"
               >
                 <option value="">Select gender</option>
@@ -289,6 +306,7 @@ function AddProduct() {
                 <option value="Female">Women</option>
                 <option value="Unisex">Unisex</option>
               </select>
+              <ErrorMessage elem={errors.gender}/>
             </div>
 
             <div className="md:col-span-2">
@@ -296,11 +314,12 @@ function AddProduct() {
                 Description <span className="text-red-500">*</span>
               </label>
               <textarea
-                {...register("description")}
+                {...register("description",{required:"field is empty!"})}
                 rows="3"
                 placeholder="Enter product description"
                 className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none resize-none placeholder-gray-400"
               ></textarea>
+              <ErrorMessage elem={errors.description}/>
             </div>
           </div>
           

@@ -1,10 +1,14 @@
+import { Filter } from "lucide-react";
 import categoryQuery from "../../utils/user/categoryQuery";
+import Loading from "./Loading";
 
-function CategoryList({ filterCategory,setFilterCategory }) {
+function CategoryList({ filterCategory,setFilterCategory,setFilterValue,filterValue }) {
 
     const { data, isLoading } = categoryQuery();
 
     const categories= data?.data?.data || [];
+
+    const active_categories= categories.filter((c)=>c.status);
 
     const handleClick= (category)=> {
 
@@ -17,11 +21,20 @@ function CategoryList({ filterCategory,setFilterCategory }) {
         setFilterCategory([...filterCategory,category.name])
       }
     }
+
+    const handleSort= (value)=> {
+      setFilterValue({...filterValue,sort:value});
+    }
+
+    if(isLoading) {
+      return <Loading/>
+    }
     
 
   return (
+    <div className="relative">
      <div className='w-full h-10 flex gap-3 items-center justify-center text-sm mt-8'>
-      {categories.map((category) => (
+      {active_categories.map((category) => (
         <button
           key={category._id}
           onClick={()=>handleClick(category)}
@@ -32,6 +45,17 @@ function CategoryList({ filterCategory,setFilterCategory }) {
           {category.name}
         </button>
       ))}
+      </div>
+      <div className="absolute right-0 mt-8 border rounded-lg px-1 text-xs font-semibold py-1 flex">
+        <Filter size={15}/>
+      <select className="outline-none" onChange={(e)=>handleSort(e.target.value)}>
+      <option value="">Sort By</option>
+      <option value="priceLtoH">Price Low to High</option>
+      <option value="priceHtoL">Price High to Low</option>
+      <option value="atoz">aA to zZ</option>
+      <option value="ztoa">zZ to aA</option>
+      </select>
+      </div>
     </div>
   )
 }

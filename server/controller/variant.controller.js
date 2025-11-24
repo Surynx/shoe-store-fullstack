@@ -1,4 +1,5 @@
 import Variant from "../models/variant.model.js";
+import STATUS from "../constants/status.constant.js";
 
 const addVariant= async(req,res)=>{
 
@@ -9,7 +10,7 @@ const addVariant= async(req,res)=>{
     const doc= await Variant.findOne({product_id:id,size});
 
     if(doc) {
-        return res.status(409).send({message:"Size Already Exist!"});
+        return res.status(STATUS.ERROR.CONFLICT).send({message:"Size Already Exist!"});
     }
 
     await Variant.create({
@@ -21,7 +22,7 @@ const addVariant= async(req,res)=>{
         discount
     });
 
-    return res.status(200).send({message:"Variant Added!"});
+    return res.status(STATUS.SUCCESS.CREATED).send({message:"Variant Added!"});
 
 } catch(error) {
     console.log("Error in Add variant",error);
@@ -34,7 +35,7 @@ const fetchVariant= async(req,res)=>{
 
     const variantDocs= await Variant.find({product_id:id});
 
-    return res.status(200).send({variantDocs});
+    return res.status(STATUS.SUCCESS.OK).send({variantDocs});
 
     }catch(error) {
 
@@ -49,7 +50,7 @@ const removeVariant= async(req,res)=> {
         let doc= await Variant.deleteOne({_id:id});
 
         if(doc) {
-            return res.status(200).send({message:"Varient Removed!"});
+            return res.status(STATUS.SUCCESS.OK).send({message:"Varient Removed!"});
         }
 
 
@@ -72,7 +73,7 @@ const updateVariant= async(req,res)=> {
             discount
         });
 
-        return res.status(200).send({message:"Varient Updated"});
+        return res.status(STATUS.SUCCESS.OK).send({message:"Varient Updated"});
 
     }catch(error) {
         console.log(error);

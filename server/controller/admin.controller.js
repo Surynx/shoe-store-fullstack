@@ -1,5 +1,6 @@
-import { addAdminService, verifyAdminService } from "../services/adminService.js"
+import { addAdminService, verifyAdminService } from "../services/admin.service.js"
 import User from "../models/user.model.js";
+import STATUS from "../constants/status.constant.js";
 
 
 const addAdmin = async(req,res)=>{
@@ -17,9 +18,9 @@ const verifyAdmin=async (req,res) => {
    const {valid,token} = await verifyAdminService(req.body);
 
    if(valid) {
-        res.status(200).send({success:true,token});
+        res.status(STATUS.SUCCESS.OK).send({success:true,token});
    }else{
-        res.status(200).send({success:false});
+        res.status(STATUS.SUCCESS.OK).send({success:false});
    }
 }
 
@@ -40,7 +41,7 @@ const fetchUsers= async(req,res)=>{
 
     const total_doc= await User.countDocuments(query);
 
-    return res.status(200).send({userDocs,total_doc,limit});
+    return res.status(STATUS.SUCCESS.OK).send({userDocs,total_doc,limit});
 
     }catch(error) {
 
@@ -54,7 +55,7 @@ const blockUser= async(req,res)=>{
 
     await User.updateOne({_id:id},{isBlock:!isBlock});
 
-    return res.status(200).send({success:true,isBlock:!isBlock});
+    return res.status(STATUS.SUCCESS.OK).send({success:true,isBlock:!isBlock});
     
 }
 

@@ -1,6 +1,7 @@
 import Admin from "../models/admin.model.js";
 import { compare, hash } from "bcrypt";
 import jwt from "jsonwebtoken"
+import User from "../models/user.model.js";
 
 const addAdminService = async ({ name,email, password }) => {
 

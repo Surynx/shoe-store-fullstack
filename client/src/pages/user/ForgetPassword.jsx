@@ -12,10 +12,10 @@ function ForgetPassword() {
         
         localStorage.setItem("verifyEmail",data.email);
         localStorage.setItem("userEmail",data.email);
-
+        localStorage.setItem("flow","forgot");
         await generateOtp({email:data.email});
 
-        nav("/verify");
+        nav("/verify",{replace:true});
     }
 
     return (

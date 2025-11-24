@@ -1,4 +1,5 @@
 import brandQuery from "../../utils/user/brandQuery";
+import Loading from "./Loading";
 
 function BrandShowcase() {
   const { data, isLoading } = brandQuery();
@@ -6,6 +7,10 @@ function BrandShowcase() {
   const brandList = data?.data?.data || [];
 
   const active_brands = brandList.filter((brand) => brand.status == true);
+
+  if(isLoading) {
+    return <Loading/>
+  }
 
   return (
     <section className="bg-gray-100 w-full py-16 flex items-center">

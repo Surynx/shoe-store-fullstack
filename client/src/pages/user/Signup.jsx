@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { registerApi } from "../../Services/user.api";
 import toast from "react-hot-toast";
 import { generateOtp } from "../../Services/otp.api";
+import ErrorMessage from "../../components/admin/ErrorMessage";
 
 export default function Signup() {
 
-    const { register, handleSubmit, reset, formState } = useForm();
+    const { register, handleSubmit, reset, formState:{errors} } = useForm();
     const nav = useNavigate();
 
     const onSubmit = async (data) => {
@@ -21,6 +22,7 @@ export default function Signup() {
         if (res.data.success) {
 
             localStorage.setItem("verifyEmail", data.email);
+            localStorage.setItem("flow","signup");
 
             reset();
             toast('Please Verify Your Mail', {
@@ -48,12 +50,13 @@ export default function Signup() {
                             Full Name
                         </label>
                         <input
-                            {...register("name")}
-                            type="text"
+                            {...register("name",{ required: "field is required" ,pattern:{value:/^[A-Za-z&\-'. ]{2,50}$/,message:"Invalid Name"}})}
+                         
                             placeholder="Enter your full name"
                             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black"
                             required
                         />
+                        <ErrorMessage elem={errors?.name}/>
                     </div>
 
 
@@ -62,12 +65,13 @@ export default function Signup() {
                             Email
                         </label>
                         <input
-                            {...register("email")}
-                            type="email"
+                            {...register("email",{required:"Empty filed"})}
+                           
                             placeholder="Enter your email"
                             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black"
                             required
                         />
+                        <ErrorMessage elem={errors?.email}/>
                     </div>
 
 
@@ -77,7 +81,7 @@ export default function Signup() {
                         </label>
                         <input
                             {...register("password", {
-                                required: "Field is required", pattern: {
+                                required: "Field is required", pattern: {value:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
                                     
                                     message: "Not Strong One..!"
                                 }
@@ -87,7 +91,7 @@ export default function Signup() {
                             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black"
                             required
                         />
-                        <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.password?.message ? `${formState.errors.password?.message}` : null}</p>
+                        <ErrorMessage elem={errors.password}/>
                     </div>
 
                     <div>
@@ -96,7 +100,7 @@ export default function Signup() {
                         </label>
                         <input
                             {...register("confirmPassword", {
-                                required: "Field is required", pattern: {
+                                required: "Field is required", pattern: {value:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
                                    
                                     message: "Not Strong One..!"
                                 }
@@ -106,7 +110,7 @@ export default function Signup() {
                             className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black"
                             required
                         />
-                        <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.confirmPassword?.message ? `${formState.errors.confirmPassword?.message}` : null}</p>
+                        <ErrorMessage elem={errors?.confirmPassword}/>
                     </div>
 
                     <button
@@ -119,7 +123,7 @@ export default function Signup() {
 
                 <p className="text-center text-sm text-gray-600 mt-6">
                     Already have an account?{" "}
-                    <span onClick={() => nav("/login")} className="text-black font-medium cursor-pointer hover:underline">
+                    <span onClick={() => nav("/login",{replace:true})} className="text-black font-medium cursor-pointer hover:underline">
                         Login
                     </span>
                 </p>

@@ -4,12 +4,13 @@ import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { addBrand, editBrand } from "../../Services/admin.api";
 import { useEffect, useState } from "react";
+import ErrorMessage from "../../components/admin/ErrorMessage";
 
 function AddBrand() {
   const { id } = useParams();
   const { state } = useLocation();
 
-  const { register, handleSubmit, reset, watch } = useForm();
+  const { register, handleSubmit, reset, watch,formState:{errors} } = useForm();
   const [loading, setLoading] = useState(false);
 
   let logoFile = watch("logo");
@@ -103,8 +104,9 @@ function AddBrand() {
               name="name"
               placeholder="e.g., Nike, Adidas, Puma"
               className="w-full border border-gray-300 rounded-lg p-3 text-sm focus:outline-none placeholder-gray-400"
-              {...register("name", { required: true })}
+              {...register("name", { required: "field is required" ,pattern:{value:/^[A-Za-z&\-'. ]{2,50}$/,message:"Invalid Name"}})}
             />
+            <ErrorMessage elem={errors?.name}/>
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">

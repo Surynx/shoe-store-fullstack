@@ -1,5 +1,7 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Search, Heart, User, ShoppingBag, SearchIcon } from "lucide-react";
+import { useEffect } from "react";
+import toast from "react-hot-toast";
 
 export default function Navbar() {
   const nav = useNavigate();
@@ -11,7 +13,7 @@ export default function Navbar() {
       </div>
       <nav className="flex items-center justify-between px-8 py-3 bg-white shadow-sm">
         <Link to="/" className=" text-2xl font-bold">
-          XOXO<span className="text-sm"> .com</span>
+          COMET<span className="">⚡️</span>
         </Link>
 
         <div className="flex gap-8 text-gray-700 ml-40">

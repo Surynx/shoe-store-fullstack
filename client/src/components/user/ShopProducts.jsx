@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import Breadcrumb from './Breadcrumb';
+import Loading from './Loading';
 
 function ShopProducts({ data, isLoading }) {
 
@@ -11,11 +12,7 @@ function ShopProducts({ data, isLoading }) {
   const {pathname} = useLocation();
 
   if (isLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen bg-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-      </div>
-    );
+   return <Loading/>
   }
 
   return (

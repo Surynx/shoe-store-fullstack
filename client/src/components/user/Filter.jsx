@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useForm,useWatch } from "react-hook-form";
 import brandQuery from "../../utils/user/brandQuery";
+import { Scale, Scale3DIcon } from "lucide-react";
 
 export default function FilterSidebar({setFilterValue}) {
 
@@ -101,7 +102,7 @@ export default function FilterSidebar({setFilterValue}) {
 
       <div>
         <h3 className="text-sm font-semibold mb-3">Size</h3>
-        <select {...register("size")} className="border p-2 rounded w-full">
+        <select {...register("size")} className="px-2 py-1.5 rounded-2xl w-full bg-gray-600 text-white text-sm outline-none">
           <option value="">Select Size</option>
           {["UK 3", "UK 4", "UK 5", "UK 6", "UK 7", "UK 10"].map((size) => (
             <option key={size} value={size}>
@@ -109,6 +110,7 @@ export default function FilterSidebar({setFilterValue}) {
             </option>
           ))}
         </select>
+        
       </div>
     </div>
   );

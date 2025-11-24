@@ -1,3 +1,4 @@
+import STATUS from "../constants/status.constant.js";
 import Product from "../models/product.model.js";
 import Variant from "../models/variant.model.js";
 
@@ -8,7 +9,7 @@ const addProduct= async(req,res)=>{
     let doc = await Product.findOne({name:{$regex:name,$options:"i"},brand_id});
 
     if(doc) {
-        return res.status(409).send({message:"Product in this Brand exists!"});
+        return res.status(STATUS.ERROR.CONFLICT).send({message:"Product in this Brand exists!"});
     }
 
     try{
@@ -20,10 +21,12 @@ const addProduct= async(req,res)=>{
 
     const { description,category_id,type,status,gender }= req.body;
 
+    const caps_name= name.split("")[0].toUpperCase()+name.slice(1);
+
     let doc= await Product.create({
         category_id,
         brand_id,
-        name,
+        name:caps_name,
         gender,
         type,
         description,
@@ -32,7 +35,7 @@ const addProduct= async(req,res)=>{
     });
 
     if(doc) {
-        res.status(200).send({message:"Product Added successfully!"});
+        res.status(STATUS.SUCCESS.CREATED).send({message:"Product Added successfully!"});
     }
 
     }catch(error) {
@@ -93,7 +96,7 @@ const fetchProduct= async(req,res)=> {
             brand:{_id:0,description:0,createdAt:0,updatedAt:0,status:0,name:0}}
         }]);
 
-        return res.status(200).send({docs,total_doc,limit});
+        return res.status(STATUS.SUCCESS.OK).send({docs,total_doc,limit});
 
     }catch(error) {
         console.log("Error in product Fetching!",error);
@@ -111,7 +114,7 @@ const editProduct= async(req,res)=> {
         let doc = await Product.findOne({_id:{$ne:id},name:{$regex:name,$options:"i"},brand_id:brand_id});
 
         if(doc) {
-        return res.status(409).send({message:"Product in this Brand exists!"});
+        return res.status(STATUS.ERROR.CONFLICT).send({message:"Product in this Brand exists!"});
         }
 
         let productImages=[];
@@ -140,7 +143,7 @@ const editProduct= async(req,res)=> {
             status
          });
 
-         res.status(200).send({message:"Product Updated!"});
+         res.status(STATUS.SUCCESS.OK).send({message:"Product Updated!"});
 
 
     }catch(error) {
@@ -177,7 +180,7 @@ const fetchLatestProduct= async(req,res)=>{
             $project:{variantsList:0}
         }]);
 
-    return res.status(200).send({data:docs});
+    return res.status(STATUS.SUCCESS.OK).send({data:docs});
 
     }catch(error) {
 
@@ -189,11 +192,32 @@ const fetchShopProducts= async(req,res)=> {
 
     try{
 
-        const { brand,gender,type,price,size,category }= req.body;
+        const { brand,gender,type,price,size,category,sort,search }= req.body;
         
         const actual_price= (10000-price)
         
         const query= {} 
+
+        let sortOrder;
+
+        switch(sort) {
+
+            case "priceHtoL":
+                sortOrder={min_price:-1}
+                break;
+            case "priceLtoH":
+                sortOrder={min_price:1}
+                break;
+            case "atoz":
+                sortOrder={name:1}
+                break;
+            case "ztoa":
+                sortOrder={name:-1}
+                break;
+            default:
+                sortOrder={}
+                break;
+        }
 
         if(category && category.length > 0) {
             query.category_name={$in:[...category]}
@@ -211,15 +235,25 @@ const fetchShopProducts= async(req,res)=> {
             query.type= {$in:[...type]}
         }
 
-        if(price) {
+        if(size && price) {
+
+            query.variant_array={$elemMatch:{sales_price:{$lte:actual_price},size:{$eq:size}}}
+
+        }else if(price) {
+
             query.variant_array={$elemMatch:{sales_price:{$lte:actual_price}}}
+
+        }else if(size) {
+
+            query.variant_array={$elemMatch:{size:{$eq:size}}}
+
         }
 
-        if(size) {
-            query.variant_array={$elemMatch:{sizet:{$eq:size}}}
+        if(search && search.length > 0) {
+            query.name={$regex:search,$options:"i"}
         }
 
-        const docs= await Product.aggregate([{
+        const pipeline=[{
             $lookup:{
                 from:"categories",
                 localField:"category_id",
@@ -249,15 +283,24 @@ const fetchShopProducts= async(req,res)=> {
                     brand_name:"$brand.name",
                     total_stock:{$sum:"$variants.stock"},
                     variant_array:{$sortArray:{input:"$variants" ,sortBy:{sales_price:1}}},
+                    min_price:{$min:"$variants.sales_price"}
                 }
             },{
                 $match:query
             },{
                 $project:{category:0,brand:0,variants:0}
             }
-        ]);
+        ]
 
-        res.status(200).send({docs});
+        if(Object.keys(sortOrder).length > 0) {
+
+            pipeline.push({$sort:sortOrder});
+        }
+
+        const docs= await Product.aggregate(pipeline);
+        // console.log(docs)
+
+        res.status(STATUS.SUCCESS.OK).send({docs});
 
     }catch(error) {
 
@@ -292,7 +335,7 @@ const fetchProductData= async(req,res)=> {
         }
     ]);
 
-    return res.status(200).send({ productDoc,variant_array,relatedProducts });
+    return res.status(STATUS.SUCCESS.OK).send({ productDoc,variant_array,relatedProducts });
 
     }catch(error) {
 

@@ -12,7 +12,7 @@ export default function RelatedProducts ({data}){
       <div>
         <hr className="text-gray-200"/>
          <h2 className="text-2xl font-semibold mt-8 text-center">You Might Also Like</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 p-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 p-20">
           {active_products.map((product) => (
             <div
               key={product.id}

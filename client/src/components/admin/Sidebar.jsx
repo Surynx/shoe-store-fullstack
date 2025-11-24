@@ -1,4 +1,4 @@
-import {  Folder, Home, LogOut, Package, TagIcon, User } from 'lucide-react'
+import {  Folder, Home, Lightbulb, LogOut, Package, TagIcon, User } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast';
 
@@ -31,7 +31,7 @@ function Sidebar() {
         <div className="fixed left-0 top-0 h-screen w-54 bg-white border-r border-gray-300 flex flex-col justify-between">
             <div>
                 <div className="p-6 border-b border-gray-300">
-                    <h1 className="text-xl font-bold text-black">Buy<span className='text-orange-600'>N</span>Go</h1>
+                    <h1 className="text-xl font-bold text-black">COMET</h1>
                     <div className="flex items-center gap-2 text-gray-500 font-bold text-xs">
                         <span>Admin Dashboard</span>
                     </div>

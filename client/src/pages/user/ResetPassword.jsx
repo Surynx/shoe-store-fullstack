@@ -3,10 +3,11 @@ import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
 import { resetPassword } from '../../Services/user.api';
 import toast from 'react-hot-toast';
+import ErrorMessage from '../../components/admin/ErrorMessage';
 
 function ResetPassword() {
 
-    const { handleSubmit,reset,register,formState } = useForm();
+    const { handleSubmit,reset,register,formState:{errors} } = useForm();
     const nav = useNavigate();
 
     const submit = async(data)=>{
@@ -20,7 +21,7 @@ function ResetPassword() {
 
             toast.success("Reset Successfully!");
             localStorage.removeItem("userEmail");
-            nav("/login");
+            nav("/login",{replace:true});
 
             }catch(err) {
                 toast.error(err.response.data.message);
@@ -55,9 +56,13 @@ function ResetPassword() {
                             type="password"
                             placeholder="Enter new password"
                             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
-                            {...register("newpassword",{required:"filed is required"})}
+                            {...register("newpassword",{
+                                required: "Field is required", pattern: {value:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
+                                   
+                                    message: "Not Strong One..!"
+                                }})}
                         />
-                        <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.newpassword?.message ? `${formState.errors.newpassword?.message}` : null}</p>
+                        <ErrorMessage elem={errors?.newpassword}/>
                     </div>
 
                     <div className="text-left">
@@ -72,9 +77,13 @@ function ResetPassword() {
                             type="password"
                             placeholder="Confirm new password"
                             className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
-                            {...register("confirmpassword",{required:"field is required"})}
+                            {...register("confirmpassword",{
+                                required: "Field is required", pattern: {value:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
+                                   
+                                    message: "Not Strong One..!"
+                                }})}
                         />
-                        <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.confirmpassword?.message ? `${formState.errors.confirmpassword?.message}` : null}</p>
+                        <ErrorMessage elem={errors?.confirmpassword}/>
                     </div>
 
                     <button
@@ -87,7 +96,7 @@ function ResetPassword() {
 
                 <p className="text-sm text-gray-600 mt-6">
                     Remember your password?{" "}
-                    <a href="/login" className="font-semibold text-black hover:underline" onClick={()=>nav("/login")}>
+                    <a href="/login" className="font-semibold text-black hover:underline" onClick={()=>nav("/login",{replace:true})}>
                         Login
                     </a>
                 </p>

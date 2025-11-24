@@ -1,0 +1,59 @@
+
+const ROUTES= {
+    ADMIN:{
+        AUTH:{
+            ADD:"/add",
+            VERIFY:"/verify"
+        },
+        USER:{
+            FETCH:"/users",
+            BLOCK:"/block-user",
+        },
+        CATEGORY:{
+            ADD:"/category/add",
+            FETCH:"/category",
+            EDIT:"/category/edit",
+        },
+        BRAND:{
+            ADD:"/brand/add",
+            FETCH:"/brand",
+            EDIT:"/brand/edit/:id"
+        },
+        PRODUCT:{
+            ADD:"/product/add",
+            FETCH:"/product",
+            EDIT:"/product/edit/:id"
+        },
+        VARIENTS:{
+            ADD:"/variant/add/:id",
+            FETCH:"/variant/:id",
+            REMOVE:"/variant/remove/:id",
+            UPDATE:"/variant/edit/:id"
+        }
+    },
+    USER:{
+        AUTH:{
+            REGISTER:"/register",
+            VERIFY:"/verify",
+            VERIFY_USER:"/verifyuser",
+            GENERATE_OTP:"/generateotp",
+            LOGIN:"/login",
+            RESETPASSWORD:"/resetpassword",
+            GOOGLE_AUTH:"/auth/google",
+            GOOGLE_CALLBACK:"/auth/google/callback"
+        },
+        PRODUCT:{
+            LATEST:"/latest/product",
+            SHOP:"/shop/product",
+            FETCH_PRODUCT_DETAIL:"/product/:id"
+        },
+        CATEGORY:{
+            FETCH:"/category",
+        },
+        BRAND:{
+            FETCH:"/brand"
+        },
+    }
+}
+
+export default ROUTES;

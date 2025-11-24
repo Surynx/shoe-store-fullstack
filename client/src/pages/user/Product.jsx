@@ -2,9 +2,11 @@ import { useQuery } from "@tanstack/react-query";
 import ProductDetail from "../../components/user/ProductDetail";
 import ProductGallery from "../../components/user/ProductGallery";
 import { getProductData } from "../../Services/user.api";
-import { NavLink, useLocation, useParams } from "react-router-dom";
+import { useLocation, useParams } from "react-router-dom";
 import RelatedProducts from "../../components/user/RelatedProducts";
 import Breadcrumb from "../../components/user/Breadcrumb";
+import Loading from "../../components/user/Loading";
+import ProductReview from "../../components/user/ProductReview";
 
 export default function Product() {
 
@@ -21,9 +23,7 @@ export default function Product() {
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-white">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-black"></div>
-      </div>
+      <Loading/>
     );
   }
 
@@ -33,9 +33,10 @@ export default function Product() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid lg:grid-cols-2 gap-10">
 
         <ProductGallery data={data}/>
-
+        
         <ProductDetail data={data}/>
       </div>
+      <ProductReview/>
       <RelatedProducts data={data}/>
     </div>
   );

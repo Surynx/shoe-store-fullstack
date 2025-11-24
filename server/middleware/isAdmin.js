@@ -1,7 +1,9 @@
 import jwt from "jsonwebtoken"
 import Admin from "../models/admin.model.js";
+import STATUS from "../constants/status.constant.js";
 
 export const isAdmin= async(req,res,next)=>{
+    try{
 
     if(req?.headers?.authorization?.startsWith("Bearer")) {
 
@@ -14,12 +16,15 @@ export const isAdmin= async(req,res,next)=>{
         const admin= await Admin.findOne({email});
 
         if(!admin) {
-            return res.status(404).send("Admin not Found");
+            return res.status(STATUS.ERROR.NOT_FOUND).send("Admin not Found");
         }
 
         next();
 
     }else {
-        return res.status(401).send("UnAuthorized Access Denied");
+        return res.status(STATUS.ERROR.FORBIDDEN).send("UnAuthorized Access Denied");
+    }
+    }catch(error) {
+        error.response.redirect("/admin/login");
     }
 }

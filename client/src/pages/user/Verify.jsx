@@ -1,116 +1,153 @@
-import React, { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form';
-import { verifyEmail, verifyUser } from '../../Services/user.api';
-import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
-import { generateOtp } from '../../Services/otp.api';
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { verifyEmail, verifyUser } from "../../Services/user.api";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
+import { generateOtp } from "../../Services/otp.api";
+import Countdown from "react-countdown";
 
 function Verify() {
+  const { register, handleSubmit, reset } = useForm();
+  const nav = useNavigate();
 
-    const { register, handleSubmit,reset } = useForm();
-    const nav = useNavigate();
+  const endTime = localStorage.getItem("endTime");
 
-    let [timer,setTimer]=useState(99);
-    let interval;
+  const continueTime = endTime ? Number(endTime) : Date.now() + 60000;
 
-    const submit = async (data) => {
+  const [timer,setTimer]= useState(continueTime);
 
-        let array_otp = Object.values(data);
-        let otp = array_otp.join("");
-        let email = localStorage.getItem("verifyEmail");
+  if (!endTime) {
+    localStorage.setItem("endTime", continueTime);
+  }
 
-        let res = await verifyEmail({ otp, email });
+  const submit = async (data) => {
+    let array_otp = Object.values(data);
+    let otp = array_otp.join("");
+    let email = localStorage.getItem("verifyEmail");
+    try {
+      let res = await verifyEmail({ otp, email });
 
-        if (res.data.success) {
+      if (res.data.success) {
+        await verifyUser({ email });
 
-            await verifyUser({email});
+        localStorage.removeItem("verifyEmail");
+        localStorage.removeItem("endTime")
+        toast.success(res.data.message);
 
-            localStorage.removeItem("verifyEmail");
-            toast.success(res.data.message);
+        const flow = localStorage.getItem("flow");
 
-            if(localStorage.getItem("userEmail")) {
-
-                nav("/resetpassword");
-
-            }else {
-
-                 nav("/login");
-
-            }
-        } else {
-            toast.error(res.data.message);
+        if (flow == "forgot") {
+          nav("/resetpassword", { replace: true });
+        } else if (flow == "signup") {
+          nav("/login");
         }
 
+        localStorage.removeItem("flow");
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
     }
+  };
 
-    const handleResend= async ()=>{
+  const handleResend = async () => {
+    let email = localStorage.getItem("verifyEmail");
+    await generateOtp({ email });
+    reset();
 
-        let email=localStorage.getItem("verifyEmail");
-        await generateOtp({email});
-        reset();
-    }
+    const newEndTime= Date.now()+60000;
+    localStorage.setItem("endTime",newEndTime);
+    setTimer(newEndTime);
 
-    useEffect(()=>{
-        interval = setInterval(()=>{
-          setTimer((p)=>p-1);
-        },1000);
+  };
 
-    },[]);
+  return (
+    <div className="flex items-center justify-center">
+      <div className="bg-white rounded-lg p-8 w-[90%] max-w-md text-center border text-xs font-bold">
+        <h2 className="text-2xl font-semibold mb-2">Verify Your Email</h2>
+        <p className="text-gray-600 mb-6">
+          We've sent a verification code to your email address. Please enter the
+          code below.
+        </p>
 
-    if(timer<=0) {
-        clearInterval(interval);
-    }
+        <form onSubmit={handleSubmit(submit)}>
+          <div className="flex justify-center gap-3 mb-6">
+            <input
+              type="text"
+              maxLength="1"
+              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              {...register("one")}
+            />
+            <input
+              type="text"
+              maxLength="1"
+              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              {...register("two")}
+            />
+            <input
+              type="text"
+              maxLength="1"
+              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              {...register("three")}
+            />
+            <input
+              type="text"
+              maxLength="1"
+              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              {...register("four")}
+            />
+            <input
+              type="text"
+              maxLength="1"
+              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              {...register("five")}
+            />
+            <input
+              type="text"
+              maxLength="1"
+              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              {...register("six")}
+            />
+          </div>
 
-    return (
-        <div className="flex items-center justify-center">
-            <div className="bg-white rounded-lg p-8 w-[90%] max-w-md text-center border text-xs font-bold">
-                <h2 className="text-2xl font-semibold mb-2">Verify Your Email</h2>
-                <p className="text-gray-600 mb-6">
-                    We've sent a verification code to your email address. Please enter the code below.
-                </p>
+          <button
+            type="submit"
+            className="w-full bg-black text-white font-semibold py-3 rounded-md hover:bg-gray-800 transition cursor-pointer"
+          >
+            Verify Email
+          </button>
+        </form>
 
-                <form onSubmit={handleSubmit(submit)}>
-                    <div className="flex justify-center gap-3 mb-6">
-                        <input type="text" maxLength="1" className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                            {...register("one")} />
-                        <input type="text" maxLength="1" className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                            {...register("two")} />
-                        <input type="text" maxLength="1" className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                            {...register("three")} />
-                        <input type="text" maxLength="1" className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                            {...register("four")} />
-                        <input type="text" maxLength="1" className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                            {...register("five")} />
-                        <input type="text" maxLength="1" className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
-                            {...register("six")} />
-                    </div>
+        <div className="mt-4 text-sm text-gray-600">
+          Didn’t receive the code?{" "}
+          {
+            <Countdown
+              key={timer}
+              date={ Number(timer) }
+              renderer={({ seconds, completed }) => {
 
+                if (completed) {
+                  return (
                     <button
-                        type="submit"
-                        className="w-full bg-black text-white font-semibold py-3 rounded-md hover:bg-gray-800 transition cursor-pointer"
+                      className="text-black font-medium hover:underline cursor-pointer"
+                      onClick={handleResend}
                     >
-                        Verify Email
+                      Resend OTP
                     </button>
-                </form>
-
-                <div className="mt-4 text-sm text-gray-600">
-                    Didn’t receive the code?{" "}
-                    {(timer >= 0) ?
-                    <span className='text-red-400 font-bold text-sm'>...{timer}</span> 
-                    :
-                    <button
-                        className="text-black font-medium hover:underline cursor-pointer"
-                        type="button"
-                        onClick={handleResend}
-                    >
-                        Resend OTP
-                    </button>}
-                </div>
-            </div>
+                  );
+                }else {
+                    return(
+                        <span className="text-red-400 font-bold text-sm">
+                            00:{seconds}
+                        </span>
+                    )
+                }
+              }}
+            />
+          }
         </div>
-    );
-
-
+      </div>
+    </div>
+  );
 }
 
-export default Verify
+export default Verify;
