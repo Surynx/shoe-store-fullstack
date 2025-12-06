@@ -40,7 +40,7 @@ const ROUTES= {
             LOGIN:"/login",
             RESETPASSWORD:"/resetpassword",
             GOOGLE_AUTH:"/auth/google",
-            GOOGLE_CALLBACK:"/auth/google/callback"
+            GOOGLE_CALLBACK:"/auth/google/callback",
         },
         PRODUCT:{
             LATEST:"/latest/product",
@@ -53,6 +53,40 @@ const ROUTES= {
         BRAND:{
             FETCH:"/brand"
         },
+        ACCOUNT:{
+            FETCH:"/account/profile",
+            EDIT_INFO:"/account/profile/edit",
+            OTP_GENERATE_PHONE:"/account/phone/otp",
+            VERIFY_PHONE:"/account/phone/verify",
+            OTP_GENERATE_EMAIL:"/account/email/otp",
+            VERIFY_EMAIL:"/account/email/verify",
+            CHANGE_PASSWORD:"/account/changepassword"
+        },
+        ADDRESS:{
+            ADD:"/address/add",
+            FETCH:"/address",
+            DELETE:"/address/:id",
+            UPDATE:"/address/:id"
+        },
+        CART:{
+            ADD:"/cart/add",
+            FETCH:"/cart",
+            REMOVE:"/cart/remove/:id",
+            QUANTITY_INC:"/cart/increase/:id",
+            QUANTITY_DEC:"/cart/decrease/:id",
+            FETCH_COUNT:"/cart/count",
+            VALIDATE_CART_ITEMS:"/cart/validate"
+        },
+        CHECKOUT:{
+            FETCH:"/checkout"
+        },
+        ORDER:{
+            ADD:"/order",
+            ORDER_DETAILS:"/order/:id",
+            FETCH:"/order",
+            CANCEL_ORDER:"/order/cancel/:id",
+            CANCEL_ITEM:'/order/item/cancel/:order_id/:item_id'
+        }
     }
 }
 

@@ -14,12 +14,12 @@ api.interceptors.request.use(
             const token=localStorage.getItem("adminToken");
             res.headers.authorization = `Bearer ${token}`
 
-        }
-        // else if(res.url.includes("/user/profile")) {
+        }else if(res.url.startsWith("/user/account") || res.url.startsWith("/user/address") || res.url.startsWith("/user/cart") 
+        || res.url.startsWith("/user/checkout") || res.url.startsWith("/user/order")) {
 
-        //     const token= localStorage.getItem("userToken");
-        //     res.headers.authorization= `Bearer ${token}`
-        // }
+            const token= localStorage.getItem("userToken");
+            res.headers.authorization= `Bearer ${token}`
+        }
 
         return res;
     },

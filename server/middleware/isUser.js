@@ -1,17 +1,25 @@
-// import jwt from "jsonwebtoken"
-// import User from "../models/user.model"
+import jwt from "jsonwebtoken"
+import STATUS from "../constants/status.constant.js";
 
-// const isUser= async(req,resizeBy,next)=> {
+export const isUser= async(req,res,next)=> {
 
-//     try {
-//         if(req?.headers?.authorization.startsWith("Bearer")) {
+    try {
+        if(req?.headers?.authorization?.startsWith("Bearer")) {
 
-//             let token= req.headers.authorization.split(" ")[1];
-//             let decode= jwt.verify(token,process.env.Jwt_Key_User);
+            let token= req.headers.authorization.split(" ")[1];
+            let decode= jwt.verify(token,process.env.Jwt_Key_User);
 
-//             const userMail= decode.email
-//             req.body= userMail;
-//         }
-//     }
+            const userMail= decode.email
+            req.email= userMail;
 
-// }
+            next();
+
+        }else {
+            return res.status(STATUS.ERROR.FORBIDDEN).send("UnAuthorized Access Denied")
+        }
+    }catch(error) {
+
+        console.log(error);
+    }
+
+}

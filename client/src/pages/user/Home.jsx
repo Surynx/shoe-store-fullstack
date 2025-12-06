@@ -1,5 +1,4 @@
 import { Truck, Headphones, RotateCcw } from "lucide-react";
-import ProductSection from "../../components/user/LatestProducts";
 import LatestProducts from "../../components/user/LatestProducts";
 import BrandShowcase from "../../components/user/BrandShowcase";
 import { useNavigate } from "react-router-dom";

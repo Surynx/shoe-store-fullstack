@@ -2,20 +2,50 @@ import { span } from "framer-motion/client";
 import { Heart, Timer } from "lucide-react";
 import { use, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { addToCart } from "../../Services/user.api";
+import toast from "react-hot-toast";
+import { QueryClient, useQueryClient } from "@tanstack/react-query";
 
 export default function ProductDetail({ data }) {
 
   const nav=useNavigate();
+  const QueryClient=useQueryClient();
 
   const productDoc = data?.data?.productDoc;
   const variant_array = data?.data?.variant_array || [];
 
   const [activeVariant, setActiveVariant] = useState(variant_array[0]);
 
-  const sizes=["UK 3","UK 4","UK 5","UK 6","UK 7"]
+  
 
   if(!productDoc?.status) {
     nav("/shop");
+  }
+
+  const handleAddtoCart= async()=> {
+
+    if(localStorage.getItem("userToken")) {
+
+    try{
+
+    const res= await addToCart({product_id:productDoc._id,variant_id:activeVariant._id});
+
+    if(res.data.success) {
+
+      toast.success(`${productDoc.name} of size ${activeVariant.size} Added To Bag Successfully!`);
+      nav("/cart");
+      QueryClient.invalidateQueries("cart-count");
+    }
+
+    }catch(error) {
+
+      toast.error(error.response.data.message);
+
+    } }else {
+
+      nav("/login");
+      toast("Please login to Add Product To Bag");
+    }
   }
 
   return (
@@ -57,7 +87,7 @@ export default function ProductDetail({ data }) {
           </button>
         )) : <span className="text-sm font-light text-gray-400">currently unavailabe.</span>}
       </div>
-      <button className="w-full mt-6 py-3 bg-black text-white rounded-3xl hover:bg-gray-900">
+      <button className="w-full mt-6 py-3 bg-black text-white rounded-3xl hover:bg-gray-900 cursor-pointer" onClick={handleAddtoCart}>
         Add to Bag
       </button>
       <button className="w-full flex items-center justify-center mt-5 py-3 gap-1 border text-black rounded-3xl hover:bg-gray-100">

@@ -1,34 +1,31 @@
-import React from 'react'
-import { Outlet, useLocation } from 'react-router-dom'
-import Navbar from '../../components/user/Navbar'
-import Footer from '../../components/user/Footer'
-import { Toaster } from "react-hot-toast"
-
+import React, { useState } from "react";
+import { Outlet, useLocation } from "react-router-dom";
+import Navbar from "../../components/user/Navbar";
+import Footer from "../../components/user/Footer";
+import ToasterDark from "../../components/user/Toaster";
 
 function UserLayout() {
 
-  let {pathname}=useLocation();
+  let { pathname } = useLocation();
 
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar/>
       <main className="flex-1 pb-6">
         <div className="relative">
-          <Toaster
-            position="top-center"
-            containerStyle={{
-              top: "120px"
-            }}
-          />
+          <ToasterDark/>
         </div>
-        <div className={(pathname == "/" || pathname == "/shop") ? "mt-0 mb-0" : "mt-20 mb-10"}>
-          <Outlet />
+        <div
+          className={
+            pathname == "/" || pathname == "/shop" || pathname == "/cart" || pathname == "" ? "mt-0 mb-0" : "mt-20 mb-10"
+          }
+        >
+          <Outlet/>
         </div>
       </main>
       <Footer />
     </div>
-  )
+  );
 }
 
-export default UserLayout
-
+export default UserLayout;

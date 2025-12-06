@@ -1,15 +1,24 @@
 import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Search, Heart, User, ShoppingBag, SearchIcon } from "lucide-react";
-import { useEffect } from "react";
-import toast from "react-hot-toast";
+import { Search, Heart, User, ShoppingBag } from "lucide-react";
+import { getCartCount } from "../../Services/user.api";
+import { useQuery } from "@tanstack/react-query";
 
 export default function Navbar() {
   const nav = useNavigate();
 
+  const { data } = useQuery({
+    queryKey: ["cart-count"],
+    queryFn: getCartCount,
+  });
+
+  const count = data?.data?.count || 0;
+
   return (
     <header className="">
-      <div className="bg-black text-white text-xs text-center py-2">
-        SIGN UP TO GET A 15% DISCOUNT NEWSLETTER
+      <div className="bg-gray-900 text-white text-xs text-center py-2">
+        <span className="ml-2 text-gray-300 animate-pulse">
+          SIGN UP TO GET A 15% DISCOUNT NEWSLETTER
+        </span>
       </div>
       <nav className="flex items-center justify-between px-8 py-3 bg-white shadow-sm">
         <Link to="/" className=" text-2xl font-bold">
@@ -45,14 +54,21 @@ export default function Navbar() {
             className="cursor-pointer hover:text-black"
             onClick={() =>
               localStorage.getItem("userToken")
-                ? nav("/profile")
+                ? nav("/account/profile")
                 : nav("/login")
             }
           />
+          <div className="relative">
           <ShoppingBag
             className="cursor-pointer hover:text-black"
             onClick={() => nav("/cart")}
           />
+          {count > 0 && (
+            <span className="absolute -top-1 -right-1 bg-gray-700 text-white text-xs px-1.5  rounded-full">
+              {(localStorage.getItem("userToken")) ? count : null}
+            </span>
+          )}
+          </div>
         </div>
       </nav>
     </header>

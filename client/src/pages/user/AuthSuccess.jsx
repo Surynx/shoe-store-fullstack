@@ -1,5 +1,6 @@
 import { CheckCircle } from 'lucide-react'
 import React, { useEffect } from 'react'
+import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 
 function AuthSuccess() {
@@ -11,6 +12,8 @@ function AuthSuccess() {
 
         localStorage.setItem("userToken",id);
         nav("/",{replace:true});
+
+        toast.success("Login");
 
     },[]);
 

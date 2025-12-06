@@ -30,7 +30,7 @@ passport.use(
             }else {
                 
                 await User.updateOne({email:user.email},{
-                    profile_picture:profile.photos[0].value,
+                    name:profile.displayName,
                     isVerified:true
                 });
             }

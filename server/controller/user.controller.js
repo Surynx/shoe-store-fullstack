@@ -37,7 +37,7 @@ const register = async (req, res) => {
     }
 }
 
-const generateOtp= async(req,res)=>{
+const generateOtpForEmail= async(req,res)=>{
 
     try{
     const {email} = req.body;
@@ -174,4 +174,145 @@ const googleAuth= async(req,res)=>{
     }
 }
 
-export { register, verifyEmail, verifyUser,userLogin,generateOtp,resetPassword,googleAuth }
+const fetchUserInfo= async(req,res)=> {
+    
+    try{
+
+    const email= req.email;
+    
+    let userInfo= await User.findOne({email});
+
+    if(userInfo) {
+        res.status(STATUS.SUCCESS.OK).send({userInfo});
+    }else {
+        res.status(STATUS.ERROR.NOT_FOUND).send("User Not Found")
+    }
+    }catch(error) {
+        console.log("Error in fetching user Info..",error);
+    }
+}
+
+const editUserInfo= async(req,res)=> {
+
+    try{
+        
+        const userEmail= req.email;
+        const { name,gender }= req.body;
+
+        if(req.file) {
+
+            const {path}= req.file;
+            await User.updateOne({email:userEmail},{
+                name,
+                gender,
+                profile_picture:path
+            });
+
+            return res.status(STATUS.SUCCESS.OK).send({message:"Changes saved successfully!"})
+        }else {
+
+            await User.updateOne({email:userEmail},{
+            name,
+            gender
+            });
+        }
+
+        return res.status(STATUS.SUCCESS.OK).send({message:"Changes saved successfully!"})
+
+    }catch(error) {
+
+        console.log("Error edituserInfo",error);
+    }
+}
+
+const generateOtpForPhone= async(req,res)=> {
+
+    const email= req.email;
+    const {phone}= req.body;
+
+    await Otp.deleteOne({email});
+    
+    const otp_generated=createNewOtp();
+    console.log("OTP: ",otp_generated);
+    
+    await Otp.create({
+        email,
+        code:otp_generated
+    });
+
+    return res.send({success:true});
+}
+
+const verifyPhone= async(req,res)=> {
+
+    try{
+
+    const email= req.email;
+    const { phone,otp }= req.body;
+
+    let doc= await Otp.findOne({email});
+
+    if(doc?.code == otp) {
+
+        await User.updateOne({email},{phone:phone});
+        await Otp.deleteOne({email});
+
+        return res.status(STATUS.SUCCESS.OK).send({success:true});
+    }else {
+
+        return res.status(STATUS.ERROR.BAD_REQUEST).send({success:false});
+    }
+    }catch(error) {
+
+        console.log("Error in VerifyPhone",error);
+    }
+}
+
+const updateEmail= async(req,res)=> {
+
+    const oldEmail = req.email;
+    const { email, otp } = req.body;
+    console.log(email);
+
+    const doc = await Otp.findOne({ email });
+
+    if (doc?.code == otp) {
+
+        await User.updateOne({ email: oldEmail }, { email: email });
+        await Otp.deleteOne({email});
+
+        return res.status(STATUS.SUCCESS.OK).send({ success: true });
+    }
+
+    return res.status(STATUS.ERROR.BAD_REQUEST).send({ success: false });
+};
+
+const changePassword= async(req,res)=> {
+
+    const { newPassword,otp } = req.body;
+    const email= req.email;
+
+    const otpDoc= await Otp.findOne({email});
+
+    if(otpDoc.code != otp) {
+
+        return res.status(STATUS.ERROR.BAD_REQUEST).send({success:false,message:"Invalid Otp"});
+    }
+
+    const doc = await User.findOne({email});
+
+    if(!doc) {
+        return res.status(STATUS.ERROR.NOT_FOUND).send({success:false,message:"User not found"});
+    }
+
+    const saltRound = 5;
+    const hashed_pass = await hash(newPassword, saltRound);
+
+    await User.updateOne({email},{password:hashed_pass});
+
+    return res.status(STATUS.SUCCESS.OK).send({success:true,message:"Password Change Successfully"});
+}
+
+
+export { register, verifyEmail, verifyUser,userLogin,generateOtpForEmail,resetPassword,googleAuth,fetchUserInfo,editUserInfo,generateOtpForPhone,
+    verifyPhone,updateEmail,changePassword }

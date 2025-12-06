@@ -25,6 +25,13 @@ import AddProduct from "./pages/admin/AddProduct"
 import AddVariant from "./pages/admin/Variants"
 import Shop from "./pages/user/Shop"
 import Product from "./pages/user/Product"
+import EditProfile from "./pages/user/EditProfile"
+import Address from "./pages/user/Address"
+import AddressForm from "./components/user/AddressForm"
+import CheckoutPage from "./pages/user/Checkout"
+import OrderSuccess from "./pages/user/OrderSuccess"
+import OrderListing from "./pages/user/OrderListing"
+import OrderDetail from "./pages/user/OrderDetail"
 
 
 function App() {
@@ -64,8 +71,16 @@ function App() {
             <Route path="shop/product/:id" element={<Product/>}/>
             <Route path="product/:id" element={<Product/>}/>
             <Route path="Cart" element={<UserProtected><Cart/></UserProtected>}/>
-            <Route path="profile" element={<UserProtected><Profile/></UserProtected>}>
-              <Route index element={<UserInfo/>}/>
+            <Route path="checkout" element={<CheckoutPage/>}/>
+            <Route path="order/success/:id" element={<OrderSuccess/>}/>
+            <Route path="/account" element={<UserProtected><Profile/></UserProtected>}>
+              <Route index path="profile" element={<UserInfo/>}/>
+              <Route path="edit" element={<EditProfile/>}/>
+              <Route path="address" element={<Address/>}/>
+              <Route path="address/add" element={<AddressForm/>}/>
+              <Route path="address/:id" element={<AddressForm/>}/>
+              <Route path="orders" element={<OrderListing/>}/>
+              <Route path="order/detail/:id" element={<OrderDetail/>}/>
             </Route>
           </Route>
           <Route path="auth/google/success/:id" element={<AuthSuccess/>}/>
