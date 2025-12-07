@@ -28,6 +28,7 @@
     "nodemailer": "^7.0.10",
     "otp-generator": "^4.0.1",
     "passport": "^0.7.0",
-    "passport-google-oauth20": "^2.0.0"
+    "passport-google-oauth20": "^2.0.0",
+    "pdfkit": "^0.17.2"
   }
 }

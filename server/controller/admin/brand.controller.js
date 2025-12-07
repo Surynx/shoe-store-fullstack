@@ -1,7 +1,7 @@
-import STATUS from "../constants/status.constant.js";
-import Brand from "../models/brand.model.js";
-import Category from "../models/category.model.js";
-import Product from "../models/product.model.js";
+import STATUS from "../../constants/status.constant.js";
+import Brand from "../../models/brand.model.js";
+import Category from "../../models/category.model.js";
+import Product from "../../models/product.model.js";
 
 const addBrand= async(req,res)=>{
 
@@ -111,18 +111,4 @@ const editBrand= async(req,res)=>{
     return res.status(STATUS.SUCCESS.OK).send({message:"Brand Updated!"});
 }
 
-const getAllBrandForUser= async(req,res)=> {
-
-    try{
-
-    const docs=await Brand.find({},{name:1,logo:1,status:1});
-
-    return res.status(STATUS.SUCCESS.OK).send({data:docs});
-    
-    }catch(error) {
-        console.log("Error in getAllBrandForUser")
-    }
-
-}
-
-export {addBrand,fetchBrands,editBrand,getAllBrandForUser}
+export {addBrand,fetchBrands,editBrand}

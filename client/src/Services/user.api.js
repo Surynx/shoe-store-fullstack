@@ -202,8 +202,14 @@ const cancelSingleItem= async({order_id,item_id})=> {
     return res;
 }
 
+const handleReturnItem= async({order_id,item_id},reason)=> {
+
+    const res= await api.patch(`/user/order/item/return/${order_id}/${item_id}`,reason);
+    return res;
+}
+
 
 export { registerApi,verifyEmail,verifyUser,userLogin,resetPassword,getAllLatestProducts,getShopProductList,getAllCategoryForUser,
     getAllBrandForUser,getProductData,getUserInfo,editUserInfo,sentOtpToPhone,verifyPhone,sendOtpToEmail,verifyEmailOtp,addNewAddress,
     getAllAddress,deleteAddress,updateAddress,changePassword,addToCart,fetchCartInfo,removeProductFromCart,increaseQty,decreaseQty,getCartCount,
-    getCheckoutInfo,placeNewOrder,validateCartItems,getOrderDetails ,getAllOrders,cancelOrder,cancelSingleItem }
+    getCheckoutInfo,placeNewOrder,validateCartItems,getOrderDetails ,getAllOrders,cancelOrder,cancelSingleItem,handleReturnItem }

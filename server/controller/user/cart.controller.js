@@ -1,9 +1,9 @@
-import STATUS from "../constants/status.constant.js";
-import Cart from "../models/cart.model.js";
-import Product from "../models/product.model.js";
-import User from "../models/user.model.js";
-import Variant from "../models/variant.model.js";
-import { cleanCartDoc } from "../utils/cart.util.js";
+import STATUS from "../../constants/status.constant.js";
+import Cart from "../../models/cart.model.js";
+import Product from "../../models/product.model.js";
+import User from "../../models/user.model.js";
+import Variant from "../../models/variant.model.js";
+import { cleanCartDoc } from "../../utils/cart.util.js";
 
 
 const addToCart= async(req,res)=> {

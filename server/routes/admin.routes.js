@@ -1,12 +1,13 @@
 import express from "express";
-import { addAdmin, blockUser, fetchUsers, verifyAdmin } from "../controller/admin.controller.js";
+import { addAdmin, blockUser, fetchUsers, verifyAdmin } from "../controller/admin/admin.controller.js";
 import { isAdmin } from "../middleware/isAdmin.js";
 import upload from "../middleware/multer.js";
-import { addcategory, editCategory, fetchCategory } from "../controller/category.controller.js";
-import { addBrand, editBrand, fetchBrands } from "../controller/brand.controller.js";
-import { addProduct, editProduct, fetchProduct } from "../controller/product.controller.js";
-import { addVariant, fetchVariant, removeVariant, updateVariant } from "../controller/variant.controller.js";
+import { addVariant, fetchVariant, removeVariant, updateVariant } from "../controller/admin/variant.controller.js";
 import ROUTES from "../constants/routes.constant.js";
+import { addcategory, editCategory, fetchCategory } from "../controller/admin/category.contoller.js";
+import { addProduct, editProduct, fetchProduct } from "../controller/admin/product.controller.js";
+import { addBrand, editBrand, fetchBrands } from "../controller/Admin/brand.controller.js";
+import { approveReturn, changeOrderStatus, completeReturn, fetchOrdersInfo, getDetailsOfOrder, rejectReturn } from "../controller/Admin/order.controller.js";
 
 const route=express.Router();
 
@@ -44,5 +45,16 @@ route.delete(ROUTES.ADMIN.VARIENTS.REMOVE,isAdmin,removeVariant);
 
 route.patch(ROUTES.ADMIN.VARIENTS.UPDATE,isAdmin,updateVariant);
 
+route.get(ROUTES.ADMIN.ORDERS.FETCH,isAdmin,fetchOrdersInfo);
+
+route.get(ROUTES.ADMIN.ORDERS.ORDER_DETAILS,isAdmin,getDetailsOfOrder);
+
+route.patch(ROUTES.ADMIN.ORDERS.CHNAGE_STATUS,isAdmin,changeOrderStatus);
+
+route.patch(ROUTES.ADMIN.ORDERS.APPROVE_RETURN,isAdmin,approveReturn);
+
+route.patch(ROUTES.ADMIN.ORDERS.COMPLETE_RETURN,isAdmin,completeReturn);
+
+route.patch(ROUTES.ADMIN.ORDERS.REJECT_RETURN,isAdmin,rejectReturn);
 
 export default route;

@@ -1,10 +1,10 @@
 import { compare, hash } from "bcrypt";
-import User from "../models/user.model.js"
-import Otp from "../models/otp.model.js";
+import User from "../../models/user.model.js"
+import Otp from "../../models/otp.model.js";
 import jwt from "jsonwebtoken";
-import createNewOtp from "../utils/otp.util.js";
-import STATUS from "../constants/status.constant.js";
-import sendEmail from "../utils/send-otp-mail.js";
+import createNewOtp from "../../utils/otp.util.js";
+import STATUS from "../../constants/status.constant.js";
+import sendEmail from "../../utils/send-otp-mail.js";
 
 const register = async (req, res) => {
 

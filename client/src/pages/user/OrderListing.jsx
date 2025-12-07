@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { Search,Package,Calendar,Download,Eye,AlertCircle,CheckCircle,Clock,Truck,XCircle,IndianRupee, Dot, X } from "lucide-react";
+import { Search,Package, Calendar, Eye, AlertCircle,CheckCircle,Clock,Truck,XCircle,IndianRupee,Dot,X } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { cancelOrder, cancelSingleItem, getAllOrders } from "../../Services/user.api";
+import { cancelOrder,cancelSingleItem,getAllOrders,handleReturnItem } from "../../Services/user.api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const OrderListingPage = () => {
+
   const { data } = useQuery({
     queryKey: ["orderListing"],
     queryFn: getAllOrders,
@@ -13,7 +14,7 @@ const OrderListingPage = () => {
 
   const nav = useNavigate();
 
-  const QueryClient= useQueryClient();
+  const QueryClient = useQueryClient();
 
   const orderDocs = data?.data?.orderDocs || [];
 
@@ -27,13 +28,11 @@ const OrderListingPage = () => {
 
   const [searchQuery, setSearchQuery] = useState("");
 
-  const [selectedOrder, setSelectedOrder] = useState(null);
-
   const [cancelTarget, setCancelTarget] = useState(null);
   const [showCancelModal, setShowCancelModal] = useState(false);
 
+  const [returnTarget, setReturnTarget] = useState(null);
   const [showReturnModal, setShowReturnModal] = useState(false);
-
   const [returnReason, setReturnReason] = useState("");
 
   const getStatusColor = (status) => {
@@ -72,67 +71,59 @@ const OrderListingPage = () => {
 
   const handleCancelOrder = (order_id, item_id = null) => {
 
-    if(item_id) {
-
+    if (item_id) {
       setCancelTarget({ order_id, item_id });
-
-    }else {
-      setCancelTarget({order_id});
-
-    } 
+    } else {
+      setCancelTarget({ order_id });
+    }
 
     setShowCancelModal(true);
-
   };
 
-  const confirmCancel = async() => {
+  const confirmCancel = async () => {
+    try {
+      let res;
+      if (cancelTarget?.item_id) {
+        res = await cancelSingleItem(cancelTarget);
+      } else {
+        res = await cancelOrder(cancelTarget);
+      }
 
-    try{
-    let res;
-    if(cancelTarget?.item_id) {
-
-      res= await cancelSingleItem(cancelTarget);
-
-    }else {
-
-      res= await cancelOrder(cancelTarget);
+      if (res?.data?.success) {
+        toast.success(res.data.message);
+        QueryClient.invalidateQueries("orderListing");
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    } finally {
+      setShowCancelModal(false);
     }
-    
-    if(res?.data?.success) {
-
-      toast.success(res.data.message);
-      QueryClient.invalidateQueries("orderListing");
-    }
-  }catch(error) {
-
-    toast.error(error.response.data.message);
-
-  }finally{
-
-    setShowCancelModal(false);
-  }
   };
 
-  const handleReturnOrder = (order) => {
+  const handleReturnOrder = (order_id, item_id) => {
 
-    setSelectedOrder(order);
+    setReturnTarget({ order_id, item_id });
     setReturnReason("");
     setShowReturnModal(true);
   };
 
-  const confirmReturn = () => {
+  const confirmReturn = async () => {
 
     if (!returnReason.trim()) {
-      alert("Return reason is required");
+      toast.error("Should provide a Reason to return a product!");
       return;
     }
-    console.log("Return:", selectedOrder, "Reason:", returnReason);
+
+    try {
+      const res = await handleReturnItem(returnTarget, { returnReason });
+
+      toast.success(res?.data?.message);
+      QueryClient.invalidateQueries("orderListing");
+      
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
     setShowReturnModal(false);
-  };
-
-  const handleDownloadInvoice = (orderID) => {
-
-    console.log("Download invoice for:", orderID);
   };
 
   const filteredOrders = orders.filter(
@@ -222,27 +213,71 @@ const OrderListingPage = () => {
                   </div>
 
                   {(order.status === "pending" ||
-                    order.status === "shipped") &&  item.status != "canceled" && (
-                    <button
-                      onClick={() => handleCancelOrder(order._id, item._id)}
-                      className="text-red-600 text-xs  border px-2 py-1 font-medium cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                  )}
-                  {item.status != "canceled" || 
-                  <>
-                  <p className="flex text-sm items-center text-green-800 gap-1"><X size={18}/>Canceled</p>
-                  <p className="text-xs font-bold text-amber-600">{new Date(item?.cancelledAt).toLocaleDateString('en-US', { 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}</p>
-                  </>
-                  }
+                    order.status === "confirmed") &&
+                    item.status != "canceled" && (
+                      <button
+                        onClick={() => handleCancelOrder(order._id, item._id)}
+                        className="text-red-600 text-xs  border px-2 py-1 font-medium cursor-pointer"
+                      >
+                        Cancel
+                      </button>
+                    )}
+                  {item.status != "canceled" || (
+                    <div className="flex flex-col items-end text-right">
+                      <p className="flex items-center text-red-700 text-sm font-medium">
+                        <Dot size={28} />
+                        Canceled
+                      </p>
 
+                      <p className="text-xs font-bold text-gray-600">
+                        {new Date(item?.cancelledAt).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}
+                      </p>
+                    </div>
+                  )}
+
+                  {item.return_status ? (
+                    <div className="flex flex-col items-end text-right">
+                      <p className="flex items-center text-blue-700 text-sm font-medium">
+                        <Dot size={28} />
+                        {item.return_status === "Requested" &&
+                          "Return Requested"}
+                        {item.return_status === "Approved" && "Return Approved"}
+                        {item.return_status === "Rejected" && "Return Rejected"}
+                        {item.return_status === "Completed" && "Return Completed"}
+                      </p>
+
+                      <p className="text-xs font-bold text-gray-600">
+                        {new Date(item?.return_date).toLocaleDateString(
+                          "en-US",
+                          {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
+                          }
+                        )}
+                      </p>
+                    </div>
+                  ) : (
+                    item.status === "delivered" && (
+                      <button
+                        onClick={() => handleReturnOrder(order._id, item._id)}
+                        className="px-2 py-1 text-xs border text-red-700 border-red-700 hover:bg-gray-100 cursor-pointer"
+                      >
+                        Return
+                      </button>
+                    )
+                  )}
                 </div>
               ))}
             </div>
@@ -262,24 +297,17 @@ const OrderListingPage = () => {
                   Details
                 </button>
 
-                <button
-                  onClick={() => handleDownloadInvoice(order.orderID)}
-                  className="px-3 py-1.5 text-xs bg-blue-50 text-blue-700 rounded-lg flex items-center gap-1"
-                >
-                  <Download className="w-3.5 h-3.5" />
-                  Invoice
-                </button>
-
-                {order.status === "delivered" && (
+                {/* {order.status === "delivered" && (
                   <button
                     onClick={() => handleReturnOrder(order)}
                     className="px-3 py-1.5 text-xs bg-orange-50 text-orange-700 rounded-lg"
                   >
                     Return
                   </button>
-                )}
+                )} */}
 
-                {(order.status === "pending" || order.status === "shipped") && (
+                {(order.status === "pending" ||
+                  order.status === "confirmed") && (
                   <button
                     onClick={() => handleCancelOrder(order._id)}
                     className="px-3 py-1.5 text-xs bg-red-50 text-red-700 rounded-lg cursor-pointer"
@@ -294,9 +322,8 @@ const OrderListingPage = () => {
       </div>
 
       {showCancelModal && (
-        <div className="fixed inset-0 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="relative bg-white w-full max-w-md p-5 border rounded-md shadow-md">
-        
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+          <div className="relative bg-white w-full max-w-md p-5 rounded-md shadow-md">
             <button
               onClick={() => setShowCancelModal(false)}
               className="absolute right-2 top-2 text-gray-500 hover:text-black text-lg leading-none cursor-pointer"
@@ -333,9 +360,16 @@ const OrderListingPage = () => {
 
       {/* Return Modal */}
       {showReturnModal && (
-        <div className="fixed inset-0 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md p-5 border">
-            <h3 className="text-base font-semibold mb-2">Return Order</h3>
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
+          <div className="bg-white w-full max-w-md p-5 relative">
+            <button
+              onClick={() => setShowReturnModal(false)}
+              className="absolute right-3 top-3 text-gray-500 hover:text-black cursor-pointer"
+            >
+              <X className="w-4 h-4" />
+            </button>
+
+            <h3 className="text-base font-semibold mb-2">Return Product</h3>
 
             <textarea
               value={returnReason}
@@ -348,14 +382,14 @@ const OrderListingPage = () => {
             <div className="flex gap-2 mt-3">
               <button
                 onClick={() => setShowReturnModal(false)}
-                className="flex-1 bg-gray-100 p-2 rounded-sm text-xs"
+                className="flex-1 bg-gray-100 p-2 rounded-sm text-xs cursor-pointer"
               >
                 Cancel
               </button>
 
               <button
                 onClick={confirmReturn}
-                className="flex-1 bg-orange-600 text-white p-2 rounded-sm text-xs"
+                className="flex-1 bg-red-600 text-white p-2 rounded-sm text-xs cursor-pointer"
               >
                 Submit Return
               </button>

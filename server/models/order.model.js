@@ -31,6 +31,16 @@ const orderItemSchema= new mongoose.Schema({
     },
     cancelledAt: {
       type:Date
+    },
+    return_status:{
+      type:String,
+      enum: ["Requested", "Approved", "Rejected", "Completed"],
+    },
+    return_reason:{
+      type:String,
+    },
+    return_date:{
+      type:Date,
     }
 });
 

@@ -32,6 +32,8 @@ import CheckoutPage from "./pages/user/Checkout"
 import OrderSuccess from "./pages/user/OrderSuccess"
 import OrderListing from "./pages/user/OrderListing"
 import OrderDetail from "./pages/user/OrderDetail"
+import OrderManagement from "./pages/admin/OrderManagment"
+import OrderDetailPage from "./pages/admin/OrderDetail"
 
 
 function App() {
@@ -56,6 +58,8 @@ function App() {
               <Route path="product/add" element={<AddProduct/>}/>
               <Route path="product/add/:id" element={<AddProduct/>}/>
               <Route path="product/varient/:id" element={<AddVariant/>}/>
+              <Route path="orders" element={<OrderManagement/>}/>
+              <Route path="order/detail/:id" element={<OrderDetailPage/>}/>
             </Route>
 
           {/* User Route */}

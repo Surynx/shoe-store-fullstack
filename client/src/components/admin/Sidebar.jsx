@@ -1,6 +1,8 @@
-import {  Folder, Home, Lightbulb, LogOut, Package, TagIcon, User } from 'lucide-react'
+import {  Folder, Home, Lightbulb, LogOut, Package, ShoppingBag, ShoppingCart, Shovel, TagIcon, User } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast';
+import { SiStockx } from 'react-icons/si';
+import { GiStockpiles } from 'react-icons/gi';
 
 function Sidebar() {
 
@@ -16,6 +18,8 @@ function Sidebar() {
         name:"Brand", icon:<TagIcon color='black' size={20}/>, path:"/admin/brand"
     },{
         name:"Product", icon:<Package color='black' size={20}/>,path:"/admin/product"
+    },{
+        name:"Orders", icon:<ShoppingCart color='black' size={20}/>,path:"/admin/orders"
     }]
 
     const logout=()=>{

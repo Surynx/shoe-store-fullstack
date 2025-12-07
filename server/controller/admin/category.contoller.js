@@ -1,7 +1,8 @@
-import STATUS from "../constants/status.constant.js";
-import Brand from "../models/brand.model.js";
-import Category from "../models/category.model.js";
-import Product from "../models/product.model.js";
+import STATUS from "../../constants/status.constant.js";
+import Brand from "../../models/brand.model.js";
+import Category from "../../models/category.model.js";
+import Product from "../../models/product.model.js";
+
 
 const addcategory= async(req,res)=> {
 
@@ -106,18 +107,4 @@ const editCategory= async(req,res) =>{
     }
 }
 
-const getAllCategoryForUser= async(req,res)=> {
-
-    try{
-        
-    const docs=await Category.find({},{name:1,status:1});
-
-    return res.status(STATUS.SUCCESS.OK).send({data:docs});
-
-    }catch(error) {
-        console.log("Error in getAllCategoryForUser")
-    }
-
-}
-
-export { addcategory,fetchCategory,editCategory,getAllCategoryForUser }
+export { addcategory,fetchCategory,editCategory }

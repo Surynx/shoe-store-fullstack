@@ -1,8 +1,8 @@
-import Admin from "../models/admin.model.js";
 import { compare, hash } from "bcrypt";
 import jwt from "jsonwebtoken"
-import User from "../models/user.model.js";
-import STATUS from "../constants/status.constant.js";
+import Admin from "../../models/admin.model.js";
+import STATUS from "../../constants/status.constant.js";
+import User from "../../models/user.model.js";
 
 
 const addAdmin = async (req, res) => {

@@ -1,16 +1,16 @@
 import express, { Router } from "express";
-import { changePassword, editUserInfo, fetchUserInfo, generateOtpForEmail, generateOtpForPhone, googleAuth, register, resetPassword, updateEmail, userLogin, verifyEmail, verifyPhone, verifyUser } from "../controller/user.controller.js";
+import { changePassword, editUserInfo, fetchUserInfo, generateOtpForEmail, generateOtpForPhone, googleAuth, register, resetPassword, updateEmail, userLogin, verifyEmail, verifyPhone, verifyUser } from "../controller/user/user.controller.js";
 import passport from "passport";
-import { fetchLatestProduct, fetchProductData, fetchShopProducts } from "../controller/product.controller.js";
-import { getAllCategoryForUser } from "../controller/category.controller.js";
-import { getAllBrandForUser } from "../controller/brand.controller.js";
+import { fetchLatestProduct, fetchProductData, fetchShopProducts } from "../controller/user/product.controller.js";
+import { getAllCategoryForUser } from "../controller/user/category.controller.js";
+import { getAllBrandForUser } from "../controller/user/brand.controller.js";
 import ROUTES from "../constants/routes.constant.js";
 import { isUser } from "../middleware/isUser.js";
 import upload from "../middleware/multer.js";
-import { addNewAddress, editAddress, fetchAddress, removeAddress } from "../controller/address.controller.js";
-import { addToCart, countCartItems, decQuantity, fetchCartInfo, incQuantity, removeItemFromCart, validateCartItems } from "../controller/cart.controller.js";
-import { getCheckoutData } from "../controller/checkout.controller.js";
-import { fetchAllOrders, getOrderDetails, handleCancelItem, handleCancelOrder, placeNewOrder } from "../controller/order.controller.js";
+import { addNewAddress, editAddress, fetchAddress, removeAddress } from "../controller/user/address.controller.js";
+import { addToCart, countCartItems, decQuantity, fetchCartInfo, incQuantity, removeItemFromCart, validateCartItems } from "../controller/user/cart.controller.js";
+import { getCheckoutData } from "../controller/user/checkout.controller.js";
+import { fetchAllOrders, getOrderDetails, handleCancelItem, handleCancelOrder, handleReturnProduct, placeNewOrder } from "../controller/user/order.controller.js";
 
 const route=express.Router();
 
@@ -88,5 +88,7 @@ route.get(ROUTES.USER.ORDER.FETCH,isUser,fetchAllOrders);
 route.patch(ROUTES.USER.ORDER.CANCEL_ORDER,isUser,handleCancelOrder);
 
 route.patch(ROUTES.USER.ORDER.CANCEL_ITEM,isUser,handleCancelItem);
+
+route.patch(ROUTES.USER.ORDER.RETURN_ITEM,isUser,handleReturnProduct);
 
 export default route;

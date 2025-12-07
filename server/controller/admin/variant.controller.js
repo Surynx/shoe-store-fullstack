@@ -1,5 +1,5 @@
-import Variant from "../models/variant.model.js";
-import STATUS from "../constants/status.constant.js";
+import Variant from "../../models/variant.model.js";
+import STATUS from "../../constants/status.constant.js";
 
 const addVariant= async(req,res)=>{
 

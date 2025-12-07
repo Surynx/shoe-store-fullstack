@@ -29,6 +29,14 @@ const ROUTES= {
             FETCH:"/variant/:id",
             REMOVE:"/variant/remove/:id",
             UPDATE:"/variant/edit/:id"
+        },
+        ORDERS:{
+            FETCH:"/orders",
+            ORDER_DETAILS:"/order/:id",
+            CHNAGE_STATUS:"/order/status/:id",
+            APPROVE_RETURN:"/item/return/approve/:order_id/:item_id",
+            COMPLETE_RETURN:"/item/return/complete/:order_id/:item_id",
+            REJECT_RETURN:"/item/return/reject/:order_id/:item_id"
         }
     },
     USER:{
@@ -85,7 +93,8 @@ const ROUTES= {
             ORDER_DETAILS:"/order/:id",
             FETCH:"/order",
             CANCEL_ORDER:"/order/cancel/:id",
-            CANCEL_ITEM:'/order/item/cancel/:order_id/:item_id'
+            CANCEL_ITEM:'/order/item/cancel/:order_id/:item_id',
+            RETURN_ITEM:"/order/item/return/:order_id/:item_id",
         }
     }
 }

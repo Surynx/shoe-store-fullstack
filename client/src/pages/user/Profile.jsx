@@ -23,7 +23,7 @@ export default function Profile() {
 
   return (
     <div className="flex my-25 mx-8">
-      <div className="w-1/4 lg:w-1/5 bg-white border ml-3.5 rounded-2xl h-120">
+      <div className="w-1/4 lg:w-1/5 bg-white border ml-3.5 rounded-2xl h-120 sticky top-5">
         <Sidebar name={data?.data?.userInfo?.name} email={data?.data?.userInfo?.email} avatar={data?.data?.userInfo?.profile_picture}/>
       </div>
 

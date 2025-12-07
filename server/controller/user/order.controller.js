@@ -1,8 +1,8 @@
-import STATUS from "../constants/status.constant.js";
-import Cart from "../models/cart.model.js";
-import Order from "../models/order.model.js";
-import User from "../models/user.model.js";
-import Variant from "../models/variant.model.js";
+import STATUS from "../../constants/status.constant.js";
+import Cart from "../../models/cart.model.js";
+import Order from "../../models/order.model.js";
+import User from "../../models/user.model.js";
+import Variant from "../../models/variant.model.js";
 
 
 const placeNewOrder= async(req,res)=> {
@@ -123,7 +123,7 @@ const handleCancelOrder= async(req,res)=> {
 
         if(item.status != "canceled") {
 
-            await Order.updateOne({_id:id,"items._id":item.id},{$set:{"items.$.status":"canceled"}});
+            await Order.updateOne({_id:id,"items._id":item.id},{$set:{"items.$.status":"canceled","items.$.cancelledAt":new Date()}});
             await Variant.updateOne({_id:item.variant_id},{$inc:{stock:item.quantity}});
         }
     }
@@ -171,16 +171,59 @@ const handleCancelItem= async(req,res)=> {
         }
     }
 
-    for(let item of orderDoc.items) {
+    const newOrderDoc= await Order.findById(order_id);
+
+    let all_item_canceled= true;
+
+    for(let item of newOrderDoc.items) {
 
         if( item.status != "canceled") {
-            break
+            all_item_canceled= false;
         }
+    }
 
+    if(all_item_canceled) {
         await Order.updateOne({_id:order_id},{$set:{status:"canceled"}});
     }
 
     return res.status(STATUS.SUCCESS.OK).send({success:true,message:`Product is being canceled from order ${orderDoc.orderId}`});
 }
 
-export { placeNewOrder,getOrderDetails,fetchAllOrders,handleCancelOrder,handleCancelItem }
+const handleReturnProduct= async(req,res)=> {
+
+    try{
+    const {order_id,item_id}= req.params;
+    const {returnReason}= req.body;
+    
+     const orderDoc = await Order.findById(order_id);
+
+     const item = orderDoc.items.id(item_id);
+
+     if (item.status !== "delivered") {
+
+      return res.status(STATUS.ERROR.BAD_REQUEST).send({success: false, message: "Item is not eligible for return as it is not delivered",});
+    }
+
+    if (item.return_status === "Requested") {
+
+      return res.status(STATUS.ERROR.BAD_REQUEST).send({success: false,message: "Return already requested for this item"});
+    }
+
+    item.return_status = "Requested";
+    item.return_reason = returnReason;
+    item.return_date = new Date();
+
+    await orderDoc.save();
+
+    return res.status(STATUS.SUCCESS.OK).send({success: true,message: "Return request submitted successfully"});
+
+    }catch(error) {
+
+        console.log("Error in return product",error);
+    }
+
+}
+
+
+
+export { placeNewOrder,getOrderDetails,fetchAllOrders,handleCancelOrder,handleCancelItem,handleReturnProduct }

@@ -30,7 +30,7 @@ export default function FilterSidebar({setFilterValue}) {
   const [priceRange,setPriceRange] = useState(0);
 
   return (
-    <div className="w-60 h-220 bg-white border rounded-xl p-5 space-y-6 text-gray-900 ">
+    <div className="w-60 h-220 bg-white border rounded-xl p-5 space-y-6 text-gray-900 sticky top-5">
       <div>
         <h3 className="text-sm font-semibold mb-3">Gender</h3>
         <div className="space-y-3">
