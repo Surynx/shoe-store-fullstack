@@ -8,6 +8,7 @@ const ReferralModal = ({ isOpen, onClose, referralCode, totalReferrals }) => {
   if (!isOpen) return null;
 
   const handleCopy = () => {
+
     navigator.clipboard.writeText(referralCode);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
@@ -47,12 +48,11 @@ const ReferralModal = ({ isOpen, onClose, referralCode, totalReferrals }) => {
               Your Referral Code
             </label>
             <div className="flex gap-2">
-              <div className="flex-1 px-4 py-2 bg-gray-50 border border-gray-300 font-mono text-base font-semibold text-gray-800 rounded-lg">
+              <div className="flex w-full px-4 py-2 justify-between items-center bg-gray-50 border border-gray-300 font-mono text-base font-semibold text-gray-800">
                 {referralCode}
-              </div>
-              <button
+                 <button
                 onClick={handleCopy}
-                className="px-4 py-2 bg-gray-800 text-white hover:bg-gray-900 cursor-pointer transition-colors flex items-center gap-2 text-sm rounded-lg"
+                className="px-4 py-2 text-gray-700 cursor-pointer transition-colors flex gap-2 text-xs font-bold"
               >
                 {copied ? (
                   <>
@@ -66,6 +66,7 @@ const ReferralModal = ({ isOpen, onClose, referralCode, totalReferrals }) => {
                   </>
                 )}
               </button>
+              </div>        
             </div>
           </div>
 

@@ -655,7 +655,7 @@ export default function CheckoutPage() {
                   <div>
                     <div className="flex gap-2 mb-3">
                       <div className="flex-1 relative">
-                        <Gift
+                        <Tag
                           className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
                           size={18}
                         />
@@ -665,7 +665,7 @@ export default function CheckoutPage() {
                           placeholder="Enter coupon code"
                           className="w-full pl-9 pr-3 py-2 border border-gray-300 text-sm outline-none focus:border-gray-900 transition-colors"
                           {...register("code", {
-                            required: true,
+                            
                           })}                 
                         />
                       </div>
@@ -679,8 +679,8 @@ export default function CheckoutPage() {
                     </div>
 
                     <div className="p-2.5 bg-gray-50 rounded-lg">
-                      <p className="text-[12px] text-gray-600 mb-1.5 font-medium">
-                        Available Coupons:
+                      <p className="text-[12px] text-gray-600 mb-1.5 font-medium flex gap-1 items-center">
+                      Available Coupons:
                       </p>
                       {coupons.length > 0 ? (
                         <div className="space-y-1">
@@ -703,6 +703,7 @@ export default function CheckoutPage() {
                         </div>
                       )}
                     </div>
+                    
                   </div>
                 ) : (
                   <div className="border-2 border-green-500 bg-green-50 rounded-lg p-3">

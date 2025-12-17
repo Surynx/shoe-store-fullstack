@@ -15,6 +15,25 @@ const placeNewOrder = async (req, res) => {
     const email = req.email;
     const user = await User.findOne({ email });
 
+    const orderCount= await Order.countDocuments({user_id:user._id});
+
+    if(orderCount == 0 && user.referred_by) {
+
+        let referrer = await User.findOne({_id:user.referred_by});
+
+        await Coupon.create({
+                code: `REF-${referrer.referral_code}`,
+                type: "flat",
+                value: 200,
+                min_purchase: 1000,
+                usageLimit: 1,
+                start_date: new Date(),
+                end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                status: true,
+                createdFor: referrer._id
+            });
+    }
+
     const { selectedAddress: address_id, selectedPayment: payment_method, appliedCoupon: coupon } = req.body;
 
     if (!address_id || !payment_method) {
@@ -80,9 +99,9 @@ const placeNewOrder = async (req, res) => {
     if(coupon) {
 
         const couponDoc= await Coupon.findOne({code:coupon.code});
+
         discount_coupon= couponDoc.type == "percentage" ? (total_amount*couponDoc.value)/100 : couponDoc.value;
 
-        couponDoc.usageLimit -=1;
         couponDoc.usageCount +=1;
 
         couponDoc.save();

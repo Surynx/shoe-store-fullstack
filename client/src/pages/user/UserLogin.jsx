@@ -55,7 +55,7 @@ export default function UserLogin() {
         <h2 className="text-2xl font-sans text-left mb-3">Welcome to Comet</h2>
         <p className="mb-8">Please login to continue</p>
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           <div className="">
             <label className="block text-sm font-bold text-gray-700 mb-1">
               Email
@@ -64,7 +64,7 @@ export default function UserLogin() {
               {...register("email")}
               type="email"
               placeholder="Enter your email"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black"
+              className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black"
               required
             />
           </div>
@@ -77,7 +77,7 @@ export default function UserLogin() {
               {...register("password")}
               type="password"
               placeholder="Enter your password"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black"
+              className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black"
               required
             />
             <p className="text-right text-xs text-gray-500 mt-2 cursor-pointer hover:text-gray-600 font-bold focus:" onClick={()=>nav("/forgotpassword")}>
@@ -101,7 +101,7 @@ export default function UserLogin() {
         </div>
 
 
-        <button onClick={handleGoogleAuth} className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-md hover:bg-gray-100 transition cursor-pointer">
+        <button onClick={handleGoogleAuth} className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 hover:bg-gray-100 transition cursor-pointer">
           <FcGoogle className="text-xl" />
           Continue with Google
         </button>

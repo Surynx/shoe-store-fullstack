@@ -11,18 +11,18 @@ const register = async (req, res) => {
 
     try {
 
-        const { name, email, password } = req.body;
+        const { name, email, password, referralCode } = req.body;
 
         let exist = await User.findOne({ email });
 
         if (exist) {
-            return res.status(STATUS.SUCCESS.OK).send({ success: false })
+            return res.status(STATUS.ERROR.CONFLICT).send({ message: "Email Already Exist!" })
         }
 
         const saltRound = 5;
         const hashed_pass = await hash(password, saltRound);
 
-        const referral_code= generateReferralCode();
+        const referral_code = generateReferralCode();
 
         let user = await User.create({
             name,
@@ -30,6 +30,17 @@ const register = async (req, res) => {
             password: hashed_pass,
             referral_code
         });
+
+        if (referralCode) {
+
+            let referred_user = await User.findOne({ referral_code: referralCode });
+
+            if (!referred_user) {
+                return res.status(STATUS.ERROR.BAD_REQUEST).send({ message: "Invalid Coupon Code" });
+            }
+
+            user.referred_by = referred_user._id;
+        }
 
         await user.save();
 
@@ -41,22 +52,22 @@ const register = async (req, res) => {
     }
 }
 
-const generateOtpForEmail= async(req,res)=>{
+const generateOtpForEmail = async (req, res) => {
 
-    try{
-    const {email} = req.body;
+    try {
+        const { email } = req.body;
 
-    const exist= await Otp.findOne({email});
+        const exist = await Otp.findOne({ email });
 
-    if(exist) {
-        await Otp.deleteOne({email});
-    }
+        if (exist) {
+            await Otp.deleteOne({ email });
+        }
 
-    const otp_generated = createNewOtp();
+        const otp_generated = createNewOtp();
 
-        console.log("OTP: "+otp_generated);
+        console.log("OTP: " + otp_generated);
 
-        await sendEmail(email,otp_generated);
+        await sendEmail(email, otp_generated);
 
         let otp = await Otp.create({
             email,
@@ -65,11 +76,11 @@ const generateOtpForEmail= async(req,res)=>{
 
         await otp.save();
 
-        return res.status(STATUS.SUCCESS.OK).send({success:true});
+        return res.status(STATUS.SUCCESS.OK).send({ success: true });
 
-    }catch(err) {
+    } catch (err) {
 
-        console.log("Error in Otp Gneration",err);
+        console.log("Error in Otp Gneration", err);
     }
 
 }
@@ -84,11 +95,11 @@ const verifyEmail = async (req, res) => {
 
         if (doc?.code == otp) {
             res.status(STATUS.SUCCESS.OK).send({ success: true, message: "Email Verified" });
-            await Otp.deleteOne({email});
+            await Otp.deleteOne({ email });
         } else {
             res.status(STATUS.ERROR.BAD_REQUEST).send({ success: false, message: "Wrong Otp" });
         }
-    }catch(error) {
+    } catch (error) {
         console.log("Error in verifyEmail");
     }
 
@@ -96,187 +107,187 @@ const verifyEmail = async (req, res) => {
 
 const verifyUser = async (req, res) => {
 
-    try{
+    try {
 
-    const { email } = req.body;
-    await User.updateOne({ email }, { isVerified: true });
-    return res.status(STATUS.SUCCESS.OK).send({success:true,message:"User Verified..!"});
+        const { email } = req.body;
+        await User.updateOne({ email }, { isVerified: true });
+        return res.status(STATUS.SUCCESS.OK).send({ success: true, message: "User Verified..!" });
 
-    }catch(error) {
+    } catch (error) {
         console.log("Error in verifyUser");
     }
 }
 
-const userLogin = async (req,res) => {
-    try{
+const userLogin = async (req, res) => {
+    try {
 
-        const {email,password} = req.body;
+        const { email, password } = req.body;
 
-        let doc= await User.findOne({email});
+        let doc = await User.findOne({ email });
 
-        if(!doc) {
-            return res.status(STATUS.ERROR.NOT_FOUND).send({success:false,message:"User not found"});
+        if (!doc) {
+            return res.status(STATUS.ERROR.NOT_FOUND).send({ success: false, message: "User not found" });
         }
 
-        let isMatch=await compare(password,doc.password);
+        let isMatch = await compare(password, doc.password);
 
-        if(!isMatch) {
-            return res.status(STATUS.ERROR.UNAUTHORIZED).send({success:false,message:"Invalid password"});
+        if (!isMatch) {
+            return res.status(STATUS.ERROR.UNAUTHORIZED).send({ success: false, message: "Invalid password" });
         }
 
-        if(doc.isBlock) {
-            return res.status(STATUS.ERROR.FORBIDDEN).send({success:false,message:"Blocked By Admin"});
+        if (doc.isBlock) {
+            return res.status(STATUS.ERROR.FORBIDDEN).send({ success: false, message: "Blocked By Admin" });
         }
 
-        if(doc.isVerified) {
+        if (doc.isVerified) {
 
-            const payload= {email:doc.email};
-            const token= jwt.sign(payload,process.env.Jwt_Key_User);
+            const payload = { email: doc.email };
+            const token = jwt.sign(payload, process.env.Jwt_Key_User);
 
-            return res.status(STATUS.SUCCESS.OK).send({success:true,message:"Login Success",token});
+            return res.status(STATUS.SUCCESS.OK).send({ success: true, message: "Login Success", token });
 
-        }else {
-            return res.status(STATUS.ERROR.FORBIDDEN).send({success:false,message:"notVerified"});
+        } else {
+            return res.status(STATUS.ERROR.FORBIDDEN).send({ success: false, message: "notVerified" });
         }
 
-    }catch(error) {
+    } catch (error) {
         console.log("Error in login");
     }
 }
 
-const resetPassword= async(req,res)=>{
-    const {newpassword,email} = req.body;
+const resetPassword = async (req, res) => {
+    const { newpassword, email } = req.body;
 
-    const doc = await User.findOne({email});
+    const doc = await User.findOne({ email });
 
-    if(!doc) {
-        return res.status(STATUS.ERROR.NOT_FOUND).send({success:false,message:"User not found"});
+    if (!doc) {
+        return res.status(STATUS.ERROR.NOT_FOUND).send({ success: false, message: "User not found" });
     }
 
     const saltRound = 5;
     const hashed_pass = await hash(newpassword, saltRound);
 
-    await User.updateOne({email},{password:hashed_pass});
+    await User.updateOne({ email }, { password: hashed_pass });
 
-    return res.status(STATUS.SUCCESS.OK).send({success:true,message:"Reset Success"});
+    return res.status(STATUS.SUCCESS.OK).send({ success: true, message: "Reset Success" });
 }
 
-const googleAuth= async(req,res)=>{
+const googleAuth = async (req, res) => {
 
     const user = req.user;
 
-    if(user.isBlock) {
+    if (user.isBlock) {
         return res.redirect(`${process.env.Client_LocalHost}/login`);
     }
-    
-    if(user) {
 
-        const payload = {email:user.email};
-        const token= await jwt.sign(payload,process.env.Jwt_Key_User);
+    if (user) {
+
+        const payload = { email: user.email };
+        const token = await jwt.sign(payload, process.env.Jwt_Key_User);
 
         return res.redirect(`${process.env.Client_LocalHost}/auth/google/success/${token}`);
     }
 }
 
-const fetchUserInfo= async(req,res)=> {
-    
-    try{
+const fetchUserInfo = async (req, res) => {
 
-    const email= req.email;
-    
-    let userInfo= await User.findOne({email});
+    try {
 
-    let referralCount= await User.countDocuments({referred_by:userInfo._id});
+        const email = req.email;
 
-    if(userInfo) {
-        
-        res.status(STATUS.SUCCESS.OK).send({userInfo,referralCount});
-    }else {
+        let userInfo = await User.findOne({ email });
 
-        res.status(STATUS.ERROR.NOT_FOUND).send("User Not Found")
-    }
-    }catch(error) {
-        console.log("Error in fetching user Info..",error);
+        let referralCount = await User.countDocuments({ referred_by: userInfo._id });
+
+        if (userInfo) {
+
+            res.status(STATUS.SUCCESS.OK).send({ userInfo, referralCount });
+        } else {
+
+            res.status(STATUS.ERROR.NOT_FOUND).send("User Not Found")
+        }
+    } catch (error) {
+        console.log("Error in fetching user Info..", error);
     }
 }
 
-const editUserInfo= async(req,res)=> {
+const editUserInfo = async (req, res) => {
 
-    try{
-        
-        const userEmail= req.email;
-        const { name,gender }= req.body;
+    try {
 
-        if(req.file) {
+        const userEmail = req.email;
+        const { name, gender } = req.body;
 
-            const {path}= req.file;
-            await User.updateOne({email:userEmail},{
+        if (req.file) {
+
+            const { path } = req.file;
+            await User.updateOne({ email: userEmail }, {
                 name,
                 gender,
-                profile_picture:path
+                profile_picture: path
             });
 
-            return res.status(STATUS.SUCCESS.OK).send({message:"Changes saved successfully!"})
-        }else {
+            return res.status(STATUS.SUCCESS.OK).send({ message: "Changes saved successfully!" })
+        } else {
 
-            await User.updateOne({email:userEmail},{
-            name,
-            gender
+            await User.updateOne({ email: userEmail }, {
+                name,
+                gender
             });
         }
 
-        return res.status(STATUS.SUCCESS.OK).send({message:"Changes saved successfully!"})
+        return res.status(STATUS.SUCCESS.OK).send({ message: "Changes saved successfully!" })
 
-    }catch(error) {
+    } catch (error) {
 
-        console.log("Error edituserInfo",error);
+        console.log("Error edituserInfo", error);
     }
 }
 
-const generateOtpForPhone= async(req,res)=> {
+const generateOtpForPhone = async (req, res) => {
 
-    const email= req.email;
-    const {phone}= req.body;
+    const email = req.email;
+    const { phone } = req.body;
 
-    await Otp.deleteOne({email});
-    
-    const otp_generated=createNewOtp();
-    console.log("OTP: ",otp_generated);
-    
+    await Otp.deleteOne({ email });
+
+    const otp_generated = createNewOtp();
+    console.log("OTP: ", otp_generated);
+
     await Otp.create({
         email,
-        code:otp_generated
+        code: otp_generated
     });
 
-    return res.send({success:true});
+    return res.send({ success: true });
 }
 
-const verifyPhone= async(req,res)=> {
+const verifyPhone = async (req, res) => {
 
-    try{
+    try {
 
-    const email= req.email;
-    const { phone,otp }= req.body;
+        const email = req.email;
+        const { phone, otp } = req.body;
 
-    let doc= await Otp.findOne({email});
+        let doc = await Otp.findOne({ email });
 
-    if(doc?.code == otp) {
+        if (doc?.code == otp) {
 
-        await User.updateOne({email},{phone:phone});
-        await Otp.deleteOne({email});
+            await User.updateOne({ email }, { phone: phone });
+            await Otp.deleteOne({ email });
 
-        return res.status(STATUS.SUCCESS.OK).send({success:true});
-    }else {
+            return res.status(STATUS.SUCCESS.OK).send({ success: true });
+        } else {
 
-        return res.status(STATUS.ERROR.BAD_REQUEST).send({success:false});
-    }
-    }catch(error) {
+            return res.status(STATUS.ERROR.BAD_REQUEST).send({ success: false });
+        }
+    } catch (error) {
 
-        console.log("Error in VerifyPhone",error);
+        console.log("Error in VerifyPhone", error);
     }
 }
 
-const updateEmail= async(req,res)=> {
+const updateEmail = async (req, res) => {
 
     const oldEmail = req.email;
     const { email, otp } = req.body;
@@ -287,7 +298,7 @@ const updateEmail= async(req,res)=> {
     if (doc?.code == otp) {
 
         await User.updateOne({ email: oldEmail }, { email: email });
-        await Otp.deleteOne({email});
+        await Otp.deleteOne({ email });
 
         return res.status(STATUS.SUCCESS.OK).send({ success: true });
     }
@@ -295,46 +306,48 @@ const updateEmail= async(req,res)=> {
     return res.status(STATUS.ERROR.BAD_REQUEST).send({ success: false });
 };
 
-const changePassword= async(req,res)=> {
+const changePassword = async (req, res) => {
 
-    try{
-    const { currentPassword,newPassword,confirmPassword }= req.body;
+    try {
+        const { currentPassword, newPassword, confirmPassword } = req.body;
 
-    const email= req.email;
+        const email = req.email;
 
-    if(newPassword != confirmPassword) {
-        return res.status(STATUS.ERROR.BAD_REQUEST).send({success:false,message:"Password not match"});
-    }
+        if (newPassword != confirmPassword) {
+            return res.status(STATUS.ERROR.BAD_REQUEST).send({ success: false, message: "Password not match" });
+        }
 
-    const userDoc = await User.findOne({email});
+        const userDoc = await User.findOne({ email });
 
-    let match= await compare(newPassword,userDoc.password);
+        let match = await compare(newPassword, userDoc.password);
 
-    if(match) {
+        if (match) {
 
-        return res.status(STATUS.ERROR.BAD_REQUEST).send({success:false,message:"Please provide a new Password!"});
-    }
-    
-    match= await compare(currentPassword,userDoc.password);
+            return res.status(STATUS.ERROR.BAD_REQUEST).send({ success: false, message: "Please provide a new Password!" });
+        }
 
-    if(!match) {
+        match = await compare(currentPassword, userDoc.password);
 
-        return res.status(STATUS.ERROR.BAD_REQUEST).send({success:false,message:"Current password is wrong please recheck!"});
-    } 
+        if (!match) {
 
-    const saltRound = 5;
-    const hashed_pass = await hash(newPassword, saltRound);
+            return res.status(STATUS.ERROR.BAD_REQUEST).send({ success: false, message: "Current password is wrong please recheck!" });
+        }
 
-    await User.updateOne({email},{password:hashed_pass});
+        const saltRound = 5;
+        const hashed_pass = await hash(newPassword, saltRound);
 
-    return res.status(STATUS.SUCCESS.OK).send({success:true,message:"Password Change Successfully"});
+        await User.updateOne({ email }, { password: hashed_pass });
 
-    }catch(error) {
+        return res.status(STATUS.SUCCESS.OK).send({ success: true, message: "Password Change Successfully" });
 
-        console.log("Error in change password!",error);
+    } catch (error) {
+
+        console.log("Error in change password!", error);
     }
 }
 
 
-export { register, verifyEmail, verifyUser,userLogin,generateOtpForEmail,resetPassword,googleAuth,fetchUserInfo,editUserInfo,generateOtpForPhone,
-    verifyPhone,updateEmail,changePassword }
+export {
+    register, verifyEmail, verifyUser, userLogin, generateOtpForEmail, resetPassword, googleAuth, fetchUserInfo, editUserInfo, generateOtpForPhone,
+    verifyPhone, updateEmail, changePassword
+}

@@ -8,50 +8,61 @@ import User from "../../models/user.model.js";
 import { cleanCartDoc } from "../../utils/cart.util.js";
 
 
-const getCheckoutData= async(req,res)=> {
+const getCheckoutData = async (req, res) => {
 
-    try{
-    const email= req.email;
+    try {
 
-    const user= await User.findOne({email});
+        const email = req.email;
 
-    if (!user) {
-      return res.status(STATUS.ERROR.NOT_FOUND).json({ success:false,message: "User not found" });
-    }
+        const user = await User.findOne({ email });
 
-    const addressDocs= await Address.find({user_id:user._id});
+        if (!user) {
+            return res.status(STATUS.ERROR.NOT_FOUND).json({ success: false, message: "User not found" });
+        }
 
-    const cartDoc= await Cart.findOne({user_id:user._id}).populate("items.product_id").populate("items.variant_id");
+        const addressDocs = await Address.find({ user_id: user._id });
 
-    const cartItems= cleanCartDoc(cartDoc);
+        const cartDoc = await Cart.findOne({ user_id: user._id }).populate("items.product_id").populate("items.variant_id");
 
-    const cartItemsWithOffers= await Promise.all(cartItems.map( async(item)=> {
+        const cartItems = cleanCartDoc(cartDoc);
 
-        const offers= await Offer.find({$or:[{category_id:item.category_id},{product_id:item.product_id}], start_date:{ $lte:new Date() },end_date:{ $gte:new Date()}})
-        const bestOffer = findBestOffer(offers,item.sales_price);
+        const cartItemsWithOffers = await Promise.all(cartItems.map(async (item) => {
 
-        return {...item,bestOffer:bestOffer}
-    }));
+            const offers = await Offer.find({ $or: [{ category_id: item.category_id }, { product_id: item.product_id }], start_date: { $lte: new Date() }, end_date: { $gte: new Date() } })
+            const bestOffer = findBestOffer(offers, item.sales_price);
 
-    const itemTotal = cartItemsWithOffers.reduce((acc,curr)=> {
+            return { ...item, bestOffer: bestOffer }
+        }));
 
-        (curr.bestOffer) ? acc+= (curr.sales_price * curr.quantity) - curr.bestOffer.discount_price : acc+= curr.sales_price * curr.quantity;
+        const itemTotal = cartItemsWithOffers.reduce((acc, curr) => {
 
-        return acc;
-    },0);
+            (curr.bestOffer) ? acc += (curr.sales_price * curr.quantity) - curr.bestOffer.discount_price : acc += curr.sales_price * curr.quantity;
 
-    const tax= (itemTotal*0.18);
+            return acc;
+        }, 0);
 
-    const total_amount= itemTotal + tax;
+        const tax = (itemTotal * 0.18);
 
-    const coupon= await Coupon.find({min_purchase:{$lte : total_amount},start_date:{ $lte:new Date() },end_date:{ $gte:new Date()},status:{$ne:false},usageLimit:{$gt:0}});
+        const total_amount = itemTotal + tax;
 
-    res.status(STATUS.SUCCESS.OK).send({cartItemsWithOffers,addressDocs,coupon});
+        const coupon = await Coupon.find({
+            min_purchase: { $lte: total_amount },
+            start_date: { $lte: new Date() },
+            end_date: { $gte: new Date() },
+            status: true,
+            $expr: { $lt: ["$usageCount", "$usageLimit"] },
+            $or: [
+                { createdFor: user._id },
+                { createdFor: null }
+            ]
+        });
 
-    }catch(error) {
+        res.status(STATUS.SUCCESS.OK).send({ cartItemsWithOffers, addressDocs, coupon });
 
-        console.log("Error in getcheckoutData",error);
+    } catch (error) {
+
+        console.log("Error in getcheckoutData", error);
     }
 }
 
-export {getCheckoutData}
+export { getCheckoutData }

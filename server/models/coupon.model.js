@@ -24,7 +24,7 @@ const couponSchema= new mongoose.Schema({
     },
     usageLimit: {
         type: Number,
-        default: 0,
+        default: 1,
     },
     usageCount: {
         type: Number,
@@ -48,6 +48,10 @@ const couponSchema= new mongoose.Schema({
     status: {
         type: Boolean,
         default:true
+    },
+    createdFor: {
+        type: mongoose.Schema.ObjectId,
+        default:null
     }
 },{timestamps:true});
 
