@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import createNewOtp from "../../utils/otp.util.js";
 import STATUS from "../../constants/status.constant.js";
 import sendEmail from "../../utils/send-otp-mail.js";
+import generateReferralCode from "../../utils/referral.util.js";
 
 const register = async (req, res) => {
 
@@ -21,10 +22,13 @@ const register = async (req, res) => {
         const saltRound = 5;
         const hashed_pass = await hash(password, saltRound);
 
+        const referral_code= generateReferralCode();
+
         let user = await User.create({
             name,
             email,
             password: hashed_pass,
+            referral_code
         });
 
         await user.save();
@@ -182,9 +186,13 @@ const fetchUserInfo= async(req,res)=> {
     
     let userInfo= await User.findOne({email});
 
+    let referralCount= await User.countDocuments({referred_by:userInfo._id});
+
     if(userInfo) {
-        res.status(STATUS.SUCCESS.OK).send({userInfo});
+        
+        res.status(STATUS.SUCCESS.OK).send({userInfo,referralCount});
     }else {
+
         res.status(STATUS.ERROR.NOT_FOUND).send("User Not Found")
     }
     }catch(error) {
@@ -289,21 +297,30 @@ const updateEmail= async(req,res)=> {
 
 const changePassword= async(req,res)=> {
 
-    const { newPassword,otp } = req.body;
+    try{
+    const { currentPassword,newPassword,confirmPassword }= req.body;
+
     const email= req.email;
 
-    const otpDoc= await Otp.findOne({email});
-
-    if(otpDoc.code != otp) {
-
-        return res.status(STATUS.ERROR.BAD_REQUEST).send({success:false,message:"Invalid Otp"});
+    if(newPassword != confirmPassword) {
+        return res.status(STATUS.ERROR.BAD_REQUEST).send({success:false,message:"Password not match"});
     }
 
-    const doc = await User.findOne({email});
+    const userDoc = await User.findOne({email});
 
-    if(!doc) {
-        return res.status(STATUS.ERROR.NOT_FOUND).send({success:false,message:"User not found"});
+    let match= await compare(newPassword,userDoc.password);
+
+    if(match) {
+
+        return res.status(STATUS.ERROR.BAD_REQUEST).send({success:false,message:"Please provide a new Password!"});
     }
+    
+    match= await compare(currentPassword,userDoc.password);
+
+    if(!match) {
+
+        return res.status(STATUS.ERROR.BAD_REQUEST).send({success:false,message:"Current password is wrong please recheck!"});
+    } 
 
     const saltRound = 5;
     const hashed_pass = await hash(newPassword, saltRound);
@@ -311,6 +328,11 @@ const changePassword= async(req,res)=> {
     await User.updateOne({email},{password:hashed_pass});
 
     return res.status(STATUS.SUCCESS.OK).send({success:true,message:"Password Change Successfully"});
+
+    }catch(error) {
+
+        console.log("Error in change password!",error);
+    }
 }
 
 

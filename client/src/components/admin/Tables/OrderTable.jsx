@@ -20,7 +20,7 @@ const OrderTable = ({ data, isLoading }) => {
         <thead className="bg-gray-50 text-gray-600 uppercase text-xs tracking-wider">
           <tr>
             <th className="py-3 px-5 text-left w-[15%]">Order ID</th>
-            <th className="py-3 px-5 text-left w-[15%]">Date</th>
+            <th className="py-3 px-5 text-left w-[18%]">Date</th>
             <th className="py-3 px-5 text-left w-[20%]">Customer</th>
             <th className="py-3 px-5 text-center w-[10%]">Items</th>
             <th className="py-3 px-5 text-right w-[15%]">Amount</th>

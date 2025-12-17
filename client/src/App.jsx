@@ -34,6 +34,8 @@ import OrderListing from "./pages/user/OrderListing"
 import OrderDetail from "./pages/user/OrderDetail"
 import OrderManagement from "./pages/admin/OrderManagment"
 import OrderDetailPage from "./pages/admin/OrderDetail"
+import WishList from "./pages/user/WishList"
+import CouponManagment from "./pages/admin/CouponManagment"
 
 
 function App() {
@@ -60,6 +62,7 @@ function App() {
               <Route path="product/varient/:id" element={<AddVariant/>}/>
               <Route path="orders" element={<OrderManagement/>}/>
               <Route path="order/detail/:id" element={<OrderDetailPage/>}/>
+              <Route path="coupon" element={<CouponManagment/>}/>
             </Route>
 
           {/* User Route */}
@@ -77,6 +80,7 @@ function App() {
             <Route path="Cart" element={<UserProtected><Cart/></UserProtected>}/>
             <Route path="checkout" element={<CheckoutPage/>}/>
             <Route path="order/success/:id" element={<OrderSuccess/>}/>
+            <Route path="wishlist" element={<WishList/>}/>
             <Route path="/account" element={<UserProtected><Profile/></UserProtected>}>
               <Route index path="profile" element={<UserInfo/>}/>
               <Route path="edit" element={<EditProfile/>}/>

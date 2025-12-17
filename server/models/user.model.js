@@ -31,6 +31,15 @@ const userSchema=new mongoose.Schema({
     isBlock:{
         type:Boolean,
         default:false
+    },
+    referral_code:{
+        type:String,
+        unique:true
+    },
+    referred_by:{
+        type:mongoose.Schema.ObjectId,
+        ref:"users",
+        default:null
     }
 },{timestamps:true});
 

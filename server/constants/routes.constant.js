@@ -13,6 +13,9 @@ const ROUTES= {
             ADD:"/category/add",
             FETCH:"/category",
             EDIT:"/category/edit",
+            ADD_OFFER:"/category/offer/:id",
+            GET_OFFERS:"/category/offers/:id",
+            REMOVE_OFFER:"/category/offer/:id"
         },
         BRAND:{
             ADD:"/brand/add",
@@ -22,7 +25,10 @@ const ROUTES= {
         PRODUCT:{
             ADD:"/product/add",
             FETCH:"/product",
-            EDIT:"/product/edit/:id"
+            EDIT:"/product/edit/:id",
+            ADD_OFFER:"/product/offer/:id",
+            GET_OFFERS:"/product/offers/:id",
+            REMOVE_OFFER:"/product/offer/:id"
         },
         VARIENTS:{
             ADD:"/variant/add/:id",
@@ -37,6 +43,11 @@ const ROUTES= {
             APPROVE_RETURN:"/item/return/approve/:order_id/:item_id",
             COMPLETE_RETURN:"/item/return/complete/:order_id/:item_id",
             REJECT_RETURN:"/item/return/reject/:order_id/:item_id"
+        },
+        COUPON:{
+            ADD:"/coupon",
+            GET:"/coupon",
+            CHNAGE_STATUS:"/coupon/:id"
         }
     },
     USER:{
@@ -95,6 +106,15 @@ const ROUTES= {
             CANCEL_ORDER:"/order/cancel/:id",
             CANCEL_ITEM:'/order/item/cancel/:order_id/:item_id',
             RETURN_ITEM:"/order/item/return/:order_id/:item_id",
+            DOWNLOAD_INVOICE:"/order/invoice/:order_id"
+        },
+        WISHLIST:{
+            ADD:"/wishlist/add",
+            FETCH:"/wishlist",
+            REMOVE:"/wishlist/item/:id"
+        },
+        COUPON:{
+            VALIDATE:"/coupon"
         }
     }
 }

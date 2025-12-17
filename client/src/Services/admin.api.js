@@ -145,6 +145,61 @@ const rejectReturn= async(orderId, itemId)=> {
     return res;
 }
 
+const addOfferForCategory= async (data,id) => {
+    
+    const res= await api.post(`/admin/category/offer/${id}`,data);
+    return res;
+}
+
+const getAllOfferOfCategory= async(id)=> {
+
+    const res= await api.get(`/admin/category/offers/${id}`);
+    return res;
+}
+
+const  deleteOffer= async(id)=> {
+
+    const res= await api.delete(`/admin/category/offer/${id}`);
+    return res;
+}
+
+const addOfferForProduct= async (data,id) => {
+    
+    const res= await api.post(`/admin/product/offer/${id}`,data);
+    return res;
+}
+
+const getAllOfferOfProduct= async(id)=> {
+
+    const res= await api.get(`/admin/product/offers/${id}`);
+    return res;
+}
+
+const addNewCoupon= async(data)=> {
+
+    const res= await api.post(`/admin/coupon`,data);
+    return res;
+}
+
+const getAllCoupon= async(search,page)=> {
+
+    const res= await api.get("/admin/coupon",{
+        params:{
+            search:search,
+            page:page
+        }
+    });
+    return res;
+}
+
+
+const changeCouponStatus= async(id)=> {
+
+    const res= await api.patch(`/admin/coupon/${id}`);
+    return res;
+}
+
 export { verifyAdmin,getAllusers,blockUser,addCategory,getAllCategory,editCategory,addBrand,getAllbrand,editBrand,addProduct,
     getAllProduct,editProduct,addVariant,getAllVariant,removeVariant,updateVariant,getAllOrders,getOrderDetailsForAdmin,changeOrderStatus,
-    approveReturn,completeReturn,rejectReturn }
+    approveReturn,completeReturn,rejectReturn,addOfferForCategory,getAllOfferOfCategory,deleteOffer,addOfferForProduct,
+    getAllOfferOfProduct,addNewCoupon,getAllCoupon,changeCouponStatus }

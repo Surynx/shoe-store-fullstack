@@ -140,7 +140,7 @@ const OrderListingPage = () => {
         <h1 className="text-2xl font-bold text-gray-900">My Orders</h1>
         <p className="text-sm text-gray-500">Track and manage your orders</p>
       </div>
-
+    <div>
       <div className="relative">
         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
         <input
@@ -151,7 +151,8 @@ const OrderListingPage = () => {
           className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-lg outline-none"
         />
       </div>
-
+      
+      </div>
       {filteredOrders.length === 0 && (
         <div className="text-center py-12">
           <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />

@@ -1,104 +1,155 @@
-import { span } from "framer-motion/client";
-import { Heart, Timer } from "lucide-react";
-import { use, useState } from "react";
+import { Heart, Tag, Timer } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { addToCart } from "../../Services/user.api";
+import { addToCart, addToFavourite } from "../../Services/user.api";
 import toast from "react-hot-toast";
-import { QueryClient, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
 
-export default function ProductDetail({ data }) {
+export default function ProductDetail({ data, setActiveVariant, activeVariant, offer, bestOffer }) {
 
-  const nav=useNavigate();
-  const QueryClient=useQueryClient();
+  const nav = useNavigate();
+
+  const QueryClient = useQueryClient();
 
   const productDoc = data?.data?.productDoc;
+
   const variant_array = data?.data?.variant_array || [];
 
-  const [activeVariant, setActiveVariant] = useState(variant_array[0]);
+  const offer_price= bestOffer && bestOffer.type == "percentage" ? (activeVariant.sales_price*bestOffer.value)/100 : bestOffer?.value || 0;
 
-  
-
-  if(!productDoc?.status) {
+  if (!productDoc?.status) {
     nav("/shop");
   }
 
-  const handleAddtoCart= async()=> {
+  const discount_price = offer?.discount_price || 0;
 
-    if(localStorage.getItem("userToken")) {
+  const handleAddtoCart = async () => {
 
-    try{
+    if (localStorage.getItem("userToken")) {
 
-    const res= await addToCart({product_id:productDoc._id,variant_id:activeVariant._id});
+      try {
 
-    if(res.data.success) {
+        const res= await addToCart({ product_id: productDoc._id,variant_id: activeVariant._id });
 
-      toast.success(`${productDoc.name} of size ${activeVariant.size} Added To Bag Successfully!`);
-      nav("/cart");
-      QueryClient.invalidateQueries("cart-count");
-    }
-
-    }catch(error) {
-
-      toast.error(error.response.data.message);
-
-    } }else {
-
-      nav("/login");
+        if (res.data.success) {
+          toast.success(
+            `${productDoc.name} of size ${activeVariant.size} Added To Bag Successfully!`
+          );
+          nav("/cart");
+          QueryClient.invalidateQueries("cart-count");
+        }
+      } catch (error) {
+        toast.error(error.response.data.message);
+      }
+    } else {
+      nav("/signup");
       toast("Please login to Add Product To Bag");
     }
-  }
+  };
+  
+  const handleAddtoFavourite = async () => {
+
+    if (localStorage.getItem("userToken")) {
+
+      try {
+
+        const res= await addToFavourite({ product_id:productDoc._id,variant_id:activeVariant._id });
+
+        if (res.data.success) {
+          toast.success(
+            `${productDoc.name} of size ${activeVariant.size} Added To Favourite Successfully!`
+          );
+          nav("/wishlist");
+        }
+
+        
+      } catch (error) {
+
+        toast.error(error?.response?.data?.message);
+      }
+
+    }else {
+
+      nav("/signup");
+      toast("Please login to Add Product To Favourite!");
+    }
+  };
+
 
   return (
     <div className="w-100 ml-10">
       <h1 className="text-lg font-sans mb-1">{productDoc?.name}</h1>
-      <p className="text-sm text-gray-600">{productDoc?.gender}'s Shoes</p>
+      <p className="text-sm text-gray-600">{productDoc?.gender}'s {productDoc.category_id.name}</p>
 
       <div className="mt-3 flex gap-2">
-        <p className="text-xl font-sans">{ (activeVariant?.sales_price) ? `MRP: ₹${activeVariant?.sales_price}` : <span className="text-sm font-semibold text-gray-500">Details Unavailabe.</span>}</p>
+        <p className="text-xl font-sans">
+          {activeVariant?.sales_price ? (
+            `MRP: ₹${activeVariant?.sales_price - offer_price}`
+          ) : (
+            <span className="text-sm font-semibold text-gray-500">
+              Details Unavailabe.
+            </span>
+          )}
+        </p>
         {activeVariant?.original_price && (
           <div className="flex items-center font-sans gap-3 mt-1">
             <p className="text-gray-500 line-through text-md">
               ₹{activeVariant?.original_price}
             </p>
 
-            <p className="text-red-600 text-sm">
-              {activeVariant?.discount}% off
-            </p>
+            { bestOffer ? <span className="bg-green-100 border flex gap-1 border-green-300 text-black text-[11px] font-semibold px-2 py-0.5">
+              <Tag size={18}/>{bestOffer.type === "percentage"
+                ? `${bestOffer.value}% OFF`
+                : `₹${bestOffer.value} FLAT OFF`}
+            </span> : <p className="text-red-700">{activeVariant.discount}% off</p>}
           </div>
-          
         )}
       </div>
-      {activeVariant?.stock == 0 ? <p className="flex mt-4 text-red-600 gap-1"><Timer size={20}/>Sold out</p> : null}
+      {activeVariant?.stock == 0 ? (
+        <p className="flex mt-4 text-red-600 gap-1">
+          <Timer size={20} />
+          Out of stock
+        </p>
+      ) : null}
 
       <h3 className="mt-6 mb-2 font-semibold">Select Size</h3>
 
       <div className="grid grid-cols-3 sm:grid-cols-2 gap-3">
-        {(activeVariant?.size) ? variant_array.map((variant) => (
-          <button
-            key={variant._id}
-            onClick={() => setActiveVariant(variant)}
-            className={`py-2 border rounded text-sm cursor-pointer ${
-              activeVariant?.size === variant?.size
-                ? "border-black font-medium"
-                : "border-gray-300"
-            }`}
-          >
-            {variant?.size}
-          </button>
-        )) : <span className="text-sm font-light text-gray-400">currently unavailabe.</span>}
+        {activeVariant?.size ? (
+          variant_array.map((variant) => (
+            <button
+              key={variant._id}
+              onClick={() => setActiveVariant(variant)}
+              className={`py-2 border rounded text-sm cursor-pointer ${
+                activeVariant?.size === variant?.size
+                  ? "border-black font-medium"
+                  : "border-gray-300"
+              }`}
+            >
+              {variant?.size}
+            </button>
+          ))
+        ) : (
+          <span className="text-sm font-light text-gray-400">
+            currently unavailabe.
+          </span>
+        )}
       </div>
-      <button className="w-full mt-6 py-3 bg-black text-white rounded-3xl hover:bg-gray-900 cursor-pointer" onClick={handleAddtoCart}>
+      <button
+        className="w-full mt-6 py-3 bg-black text-white rounded-3xl hover:bg-gray-900 cursor-pointer"
+        onClick={handleAddtoCart}
+      >
         Add to Bag
       </button>
-      <button className="w-full flex items-center justify-center mt-5 py-3 gap-1 border text-black rounded-3xl hover:bg-gray-100">
-        Favourite <Heart size={20} />
+      <button className="w-full flex items-center justify-center mt-5 py-3 gap-1 border text-black rounded-3xl hover:bg-gray-100 cursor-pointer"
+      onClick={handleAddtoFavourite}
+      >
+        Add Favourite <Heart size={20} />
       </button>
 
       <div className="mt-6 text-sm text-gray-700 leading-relaxed">
         {productDoc?.description}
       </div>
-
-      <div className="mt-8 border-t pt-6">
+      <div className="mt-6 pt-6 border-t border-gray-300">
         <h3 className="text-lg font-semibold mb-3">Delivery & Returns</h3>
 
         <ul className="text-sm text-gray-700 list-disc pl-5 space-y-2">

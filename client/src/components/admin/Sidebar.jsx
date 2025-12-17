@@ -1,17 +1,19 @@
-import {  Folder, Home, Lightbulb, LogOut, Package, ShoppingBag, ShoppingCart, Shovel, TagIcon, User } from 'lucide-react'
+import {  Folder, Gift, Home, Lightbulb, LogOut, Package, ShoppingBag, ShoppingCart, Shovel, Tag, TagIcon, User } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast';
 import { SiStockx } from 'react-icons/si';
 import { GiStockpiles } from 'react-icons/gi';
+import { path } from 'framer-motion/client';
+import { RiCoupon2Fill, RiCoupon2Line, RiCouponFill } from 'react-icons/ri';
 
 function Sidebar() {
 
     const nav=useNavigate();
 
     const menuItems = [{
-        name: "Dashboard", icon: <Home color='black' size={20} />, path: "/admin/dashboard"
+        name: "Dashboard", icon: <Home color='black' size={20} />, path:"/admin/dashboard"
     }, {
-        name: "Users", icon: <User color='black' size={20} />, path: "/admin/users"
+        name: "Users", icon: <User color='black' size={20} />, path:"/admin/users"
     },{
         name:"Category" , icon: <Folder color='black' size={20}/> , path:"/admin/category"
     },{
@@ -20,6 +22,8 @@ function Sidebar() {
         name:"Product", icon:<Package color='black' size={20}/>,path:"/admin/product"
     },{
         name:"Orders", icon:<ShoppingCart color='black' size={20}/>,path:"/admin/orders"
+    },{
+        name:"Coupon", icon:<Gift color='black' size={20}/> , path:"/admin/coupon"
     }]
 
     const logout=()=>{

@@ -1,6 +1,9 @@
+import { findBestOffer } from "../../computation/offer.computation.js";
 import STATUS from "../../constants/status.constant.js";
 import Address from "../../models/address.model.js";
 import Cart from "../../models/cart.model.js";
+import Coupon from "../../models/coupon.model.js";
+import Offer from "../../models/offer.model.js";
 import User from "../../models/user.model.js";
 import { cleanCartDoc } from "../../utils/cart.util.js";
 
@@ -22,7 +25,28 @@ const getCheckoutData= async(req,res)=> {
 
     const cartItems= cleanCartDoc(cartDoc);
 
-    res.status(STATUS.SUCCESS.OK).send({cartItems,addressDocs});
+    const cartItemsWithOffers= await Promise.all(cartItems.map( async(item)=> {
+
+        const offers= await Offer.find({$or:[{category_id:item.category_id},{product_id:item.product_id}], start_date:{ $lte:new Date() },end_date:{ $gte:new Date()}})
+        const bestOffer = findBestOffer(offers,item.sales_price);
+
+        return {...item,bestOffer:bestOffer}
+    }));
+
+    const itemTotal = cartItemsWithOffers.reduce((acc,curr)=> {
+
+        (curr.bestOffer) ? acc+= (curr.sales_price * curr.quantity) - curr.bestOffer.discount_price : acc+= curr.sales_price * curr.quantity;
+
+        return acc;
+    },0);
+
+    const tax= (itemTotal*0.18);
+
+    const total_amount= itemTotal + tax;
+
+    const coupon= await Coupon.find({min_purchase:{$lte : total_amount},start_date:{ $lte:new Date() },end_date:{ $gte:new Date()},status:{$ne:false},usageLimit:{$gt:0}});
+
+    res.status(STATUS.SUCCESS.OK).send({cartItemsWithOffers,addressDocs,coupon});
 
     }catch(error) {
 

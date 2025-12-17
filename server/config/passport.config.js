@@ -2,6 +2,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy }  from "passport-google-oauth20";
 import User from "../models/user.model.js";
 import { configDotenv } from "dotenv";
+import generateReferralCode from "../utils/referral.util.js";
 
 configDotenv();
 
@@ -17,21 +18,23 @@ passport.use(
             let user = await User.findOne({ email:profile.emails[0].value });
 
             if(!user) {
+
+                const referral_code= generateReferralCode();
                 
                 user = await User.create({
                     name:profile.displayName,
                     email:profile.emails[0].value,
                     profile_picture:profile.photos[0].value,
-                    isVerified:true
+                    isVerified:true,
+                    referral_code
                 });
 
                 await user.save();
 
-            }else {
-                
+            }else { 
                 await User.updateOne({email:user.email},{
                     name:profile.displayName,
-                    isVerified:true
+                    isVerified:true,
                 });
             }
 

@@ -53,14 +53,14 @@ export default function Login() {
                 position="top-center"
                 reverseOrder={false}
             />
-            <div className="bg-white rounded-md border p-8 w-full max-w-sm">
-                <div className="flex font-bold text-sm ml-20 gap-1 text-green-800 w-80 h-10 mb-5">
+            <div className="rounded-md p-2 w-full max-w-sm">
+                 <div className="flex rounded-md items-center justify-center font-bold text-sm mx-auto gap-1 text-green-800 w-80 h-10 mb-5 border border-green-300 bg-green-100">
                     <FaExclamationCircle size={20}/> Slick Admin Panel
                 </div>
 
-                <div className="mb-5">
+                <div className="mb-6">
                     <h2 className="text-lg font-semibold text-gray-900 text-center">Welcome back</h2>
-                    <p className="text-xs text-gray-500 text-center">Sign in to your admin account</p>
+                    <p className="text-xs text-gray-500 text-center mt-1 font-sans">Sign in to your admin account</p>
                 </div>
 
                 <form onSubmit={handleSubmit(submit)} className="space-y-4">
@@ -71,7 +71,7 @@ export default function Login() {
                         <input
                             type="email"
                             placeholder="Enter you Mail"
-                            className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none"
+                            className="w-full border border-gray-300 px-3 py-1 text-sm outline-none"
                             {...register("email", { required: "field is required", pattern: { value: /^\S+@\S+$/i, message: "Invalid mail" } })}
                         />
                         <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.email?.message ? `${formState.errors.email?.message}` : null}</p>
@@ -85,7 +85,7 @@ export default function Login() {
                             <input
                                 type="password"
                                 placeholder="Enter your password"
-                                className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm outline-none"
+                                className="w-full border border-gray-300 px-3 py-1 text-sm outline-none"
                                 {...register("password", { required: "field is required" })}
                             />
                             <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.password?.message ? `${formState.errors.password?.message}` : null}</p>
@@ -98,7 +98,7 @@ export default function Login() {
 
                     <button
                         type="submit"
-                        className="cursor-pointer w-full bg-black text-white py-2 rounded-lg text-sm font-medium hover:bg-gray-900 transition"
+                        className="cursor-pointer w-full bg-black text-white py-2 text-sm font-medium hover:bg-gray-900 transition"
                     >
                         Login
                     </button>

@@ -68,13 +68,10 @@ const OrderDetail = () => {
     };
   };
 
-  const handleCancelOrder = () => {
-    console.log("Cancel order:", order.orderId, "Reason:", cancelReason);
-    setShowCancelModal(false);
-  };
 
   const handleDownloadInvoice = () => {
-    console.log("Download invoice:", order.orderId);
+    
+    window.open(`${import.meta.env.VITE_BASE_URL}/user/order/invoice/${order._id}`,"_blank");
   };
 
   if (!order) return <div className="text-center py-12">Loading...</div>;
@@ -261,7 +258,7 @@ const OrderDetail = () => {
                       <div className="flex items-center gap-2 mb-1">
                         <span className="text-sm font-bold text-gray-900">
                           ₹
-                          {item?.variant_id?.sales_price?.toLocaleString(
+                          {item?.sales_price?.toLocaleString(
                             "en-IN"
                           )}
                         </span>
@@ -269,7 +266,7 @@ const OrderDetail = () => {
                           item.variant_id?.sales_price && (
                           <span className="text-xs text-gray-400 line-through">
                             ₹
-                            {item?.variant_id?.original_price.toLocaleString(
+                            {item?.original_price.toLocaleString(
                               "en-IN"
                             )}
                           </span>
@@ -340,7 +337,7 @@ const OrderDetail = () => {
                         <p className="text-base font-bold text-gray-900">
                           ₹
                           {(
-                            item?.variant_id?.sales_price * item.quantity
+                            item?.sales_price * item.quantity
                           ).toLocaleString("en-IN")}
                         </p>
                       )}
@@ -504,22 +501,11 @@ const OrderDetail = () => {
               <div className="space-y-3">
                 <button
                   onClick={handleDownloadInvoice}
-                  className="w-full px-3 py-2 text-sm font-medium text-blue-700 border border-blue-700 transition-colors flex items-center justify-center gap-2"
+                  className="w-full px-3 py-2 text-sm font-medium text-blue-700 cursor-pointer border border-blue-700 transition-colors flex items-center justify-center gap-2"
                 >
                   <Download className="w-4 h-4" />
                   Download Invoice
                 </button>
-
-                {/* {[
-                  "pending",
-                  "confirmed",
-                  "shipped",
-                  "out_for_delivery",
-                ].includes(order.status) && (
-                  <button className="w-full px-3 py-2 text-sm font-medium text-red-600 border border-red-700 transition-colors">
-                    Cancel Order
-                  </button>
-                )} */}
               </div>
             </div>
           </div>

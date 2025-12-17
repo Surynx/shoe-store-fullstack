@@ -1,4 +1,4 @@
-import BrandTable from "../../components/admin/BrandTable";
+import BrandTable from "../../components/admin/Tables/BrandTable";
 import { FaPlus } from "react-icons/fa";
 import SearchBox from "../../components/admin/SearchBox";
 import Pagination from "../../components/admin/Pagination";
@@ -32,9 +32,12 @@ function BrandManagment() {
     <>
       <div className="p-8 bg-gray-50 min-h-screen">
         <div className="flex justify-between items-center mb-6">
+          <div>
           <h1 className="text-2xl font-bold text-gray-800">
             Brand Management
           </h1>
+          <h6 className='text-xs font-md mt-2'>Available Brands: <span className='font-semibold'>{data?.data?.docs?.length}</span></h6>
+          </div>
           <button
           onClick={()=>nav("/admin/brand/add")} 
           className="cursor-pointer flex items-center bg-green-800 text-white px-3 py-2 rounded-md hover:bg-green-900 transition text-xs font-bold">

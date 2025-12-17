@@ -51,11 +51,12 @@ export default function UserLogin() {
 
   return (
     <div className="flex justify-center items-center px-4">
-      <div className="bg-white p-8 rounded-lg border text-sm w-2xl max-w-sm">
-        <h2 className="text-2xl font-bold text-center mb-8">Login</h2>
+      <div className="bg-white p-8 text-sm w-2xl max-w-sm">
+        <h2 className="text-2xl font-sans text-left mb-3">Welcome to Comet</h2>
+        <p className="mb-8">Please login to continue</p>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
+          <div className="">
             <label className="block text-sm font-bold text-gray-700 mb-1">
               Email
             </label>
@@ -86,7 +87,7 @@ export default function UserLogin() {
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-900 transition-colors cursor-pointer"
+            className="w-full bg-black text-white py-2 hover:bg-gray-900 transition-colors cursor-pointer"
           >
             Login
           </button>

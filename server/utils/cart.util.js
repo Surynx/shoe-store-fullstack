@@ -8,8 +8,8 @@ export const cleanCartDoc= (cartDoc)=> {
         id: obj._id,
         name: product.name,
         gender: product.gender,
-        sales_price: obj.sales_price,
-        original_price: obj.original_price,
+        sales_price: variant.sales_price,
+        original_price: variant.original_price,
         product_image: product?.productImages[0],
         quantity: obj.quantity,
         type: product.type,
@@ -17,6 +17,7 @@ export const cleanCartDoc= (cartDoc)=> {
         product_id: product._id,
         stock: variant.stock,
         status: product.status,
+        category_id: product.category_id
       };
     }) || [];
 

@@ -11,14 +11,6 @@ const itemSchema= new moongose.Schema({
         required:true,
         ref:"variants"
     },
-    sales_price:{
-        type:Number,
-        required:true
-    },
-    original_price:{
-        type:Number,
-        required:true
-    },
     quantity:{
         type:Number,
         default:1,

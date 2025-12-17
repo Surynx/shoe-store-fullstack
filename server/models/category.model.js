@@ -15,10 +15,6 @@ const categorySchema=new mongoose.Schema({
     status:{
         type:Boolean,
         default:true
-    },
-    offerId:{
-        type:mongoose.Schema.ObjectId,
-        ref:"offers"
     }
 },{timestamps:true});
 

@@ -62,9 +62,9 @@ function Verify() {
 
   return (
     <div className="flex items-center justify-center">
-      <div className="bg-white rounded-lg p-8 w-[90%] max-w-md text-center border text-xs font-bold">
+      <div className="bg-white p-8 w-[90%] max-w-md text-left text-sm font-sans">
         <h2 className="text-2xl font-semibold mb-2">Verify Your Email</h2>
-        <p className="text-gray-600 mb-6">
+        <p className="text-gray-600 mb-8">
           We've sent a verification code to your email address. Please enter the
           code below.
         </p>
@@ -117,7 +117,7 @@ function Verify() {
           </button>
         </form>
 
-        <div className="mt-4 text-sm text-gray-600">
+        <div className="mt-4 text-sm text-gray-600 text-center">
           Didn’t receive the code?{" "}
           {
             <Countdown

@@ -1,12 +1,63 @@
-import { Eye, Folder, FolderArchive, FolderClock, FolderCog, Plus } from "lucide-react";
-import { FaEdit, FaTrash, FaTag, FaPlus } from "react-icons/fa";
-import { VscActivateBreakpoints } from "react-icons/vsc";
+import { Plus } from "lucide-react";
+import { FaEdit, FaTag } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { OfferModal } from "../modal/Offer";
+import { useState } from "react";
+import { addOfferForProduct, getAllOfferOfProduct,deleteOffer } from "../../../Services/admin.api";
+import toast from "react-hot-toast";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 function ProductTable({ docs = [] }) {
 
   const nav=useNavigate();
 
+  const QueryClient= useQueryClient();
+
+  const [ openModal, setOpenModal ] = useState(false);
+
+  const [ offerProduct,setOfferProduct ]= useState(null);
+
+  const { data }= useQuery({
+    queryKey:["offer-list-category",offerProduct],
+    queryFn:()=>getAllOfferOfProduct(offerProduct._id)
+  });
+
+  const handleOffer= (product)=> {
+
+    setOfferProduct(product);
+    setOpenModal(true);
+  }
+
+  const handleAddOffer = async (data) => {
+
+    try{
+    
+    const res = await addOfferForProduct(data,offerProduct._id);
+
+    if(res?.data?.success) {
+
+        toast.success("Offer Applied To Product!");
+        QueryClient.invalidateQueries("offer-list-product")
+        setOpenModal(false);
+    }
+
+    }catch(error) {
+
+      toast.error(error?.response?.data?.message);
+    }
+
+  };
+
+  const removeOffer= async (id) => {
+
+    const res= await deleteOffer(id);
+
+    if(res?.data?.success) {
+
+        toast.success("Offer Removed Success");
+        QueryClient.invalidateQueries("offer-list-product");
+    }
+  }
 
   return (
     <div className="bg-white border border-gray-200 rounded-md shadow-sm overflow-hidden">
@@ -17,7 +68,7 @@ function ProductTable({ docs = [] }) {
             <th className="py-3 px-5 text-center w-[20%]">Product</th>
             <th className="py-3 px-5 text-center w-[15%]">Category</th>
             <th className="py-3 px-5 text-center w-[15%]">Brand</th>
-            <th className="py-3 px-5 text-center w-[10%]">Stock</th>
+            <th className="py-3 px-5 text-center w-[15%]">Stock</th>
             <th className="py-3 px-5 text-center w-[15%]">Status</th>
             <th className="py-3 px-2 text-center w-[10%]">Actions</th>
           </tr>
@@ -53,7 +104,7 @@ function ProductTable({ docs = [] }) {
                     />
                 </td>
 
-                <td className="py-4 px-5 text-center">{doc.stock || 0}</td>
+                <td className="py-4 px-5 text-center">{doc.stock || <span className="text-xs font-bold text-red-600">Out of stock</span>}</td>
 
                 <td className="py-4 px-5 text-center">
                   <span
@@ -78,8 +129,9 @@ function ProductTable({ docs = [] }) {
                     </button>
 
                     <button
-                      className="text-green-600 hover:text-green-800 text-lg"
+                      className="text-green-600 hover:text-green-800 text-lg cursor-pointer"
                       title="Apply Offer"
+                      onClick={()=>handleOffer(doc)}
                     >
                       <FaTag />
                     </button>
@@ -107,6 +159,14 @@ function ProductTable({ docs = [] }) {
           )}
         </tbody>
       </table>
+      <OfferModal
+        isOpen={openModal}
+        onClose={() => setOpenModal(false)}
+        item={offerProduct}
+        addOffer={handleAddOffer}
+        data={data}
+        removeOffer={removeOffer}
+      />
     </div>
   );
 }

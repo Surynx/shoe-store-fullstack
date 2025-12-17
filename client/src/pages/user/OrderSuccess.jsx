@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { Package } from 'lucide-react';
+import { useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 export default function OrderSuccess() {
@@ -10,7 +11,6 @@ export default function OrderSuccess() {
   const {state}= useLocation();
 
   const total_amount = state;
-
 
   return (
     <div className="mb-5 mt-10 flex items-center justify-center p-3 gap-10">

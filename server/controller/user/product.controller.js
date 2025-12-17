@@ -1,4 +1,6 @@
+import { findBestOffer } from "../../computation/offer.computation.js";
 import STATUS from "../../constants/status.constant.js";
+import Offer from "../../models/offer.model.js";
 import Product from "../../models/product.model.js";
 import Variant from "../../models/variant.model.js";
 
@@ -149,9 +151,24 @@ const fetchShopProducts= async(req,res)=> {
         }
 
         const docs= await Product.aggregate(pipeline);
-        // console.log(docs)
 
-        res.status(STATUS.SUCCESS.OK).send({docs});
+        const categoryOffers= await Offer.find({apply_for:"category",start_date:{ $lte:new Date() },end_date:{ $gte:new Date() }});
+        const productOffers= await Offer.find({apply_for:"product", start_date:{ $lte:new Date() },end_date:{ $gte:new Date() } })
+ 
+        const offerProducts= docs.map((product)=> {
+
+            const categoryOff = categoryOffers.filter((offer)=> String(offer.category_id) == String(product.category_id));
+            const productOff = productOffers.filter((offer)=> String(offer.product_id) == String(product._id));
+
+            let offers=[...categoryOff,...productOff];
+
+            const bestOffer= findBestOffer(offers,product.min_price);
+    
+            return {...product,bestOffer}
+
+        });
+
+        res.status(STATUS.SUCCESS.OK).send({offerProducts});
 
     }catch(error) {
 
@@ -165,11 +182,12 @@ const fetchProductData= async(req,res)=> {
     try{
     const {id}= req.params;
     
-    const productDoc=await Product.findById({_id:id});
-    const variant_array= await Variant.find({product_id:id});
+    const productDoc=await Product.findById({_id:id}).populate("category_id");
+    
+    const variant_array= await Variant.find({product_id:id}).sort({sales_price:1});
 
     const relatedProducts= await Product.aggregate([{
-        $match:{category_id:productDoc.category_id,_id:{$ne:productDoc._id}}
+        $match:{category_id:productDoc.category_id._id,_id:{$ne:productDoc._id}}
     },{
         $lookup:{
             from:"variants",
@@ -186,10 +204,13 @@ const fetchProductData= async(req,res)=> {
         }
     ]);
 
-    return res.status(STATUS.SUCCESS.OK).send({ productDoc,variant_array,relatedProducts });
+    const offers= await Offer.find({$or:[{category_id:productDoc.category_id._id},{product_id:productDoc._id}],start_date:{ $lte:new Date() },end_date:{ $gte:new Date() }});
+
+    return res.status(STATUS.SUCCESS.OK).send({ productDoc,variant_array,relatedProducts,offers });
 
     }catch(error) {
 
+        console.log("Error in fetchProductData",error);
     }
 
 }

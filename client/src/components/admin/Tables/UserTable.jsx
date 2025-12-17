@@ -1,8 +1,8 @@
-import { blockUser } from '../../Services/admin.api';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import { useQueryClient } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
+import { blockUser } from "../../../Services/admin.api";
 
 
 function UserTable({data,isLoading}) {

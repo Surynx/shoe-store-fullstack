@@ -40,9 +40,9 @@ export default function Signup() {
 
     return (
         <div className="flex justify-center items-center px-4">
-            <div className="bg-white p-8 rounded-lg border text-sm font-bold w-full max-w-sm">
-                <h2 className="text-2xl font-bold text-center mb-8">Sign Up</h2>
-
+            <div className="bg-white p-8 text-sm w-full max-w-sm">
+                <h2 className="text-2xl font-sans text-left mb-3">Don't Have an Account?</h2>
+                <p className="mb-8">Please signup to create acunt</p>
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
 
                     <div>

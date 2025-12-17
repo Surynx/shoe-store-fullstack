@@ -1,20 +1,24 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Check, Truck, Download, X, Edit } from "lucide-react";
+import { Plus, Check, Truck, Download, X, Edit, Tag, Gift } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { addNewAddress, getCheckoutInfo, placeNewOrder, updateAddress, validateCartItems } from "../../Services/user.api";
+import {
+  addNewAddress,
+  getCheckoutInfo,
+  placeNewOrder,
+  updateAddress,
+  validateCartItems,
+  validateCoupon,
+} from "../../Services/user.api";
 import { useForm } from "react-hook-form";
 import ErrorMessage from "../../components/admin/ErrorMessage";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-
 export default function CheckoutPage() {
-
-    useEffect(() => {
+  useEffect(() => {
     const validateCart = async () => {
       try {
         const res = await validateCartItems();
-
       } catch (err) {
         console.error(err);
         toast.error(err.response.data.message);
@@ -25,36 +29,43 @@ export default function CheckoutPage() {
     validateCart();
   }, []);
 
-  const nav= useNavigate();
+  const nav = useNavigate();
 
   const [selectedAddress, setSelectedAddress] = useState(null);
 
   const [showAddressForm, setShowAddressForm] = useState(false);
 
   const [isEditing, setIsEditing] = useState(false);
-  const [editAddress_id, setEditAddress_id]= useState(null);
+  const [editAddress_id, setEditAddress_id] = useState(null);
 
   const { reset, handleSubmit,register,formState: { errors } } = useForm();
 
   const { data, isLoading } = useQuery({
-    queryKey: ["fetchAddress-checkout"],
+    queryKey: ["checkout-data"],
     queryFn: getCheckoutInfo,
     keepPreviousData: true,
   });
 
-  const QueryClient= useQueryClient();
+  const QueryClient = useQueryClient();
 
   const addresses = data?.data?.addressDocs || [];
-  const cartItems = data?.data?.cartItems || [];
+  const cartItems = data?.data?.cartItemsWithOffers || [];
+  const coupons = data?.data?.coupon || [];
 
   useEffect(() => {
-  if (addresses.length > 0 && !selectedAddress) {
-    setSelectedAddress(addresses[0]._id);
-  }
+
+    if (addresses.length > 0 && !selectedAddress) {
+      setSelectedAddress(addresses[0]._id);
+    }
   }, [addresses]);
 
-
   const [selectedPayment, setSelectedPayment] = useState("card");
+
+  const [couponCode, setCouponCode] = useState("");
+
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
+
+  const [couponDiscount, setCouponDiscount] = useState(0);
 
   const subtotal = cartItems.reduce((acc, curr) => {
     acc += curr.original_price * curr.quantity;
@@ -66,30 +77,43 @@ export default function CheckoutPage() {
     return acc;
   }, 0);
 
-  const discount = subtotal - sales_price_total;
+  const offerDiscount = cartItems.reduce((acc, curr) => {
+    if (curr.bestOffer) {
+      acc += curr.bestOffer.discount_price * curr.quantity;
+    }
+    return acc;
+  }, 0);
 
-  const shipping = (selectedPayment == "cod") ? "₹ 7" : "Free";
-  const shipping_charge = (selectedPayment == "cod") ? 7 : 0;
+  const discount = subtotal - sales_price_total + offerDiscount;
 
-  const tax = Math.round(sales_price_total * 0.18);
-  const total = subtotal - discount + shipping_charge + tax;
+  const shipping = selectedPayment == "cod" ? "₹ 7" : "Free";
+  const shipping_charge = selectedPayment == "cod" ? 7 : 0;
+
+  const taxableAmount = cartItems.reduce((acc, curr) => {
+    acc += curr.bestOffer
+      ? curr.sales_price * curr.quantity - curr.bestOffer.discount_price
+      : curr.sales_price * curr.quantity;
+
+    return acc;
+  }, 0);
+
+  const tax = Math.round(taxableAmount * 0.18);
+
+  const total = subtotal - discount - couponDiscount + shipping_charge + tax;
 
   const handleEditAddress = (addressId) => {
-
     setIsEditing(true);
     setShowAddressForm(true);
     setEditAddress_id(addressId);
 
-    let editAddress= addresses.find((address)=> address._id == addressId);
+    let editAddress = addresses.find((address) => address._id == addressId);
     reset(editAddress);
-    
   };
 
   const handleAddNewAddress = () => {
-
     reset({
-        type:""
-    })
+      type: "",
+    });
 
     setIsEditing(false);
     setShowAddressForm(true);
@@ -101,59 +125,89 @@ export default function CheckoutPage() {
     reset();
   };
 
-  const onSubmit = async(data) => {
-    
-    try{
-    let res;
+  const onSubmit = async (data) => {
+    try {
+      let res;
 
-    if(isEditing) {
-        res= await updateAddress(data,editAddress_id);
-    }else {
-        res= await addNewAddress(data);
-    }
+      if (isEditing) {
+        res = await updateAddress(data, editAddress_id);
+      } else {
+        res = await addNewAddress(data);
+      }
 
-    if(res && res.data.success) {
-
-      toast.success(res.data.message);
-      setShowAddressForm(false)
-      setIsEditing(false);
-      QueryClient.invalidateQueries("fetchAddress-checkout");
-      
-    }
-    }catch(error) {
-
+      if (res && res.data.success) {
+        toast.success(res.data.message);
+        setShowAddressForm(false);
+        setIsEditing(false);
+        QueryClient.invalidateQueries("checkout-data");
+      }
+    } catch (error) {
       console.log(error);
       toast.error("Something went Wrong!");
     }
+  };
+
+  const handleApplyCoupon = async(data) => {
+    
+    try{
+    const res= await validateCoupon(data);
+
+    if(res?.data?.success) {
+
+      const coupon= res.data.coupon[0]
+
+      toast.success(res.data.message);
+
+      setAppliedCoupon(coupon);
+
+      const discount_value = coupon.type == "flat" ? coupon.value : (total*coupon.value) / 100 ;
+
+      setCouponDiscount(discount_value);
+    }
+  }catch(error) {
+
+    toast.error(error.response.data.message);
+  }
     
   };
 
-  const handlePlaceOrder= async()=> {
+  const handleRemoveCoupon = () => {
+    setCouponCode("");
+    setAppliedCoupon(null);
+    setCouponDiscount(0);
+    toast.success("Coupon removed");
+  };
 
-    try{
-    const res= await placeNewOrder({selectedAddress,selectedPayment});
+  const handlePlaceOrder = async () => {
+    try {
 
-    if(res && res.data.success) {
+      let res;
 
-      const orderId= res.data.orderId;
-      nav(`/order/success/${orderId}`,{state:total});
+      if(appliedCoupon) {
 
-    }  
-    }catch(error) {
+        res = await placeNewOrder({ selectedAddress, selectedPayment, appliedCoupon });
 
+      }else {
+
+        res = await placeNewOrder({ selectedAddress, selectedPayment });
+      }
+
+      if (res && res.data.success) {
+
+        const orderId = res.data.orderId;
+        nav(`/order/success/${orderId}`, { state: total });
+
+      }
+    } catch (error) {
       toast.error(error.response.data.message);
     }
-  }
+  };
 
   return (
     <div className="py-6 px-4">
       <div className="max-w-6xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          
-          
           <div className="lg:col-span-2 space-y-5">
-
-          
             <div className="bg-white rounded-md p-5 border border-gray-400">
               <div className="flex items-center justify-between mb-5">
                 <div className="flex items-center gap-2">
@@ -245,7 +299,6 @@ export default function CheckoutPage() {
                 </div>
               ) : (
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
-                  
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-base font-semibold text-gray-800">
                       {isEditing ? "Edit Address" : "Add New Address"}
@@ -259,7 +312,6 @@ export default function CheckoutPage() {
                     </button>
                   </div>
 
-                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Address Type
@@ -278,7 +330,6 @@ export default function CheckoutPage() {
                     <ErrorMessage elem={errors.type} />
                   </div>
 
-                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -319,7 +370,6 @@ export default function CheckoutPage() {
                     </div>
                   </div>
 
-                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Address Line 1 *
@@ -335,7 +385,6 @@ export default function CheckoutPage() {
                     <ErrorMessage elem={errors.line1} />
                   </div>
 
-                  
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Address Line 2
@@ -348,7 +397,6 @@ export default function CheckoutPage() {
                     />
                   </div>
 
-                  
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1.5">
@@ -420,7 +468,6 @@ export default function CheckoutPage() {
               )}
             </div>
 
-            
             <div className="bg-white rounded-md p-5 border border-gray-400">
               <div className="flex items-center gap-2 mb-5">
                 <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm font-semibold">
@@ -458,14 +505,30 @@ export default function CheckoutPage() {
                         <div className="text-right">
                           <div className="flex items-center">
                             <p className="font-semibold text-lg text-black">
-                              ₹ {(item.sales_price * item.quantity).toLocaleString("en-IN")}
+                              ₹{" "}
+                              {item.bestOffer
+                                ? (
+                                    item.sales_price * item.quantity -
+                                    item.bestOffer.discount_price
+                                  ).toLocaleString("en-IN")
+                                : item.sales_price * item.quantity}
                             </p>
                             {item.original_price && (
                               <p className="text-orange-700 line-through text-xs ml-2">
-                                ₹ {(item.original_price * item.quantity).toLocaleString("en-IN")}
+                                ₹{" "}
+                                {(
+                                  item.original_price * item.quantity
+                                ).toLocaleString("en-IN")}
                               </p>
                             )}
                           </div>
+                          {item.bestOffer && (
+                            <span className="bg-red-500 text-white text-[9px] font-semibold px-2 py-0.5 rounded-full mt-1 w-fit">
+                              {item.bestOffer.type === "percentage"
+                                ? `${item.bestOffer.value}% OFF`
+                                : `₹${item.bestOffer.value} FLAT OFF`}
+                            </span>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -474,7 +537,6 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-          
             <div className="bg-white rounded-md p-5 border border-gray-400">
               <div className="flex items-center gap-2 mb-5">
                 <div className="w-8 h-8 rounded-full bg-gray-900 text-white flex items-center justify-center text-sm font-semibold">
@@ -487,10 +549,22 @@ export default function CheckoutPage() {
 
               <div className="space-y-2.5">
                 {[
-                  { id: "card", label: "Credit/Debit Card", desc: "Pay securely with your card" },
+                  {
+                    id: "card",
+                    label: "Credit/Debit Card",
+                    desc: "Pay securely with your card",
+                  },
                   { id: "upi", label: "UPI", desc: "Pay using UPI apps" },
-                  { id: "wallet", label: "Wallets", desc: "PayPal, Amazon Pay, and more" },
-                  { id: "cod", label: "Cash on Delivery", desc: "Pay when you receive" },
+                  {
+                    id: "wallet",
+                    label: "Wallets",
+                    desc: "PayPal, Amazon Pay, and more",
+                  },
+                  {
+                    id: "cod",
+                    label: "Cash on Delivery",
+                    desc: "Pay when you receive",
+                  },
                 ].map((method) => (
                   <div
                     key={method.id}
@@ -514,7 +588,9 @@ export default function CheckoutPage() {
                         )}
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-gray-900">{method.label}</p>
+                        <p className="text-sm font-semibold text-gray-900">
+                          {method.label}
+                        </p>
                         <p className="text-xs text-gray-600">{method.desc}</p>
                       </div>
                     </div>
@@ -522,10 +598,8 @@ export default function CheckoutPage() {
                 ))}
               </div>
             </div>
-
           </div>
 
-          
           <div className="lg:col-span-1">
             <div className="bg-white p-5 border shadow-sm sticky top-4">
               <h2 className="text-lg font-semibold text-gray-900 mb-4">
@@ -542,6 +616,13 @@ export default function CheckoutPage() {
                   <span>Discount</span>
                   <span>-₹{discount}</span>
                 </div>
+
+                {couponDiscount > 0 && (
+                  <div className="flex justify-between text-sm text-green-600">
+                    <span>Coupon Discount</span>
+                    <span>-₹{couponDiscount.toLocaleString("en-IN")}</span>
+                  </div>
+                )}
 
                 <div className="flex justify-between text-sm text-gray-700">
                   <span>Shipping</span>
@@ -565,32 +646,99 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
-              <button className="w-full bg-gray-900 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors cursor-pointer mb-4"
+              <div className="mb-5 pb-5">
+                <h3 className="text-sm font-semibold text-gray-900 mb-3">
+                  Apply Coupon
+                </h3>
+
+                {!appliedCoupon ? (
+                  <div>
+                    <div className="flex gap-2 mb-3">
+                      <div className="flex-1 relative">
+                        <Gift
+                          className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"
+                          size={18}
+                        />
+
+                        <input
+                          type="text"
+                          placeholder="Enter coupon code"
+                          className="w-full pl-9 pr-3 py-2 border border-gray-300 text-sm outline-none focus:border-gray-900 transition-colors"
+                          {...register("code", {
+                            required: true,
+                          })}                 
+                        />
+                      </div>
+
+                      <button
+                        onClick={handleSubmit(handleApplyCoupon)}
+                        className="px-4 py-2 bg-gray-900 text-white rounded-sm text-sm font-semibold hover:bg-gray-800 transition-colors cursor-pointer"
+                      >
+                        Apply
+                      </button>
+                    </div>
+
+                    <div className="p-2.5 bg-gray-50 rounded-lg">
+                      <p className="text-[12px] text-gray-600 mb-1.5 font-medium">
+                        Available Coupons:
+                      </p>
+                      {coupons.length > 0 ? (
+                        <div className="space-y-1">
+                          {coupons.map((coupon) => (
+                            <p className="text-[10px] text-gray-700">
+                              <span className="font-semibold">
+                                {coupon.code}
+                              </span>
+                              {coupon.type == "flat"
+                                ? ` - ₹${coupon.value} flat discount`
+                                : ` - Get ${coupon.value}% off`}
+                            </p>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="space-y-1">
+                          <p className="text-[10px] italic text-red-600 font-sans">
+                            coupon unavailable for the price{" "}
+                          </p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="border-2 border-green-500 bg-green-50 rounded-lg p-3">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center">
+                          <Check size={16} className="text-white" />
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-gray-900">
+                            {appliedCoupon.code} Applied
+                          </p>
+                          <p className="text-xs text-green-700">
+                            You saved ₹{couponDiscount.toLocaleString("en-IN")}
+                          </p>
+                        </div>
+                      </div>
+                      <button
+                        onClick={handleRemoveCoupon}
+                        className="p-1 hover:bg-green-100 rounded transition-colors"
+                      >
+                        <X size={16} className="text-gray-600" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              <button
+                className="w-full bg-gray-900 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors cursor-pointer mb-4"
                 onClick={handlePlaceOrder}
               >
                 Place Order
               </button>
-
-              <div className="space-y-2 text-xs text-gray-600">
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-green-600" />
-                  <span>Secure checkout</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Check size={14} className="text-green-600" />
-                  <span>Free returns within 30 days</span>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <Truck size={14} className="text-green-600" />
-                  <span>Estimated delivery: 3–5 days</span>
-                </div>
-              </div>
-
             </div>
           </div>
-
         </div>
       </div>
     </div>

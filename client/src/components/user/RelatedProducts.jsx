@@ -1,3 +1,4 @@
+import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function RelatedProducts ({data}){
@@ -28,12 +29,6 @@ export default function RelatedProducts ({data}){
                     className="w-full h-full object-cover"
                   />
                 </div>
-                
-                {/* <button
-                  className="absolute top-3 right-3 p-2 bg-white rounded-full hover:opacity-80 transition-opacity"
-                >
-                  <Heart size={18}/>
-                </button> */}
               </div>
 
               <div className="flex flex-col px-1">

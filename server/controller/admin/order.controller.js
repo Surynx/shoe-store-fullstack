@@ -14,6 +14,8 @@ const fetchOrdersInfo = async (req, res) => {
         const total_doc = await Order.countDocuments(query);
 
         const docs = await Order.aggregate([{
+            $sort:{order_date:-1}
+        },{
             $match: query
         }, {
             $skip: skip
@@ -26,8 +28,6 @@ const fetchOrdersInfo = async (req, res) => {
                 foreignField: "_id",
                 as: "user"
             }
-        },{
-            $sort:{order_date:-1}
         }]);
 
         return res.status(STATUS.SUCCESS.OK).send({docs,total_doc,limit});

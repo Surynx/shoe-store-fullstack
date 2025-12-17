@@ -8,6 +8,8 @@ import { addcategory, editCategory, fetchCategory } from "../controller/admin/ca
 import { addProduct, editProduct, fetchProduct } from "../controller/admin/product.controller.js";
 import { addBrand, editBrand, fetchBrands } from "../controller/Admin/brand.controller.js";
 import { approveReturn, changeOrderStatus, completeReturn, fetchOrdersInfo, getDetailsOfOrder, rejectReturn } from "../controller/Admin/order.controller.js";
+import { addNewOfferForCategory, addNewOfferForProduct, getAllOfferOfCategory, getAllOfferOfProduct, removeOffer } from "../controller/admin/offer.controller.js";
+import { addNewCoupon, changeCouponStatus, getAllCoupon } from "../controller/admin/coupon.controller.js";
 
 const route=express.Router();
 
@@ -56,5 +58,21 @@ route.patch(ROUTES.ADMIN.ORDERS.APPROVE_RETURN,isAdmin,approveReturn);
 route.patch(ROUTES.ADMIN.ORDERS.COMPLETE_RETURN,isAdmin,completeReturn);
 
 route.patch(ROUTES.ADMIN.ORDERS.REJECT_RETURN,isAdmin,rejectReturn);
+
+route.post(ROUTES.ADMIN.CATEGORY.ADD_OFFER,isAdmin,addNewOfferForCategory);
+
+route.get(ROUTES.ADMIN.CATEGORY.GET_OFFERS,isAdmin,getAllOfferOfCategory);
+
+route.delete(ROUTES.ADMIN.CATEGORY.REMOVE_OFFER,isAdmin,removeOffer);
+
+route.post(ROUTES.ADMIN.PRODUCT.ADD_OFFER,isAdmin,addNewOfferForProduct);
+
+route.get(ROUTES.ADMIN.PRODUCT.GET_OFFERS,isAdmin,getAllOfferOfProduct);
+
+route.post(ROUTES.ADMIN.COUPON.ADD,isAdmin,addNewCoupon);
+
+route.get(ROUTES.ADMIN.COUPON.GET,isAdmin,getAllCoupon);
+
+route.patch(ROUTES.ADMIN.COUPON.CHNAGE_STATUS,isAdmin,changeCouponStatus);
 
 export default route;

@@ -1,4 +1,4 @@
-import ProductTable from '../../components/admin/ProductTable'
+import ProductTable from '../../components/admin/Tables/ProductTable'
 import { FaPlus } from 'react-icons/fa'
 import SearchBox from '../../components/admin/SearchBox'
 import Pagination from '../../components/admin/Pagination'

@@ -526,7 +526,7 @@ const OrderDetailPage = () => {
                       Discount{" "}
                       {orderData.coupon_id && `(${orderData.coupon_id.code})`}
                     </span>
-                    <span>-₹{orderData.discount}</span>
+                    <span>-₹{orderData.discount.toFixed()}</span>
                   </div>
                 )}
                 <div className="flex justify-between">

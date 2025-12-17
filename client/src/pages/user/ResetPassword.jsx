@@ -37,9 +37,9 @@ function ResetPassword() {
 
     return (
         <div className="flex items-center justify-center">
-            <div className="bg-white w-full max-w-md p-8 rounded-xl border text-xs font-bold text-center">
-                <h2 className="text-2xl font-bold mb-2">Reset Password</h2>
-                <p className="text-gray-600 text-sm mb-6">
+            <div className="bg-white w-full max-w-md p-8 text-sm font-sans text-left">
+                <h2 className="text-2xl font-bold mb-2">Reset Password ?</h2>
+                <p className="text-gray-600 text-sm mb-8">
                     Enter your new password below
                 </p>
 
@@ -88,13 +88,13 @@ function ResetPassword() {
 
                     <button
                         type="submit"
-                        className="w-full bg-black text-white py-2 rounded-lg font-medium hover:bg-gray-800 transition cursor-pointer"
+                        className="w-full bg-black text-white py-2 font-medium hover:bg-gray-800 transition cursor-pointer"
                     >
                         Reset Password
                     </button>
                 </form>
 
-                <p className="text-sm text-gray-600 mt-6">
+                <p className="text-sm text-gray-600 mt-6 text-center">
                     Remember your password?{" "}
                     <a href="/login" className="font-semibold text-black hover:underline" onClick={()=>nav("/login",{replace:true})}>
                         Login

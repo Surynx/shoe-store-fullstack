@@ -1,5 +1,7 @@
+import { findBestOffer } from "../../computation/offer.computation.js";
 import STATUS from "../../constants/status.constant.js";
 import Cart from "../../models/cart.model.js";
+import Offer from "../../models/offer.model.js";
 import Product from "../../models/product.model.js";
 import User from "../../models/user.model.js";
 import Variant from "../../models/variant.model.js";
@@ -9,6 +11,7 @@ import { cleanCartDoc } from "../../utils/cart.util.js";
 const addToCart= async(req,res)=> {
 
     const { product_id, variant_id }= req.body;
+
     const email= req.email;
 
     const user= await User.findOne({email});
@@ -23,9 +26,6 @@ const addToCart= async(req,res)=> {
         return res.status(STATUS.ERROR.CONFLICT).send({success:false,message:`${productDoc.name} is currentlty unavailable`});
     }
 
-    const sales_price= variantDoc.sales_price;
-    const original_price= variantDoc.original_price;
-
     if(variantDoc.stock == 0) {
 
         return res.status(STATUS.ERROR.CONFLICT).send({success:false,message:`The ${variantDoc.size} Size is unavailable for this product!`})
@@ -35,7 +35,7 @@ const addToCart= async(req,res)=> {
 
         await Cart.create({
             user_id:user._id,
-            items:[{ product_id,variant_id,sales_price,original_price }]
+            items:[{ product_id,variant_id }]
         });
 
         return res.status(STATUS.SUCCESS.CREATED).send({success:true});
@@ -45,10 +45,11 @@ const addToCart= async(req,res)=> {
 
     if(variant_exist.length > 0) {
 
-        return res.status(STATUS.ERROR.CONFLICT).send({ success:false,message:`${productDoc.name} of size ${activeVariant.size} Already Exists!` });
+        return res.status(STATUS.ERROR.CONFLICT).send({ success:false,message:`${productDoc.name} of size ${variantDoc.size} Already Exists!` });
     }
 
-    cartDoc.items.unshift({product_id,variant_id,sales_price,original_price});
+    cartDoc.items.unshift({ product_id,variant_id });
+    
     await cartDoc.save();
 
     return res.status(STATUS.SUCCESS.OK).send({success:true});
@@ -66,7 +67,15 @@ const fetchCartInfo= async(req,res)=> {
 
     const cartItems= cleanCartDoc(cartDoc);
 
-    res.status(STATUS.SUCCESS.OK).send({cartItems});
+    const cartItemsWithOffers= await Promise.all(cartItems.map( async(item)=> {
+
+        const offers= await Offer.find({$or:[{category_id:item.category_id},{product_id:item.product_id}], start_date:{ $lte:new Date() },end_date:{ $gte:new Date()}})
+        const bestOffer = findBestOffer(offers,item.sales_price);
+
+        return {...item,bestOffer:bestOffer}
+    }));
+
+    res.status(STATUS.SUCCESS.OK).send({cartItemsWithOffers});
 }
 
 const removeItemFromCart= async(req,res)=> {

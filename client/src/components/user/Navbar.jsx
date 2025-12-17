@@ -9,6 +9,7 @@ export default function Navbar() {
   const { data } = useQuery({
     queryKey: ["cart-count"],
     queryFn: getCartCount,
+    refetchInterval: 3000,
   });
 
   const count = data?.data?.count || 0;
@@ -20,12 +21,12 @@ export default function Navbar() {
           SIGN UP TO GET A 15% DISCOUNT NEWSLETTER
         </span>
       </div>
-      <nav className="flex items-center justify-between px-8 py-3 bg-white shadow-sm">
+      <nav className="flex items-center justify-between px-8 py-3 bg-white shadow-sm text-md">
         <Link to="/" className=" text-2xl font-bold">
-          COMET<span className="">⚡️</span>
+          COMET
         </Link>
 
-        <div className="flex gap-8 text-gray-700 ml-40">
+        <div className="flex gap-8 text-gray-700 ml-45 ">
           <NavLink to="/" className="hover:text-black" end>
             Home
           </NavLink>
@@ -42,15 +43,21 @@ export default function Navbar() {
 
         <div className="flex items-center gap-4 text-gray-700">
           <div className="relative w-36">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 w-4 h-4" />
+            <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 w-3 h-3" />
             <input
               type="text"
               placeholder="Search..."
               className="w-full pl-8 pr-3 py-1 text-sm rounded-full border border-gray-300 outline-none"
             />
           </div>
-          <Heart className="cursor-pointer hover:text-black" />
-          <User
+          <Heart className="cursor-pointer hover:text-black" size={23}
+            onClick={() =>
+              localStorage.getItem("userToken")
+                ? nav("/wishlist")
+                : nav("/login")
+            } 
+          />
+          <User size={23}
             className="cursor-pointer hover:text-black"
             onClick={() =>
               localStorage.getItem("userToken")
@@ -59,7 +66,7 @@ export default function Navbar() {
             }
           />
           <div className="relative">
-          <ShoppingBag
+          <ShoppingBag size={23}
             className="cursor-pointer hover:text-black"
             onClick={() => nav("/cart")}
           />

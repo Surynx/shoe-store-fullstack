@@ -10,7 +10,9 @@ import upload from "../middleware/multer.js";
 import { addNewAddress, editAddress, fetchAddress, removeAddress } from "../controller/user/address.controller.js";
 import { addToCart, countCartItems, decQuantity, fetchCartInfo, incQuantity, removeItemFromCart, validateCartItems } from "../controller/user/cart.controller.js";
 import { getCheckoutData } from "../controller/user/checkout.controller.js";
-import { fetchAllOrders, getOrderDetails, handleCancelItem, handleCancelOrder, handleReturnProduct, placeNewOrder } from "../controller/user/order.controller.js";
+import { fetchAllOrders, generateInvoice, getOrderDetails, handleCancelItem, handleCancelOrder, handleReturnProduct, placeNewOrder } from "../controller/user/order.controller.js";
+import { addProductToWishlist, fetchWishlistInfo, removeItemFromWishlist } from "../controller/user/wishlist.controller.js";
+import { validateCoupon } from "../controller/admin/coupon.controller.js";
 
 const route=express.Router();
 
@@ -90,5 +92,15 @@ route.patch(ROUTES.USER.ORDER.CANCEL_ORDER,isUser,handleCancelOrder);
 route.patch(ROUTES.USER.ORDER.CANCEL_ITEM,isUser,handleCancelItem);
 
 route.patch(ROUTES.USER.ORDER.RETURN_ITEM,isUser,handleReturnProduct);
+
+route.get(ROUTES.USER.ORDER.DOWNLOAD_INVOICE,generateInvoice); 
+
+route.post(ROUTES.USER.WISHLIST.ADD,isUser,addProductToWishlist);
+
+route.get(ROUTES.USER.WISHLIST.FETCH,isUser,fetchWishlistInfo);
+
+route.patch(ROUTES.USER.WISHLIST.REMOVE,isUser,removeItemFromWishlist);
+
+route.post(ROUTES.USER.COUPON.VALIDATE,isUser,validateCoupon);
 
 export default route;

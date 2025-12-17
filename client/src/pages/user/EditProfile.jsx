@@ -251,7 +251,7 @@ export default function EditProfile() {
             <div className="flex justify-end pt-2">
               <button
                 type="submit"
-                className="px-5 py-2 font-medium bg-blue-600 text-white hover:bg-blue-700 text-sm transition-colors cursor-pointer"
+                className="px-5 py-2 font-medium bg-blue-700 text-white hover:bg-blue-700 text-sm transition-colors cursor-pointer"
               >
                 {loading ? (
                   <span className="flex">

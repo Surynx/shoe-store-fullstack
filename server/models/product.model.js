@@ -1,4 +1,4 @@
-import mongoose, { Mongoose } from "mongoose";
+import mongoose from "mongoose";
 
 const productSchema=new mongoose.Schema({
     category_id:{
@@ -39,11 +39,6 @@ const productSchema=new mongoose.Schema({
     status:{
         type:Boolean,
         default:true
-    },
-    offer_id:{
-        type:mongoose.Schema.ObjectId,
-        ref:"offers",
-        default:null
     }
 },{timestamps:true});
 

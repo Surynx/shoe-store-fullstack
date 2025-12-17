@@ -208,8 +208,33 @@ const handleReturnItem= async({order_id,item_id},reason)=> {
     return res;
 }
 
+const addToFavourite= async(data)=> {
+
+    const res= await api.post("/user/wishlist/add",data);
+    return res;
+}
+
+const fetchWishListInfo= async () => {
+    
+    const res= await api.get("/user/wishlist");
+    return res;
+}
+
+const removeItemFromWishlist= async(id) => {
+
+    const res= await api.patch(`/user/wishlist/item/${id}`);
+    return res;
+}
+
+const validateCoupon= async (data) => {
+
+    const res= await api.post("/user/coupon",data);
+    return res;
+}
+
 
 export { registerApi,verifyEmail,verifyUser,userLogin,resetPassword,getAllLatestProducts,getShopProductList,getAllCategoryForUser,
     getAllBrandForUser,getProductData,getUserInfo,editUserInfo,sentOtpToPhone,verifyPhone,sendOtpToEmail,verifyEmailOtp,addNewAddress,
     getAllAddress,deleteAddress,updateAddress,changePassword,addToCart,fetchCartInfo,removeProductFromCart,increaseQty,decreaseQty,getCartCount,
-    getCheckoutInfo,placeNewOrder,validateCartItems,getOrderDetails ,getAllOrders,cancelOrder,cancelSingleItem,handleReturnItem }
+    getCheckoutInfo,placeNewOrder,validateCartItems,getOrderDetails ,getAllOrders,cancelOrder,cancelSingleItem,handleReturnItem,addToFavourite,
+    fetchWishListInfo,removeItemFromWishlist,validateCoupon }
