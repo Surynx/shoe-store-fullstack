@@ -11,7 +11,7 @@ function Sidebar() {
     const nav=useNavigate();
 
     const menuItems = [{
-        name: "Dashboard", icon: <Home color='black' size={20} />, path:"/admin/dashboard"
+        name: "Dashboard", icon: <Home color='black' size={20} />, path:"/admin"
     }, {
         name: "Users", icon: <User color='black' size={20} />, path:"/admin/users"
     },{
@@ -49,6 +49,7 @@ function Sidebar() {
                         <NavLink
                             key={index}
                             to={item.path}
+                            end 
                             className={({ isActive }) =>
                                 `flex items-center gap-3 px-4 py-2 rounded-lg mb-1 font-bold text-sm transition-all ${isActive
                                     ? "bg-blue-50 text-blue-600"

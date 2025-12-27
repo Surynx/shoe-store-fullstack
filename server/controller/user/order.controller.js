@@ -1,138 +1,106 @@
-import { findBestOffer } from "../../computation/offer.computation.js";
 import STATUS from "../../constants/status.constant.js";
-import Cart from "../../models/cart.model.js";
 import Coupon from "../../models/coupon.model.js";
-import Offer from "../../models/offer.model.js";
 import Order from "../../models/order.model.js";
-import Product from "../../models/product.model.js";
 import User from "../../models/user.model.js";
 import Variant from "../../models/variant.model.js";
 import PDFDocument from "pdfkit";
+import Wallet from "../../models/wallet.model.js";
+import WalletLedger from "../../models/wallet-ledger.model.js";
+import { createOrderService } from "../../services/order.service.js";
+import { findRefundAmount } from "../../computation/refund.computation.js";
+import Cart from "../../models/cart.model.js";
 
 
 const placeNewOrder = async (req, res) => {
 
     const email = req.email;
+
     const user = await User.findOne({ email });
 
-    const orderCount= await Order.countDocuments({user_id:user._id});
+    const cart = await Cart.findOne({ user_id: user._id });
 
-    if(orderCount == 0 && user.referred_by) {
+    const cartItems = cart?.items;
 
-        let referrer = await User.findOne({_id:user.referred_by});
+    if (!cart || cartItems.length === 0) {
+
+        return res.status(STATUS.ERROR.BAD_REQUEST).json({ success: false, message: "Cart is empty!" });
+    }
+
+    const orderCount = await Order.countDocuments({ user_id: user._id });
+
+    if (orderCount == 0 && user.referred_by) {
+
+        let referrer = await User.findOne({ _id: user.referred_by });
 
         await Coupon.create({
-                code: `REF-${referrer.referral_code}`,
-                type: "flat",
-                value: 200,
-                min_purchase: 1000,
-                usageLimit: 1,
-                start_date: new Date(),
-                end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-                status: true,
-                createdFor: referrer._id
-            });
+            code: `REF-${referrer.referral_code}`,
+            type: "flat",
+            value: 200,
+            min_purchase: 1000,
+            usageLimit: 1,
+            start_date: new Date(),
+            end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            status: true,
+            createdFor: referrer._id
+        });
     }
 
     const { selectedAddress: address_id, selectedPayment: payment_method, appliedCoupon: coupon } = req.body;
 
     if (!address_id || !payment_method) {
 
-        return res.status(STATUS.ERROR.NOT_FOUND).json({ success: false, message: "Address and payment method required!" });
+        return res.status(STATUS.ERROR.NOT_FOUND).send({ success: false, message: "Address and payment method required!" });
     }
 
-    const cart = await Cart.findOne({ user_id: user._id });
+    let wallet;
 
-    const cartItems = cart?.items;
+    if (payment_method == "wallet") {
 
-    if (!cart || cartItems === 0) {
+        wallet = await Wallet.findOne({ user_id: user._id });
 
-        return res.status(400).json({ success: false, message: "Cart is empty!" });
-    }
-
-    const cartItemsWithOffers= await Promise.all(cartItems.map( async(item)=> {
-
-        const product= await Product.findById(item.product_id);
-        const variant= await Variant.findById(item.variant_id);
-
-        const offers= await Offer.find({$or:[{category_id:product.category_id},{product_id:product._id}], start_date:{ $lte:new Date() },end_date:{ $gte:new Date()}})
-        const bestOffer = findBestOffer(offers,variant.sales_price);
-
-        return {...item.toObject(),bestOffer:bestOffer}
-    }));
-
-    const orderItems= await Promise.all(cartItemsWithOffers.map( async(item)=>{
-
-        const variant= await Variant.findById(item.variant_id);
-
-        const sales_price= (item.bestOffer) ? variant.sales_price - item.bestOffer.discount_price : variant.sales_price;
-
-        return{
-            product_id:item.product_id,
-            variant_id:item.variant_id,
-            sales_price,
-            original_price:variant.original_price,
-            quantity:item.quantity
+        if (!wallet) {
+            return res.status(STATUS.ERROR.BAD_REQUEST).json({ success: false, message: "Wallet not found. Please add money to your wallet to continue" });
         }
-    }));
 
-    const original_price_total = orderItems.reduce((acc, curr) => {
-        acc += curr.original_price * curr.quantity;
-        return acc;
-    }, 0);
-
-    const sales_price_total = orderItems.reduce((acc, curr) => {
-        acc += curr.sales_price * curr.quantity;
-        return acc;
-    }, 0);
-
-    const discount = original_price_total - sales_price_total;
-
-    const delivery_charge = (payment_method == "cod") ? 7 : 0;
-
-    const tax = Math.round(sales_price_total * 0.18);
-
-    let total_amount = original_price_total - discount + delivery_charge + tax;
-
-    let discount_coupon= 0;
-
-    if(coupon) {
-
-        const couponDoc= await Coupon.findOne({code:coupon.code});
-
-        discount_coupon= couponDoc.type == "percentage" ? (total_amount*couponDoc.value)/100 : couponDoc.value;
-
-        couponDoc.usageCount +=1;
-
-        couponDoc.save();
     }
 
-    total_amount= total_amount - discount_coupon;
+    const newOrder = await createOrderService(address_id,payment_method,coupon,user,cartItems);
 
-    const newOrder = await Order.create({
-        user_id: user._id,
-        address_id,
-        payment_method,
-        payment_status: (payment_method == "cod") ? "pending" : "paid",
-        items: orderItems,
-        discount,
-        total_amount,
-        tax,
-        delivery_charge,
-    });
+    if (payment_method == "wallet") {
 
-    if(coupon) {
+        if (wallet.balance < newOrder.total_amount) {
 
-        newOrder.coupon_id= coupon._id;
-        newOrder.save();
+            return res.status(STATUS.ERROR.BAD_REQUEST).json({ success: false, message: "Insufficient wallet balance" });
+        }
+
+        wallet.balance -= newOrder.total_amount;
+        wallet.lastTransactionAt = new Date();
+
+        await wallet.save();
+
+        await WalletLedger.create({
+            wallet_id: wallet._id,
+            orderId: newOrder.orderId,
+            amount: newOrder.total_amount,
+            transaction_type: "debited",
+            reason: "Purchase",
+            status: "completed",
+            balance_after: wallet.balance
+        });
+
     }
 
-    for (let item of cartItems) {
+    if (coupon) {
+
+        await Coupon.updateOne({ code: coupon.code },{ $inc: { usageCount: 1 }} );
+    }
+
+    for (let item of newOrder.items) {
 
         await Variant.updateOne({ _id: item.variant_id }, { $inc: { stock: -item.quantity } });
     }
 
-    await Cart.updateOne({ user_id: user._id }, { $set: { items: [] } });
+    await Cart.updateOne({ user_id: newOrder.user_id }, { $set: { items: [] } });
 
     return res.status(STATUS.SUCCESS.CREATED).send({ success: true, orderId: newOrder.orderId });
 
@@ -198,6 +166,46 @@ const handleCancelOrder = async (req, res) => {
             }
         }
 
+        if (orderDoc.payment_status == "paid") {
+
+            if (orderDoc.payment_method != "cod") {
+
+                const refundAmount = orderDoc.total_amount;
+
+                const user = await User.findOne({ email });
+
+                let wallet = await Wallet.findOne({ user_id: user._id });
+
+                if (!wallet) {
+                    Wallet.create({
+                        user_id: user._id,
+                        balance: refundAmount,
+                        lastTransactionAt: new Date()
+                    });
+                } else {
+
+                    wallet.balance += refundAmount;
+                    wallet.lastTransactionAt = new Date();
+
+                    await wallet.save();
+                }
+
+                await WalletLedger.create({
+                    wallet_id: wallet._id,
+                    amount: refundAmount, 
+                    balance_after: wallet.balance,
+                    transaction_type: "credited",
+                    orderId: orderDoc.orderId,
+                    reason: "Cancel Refund",
+                    status: "completed"
+                });
+
+            }
+
+            await Order.updateOne({ _id: id }, { $set: { payment_status: "refunded" } });
+
+        }
+
         await Order.updateOne({ _id: id }, { $set: { status: "canceled", cancelledAt: new Date() } });
 
         return res.status(STATUS.SUCCESS.OK).send({ success: true, message: `Order ${orderDoc.orderId} has canceled successfully!` });
@@ -253,7 +261,58 @@ const handleCancelItem = async (req, res) => {
     }
 
     if (all_item_canceled) {
+
         await Order.updateOne({ _id: order_id }, { $set: { status: "canceled" } });
+
+        if( orderDoc.payment_status == "paid" && orderDoc.payment_method != "cod"){
+
+            await Order.updateOne({_id:order_id},{ $set:{payment_status:"refunded"} });
+        }
+    }
+
+    if (orderDoc.payment_status == "paid" && orderDoc.payment_method != "cod") {
+
+        const item = await orderDoc.items.id(item_id);
+
+        let coupon = null;
+
+        if (orderDoc?.coupon_id) {
+
+            coupon = await Coupon.findById(orderDoc.coupon_id);
+        }
+
+        const refundAmount = findRefundAmount(orderDoc,item,coupon)
+
+        let email= req.email;
+
+        let user= await User.findOne({email});
+
+        let wallet = await Wallet.findOne({ user_id: user._id });
+
+        if (!wallet) {
+
+            Wallet.create({
+                user_id: user._id,
+                balance: refundAmount,
+                lastTransactionAt: new Date()
+            });
+        } else {
+
+            wallet.balance += refundAmount;
+            wallet.lastTransactionAt = new Date();
+
+            await wallet.save();
+        }
+
+        await WalletLedger.create({
+            wallet_id: wallet._id,
+            amount: refundAmount,
+            balance_after: wallet.balance,
+            transaction_type: "credited",
+            orderId: orderDoc.orderId,
+            reason: "Cancel Refund",
+            status: "completed"
+        });
     }
 
     return res.status(STATUS.SUCCESS.OK).send({ success: true, message: `Product is being canceled from order ${orderDoc.orderId}` });
@@ -359,6 +418,8 @@ const generateInvoice = async (req, res) => {
         console.log("Error in generating Invoice for order!", error);
     }
 }
+
+
 
 
 

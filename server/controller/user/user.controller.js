@@ -6,6 +6,7 @@ import createNewOtp from "../../utils/otp.util.js";
 import STATUS from "../../constants/status.constant.js";
 import sendEmail from "../../utils/send-otp-mail.js";
 import generateReferralCode from "../../utils/referral.util.js";
+import Wallet from "../../models/wallet.model.js";
 
 const register = async (req, res) => {
 
@@ -199,9 +200,11 @@ const fetchUserInfo = async (req, res) => {
 
         let referralCount = await User.countDocuments({ referred_by: userInfo._id });
 
+        let wallet = await Wallet.findOne({user_id:userInfo._id}).select("balance");
+
         if (userInfo) {
 
-            res.status(STATUS.SUCCESS.OK).send({ userInfo, referralCount });
+            res.status(STATUS.SUCCESS.OK).send({ userInfo, referralCount, balance:wallet.balance });
         } else {
 
             res.status(STATUS.ERROR.NOT_FOUND).send("User Not Found")

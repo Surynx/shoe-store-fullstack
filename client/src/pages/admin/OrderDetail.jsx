@@ -1,7 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { ArrowLeft,Package,User,MapPin,CreditCard,Calendar,Truck,CheckCircle,XCircle,Clock,Dot } from "lucide-react";
+import {
+  ArrowLeft,
+  Package,
+  User,
+  MapPin,
+  CreditCard,
+  Calendar,
+  Truck,
+  CheckCircle,
+  XCircle,
+  Clock,
+  AlertCircle,
+} from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { approveReturn,changeOrderStatus,completeReturn,getOrderDetailsForAdmin, rejectReturn } from "../../Services/admin.api";
+import {
+  approveReturn,
+  changeOrderStatus,
+  completeReturn,
+  getOrderDetailsForAdmin,
+  rejectReturn,
+} from "../../Services/admin.api";
 import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -55,6 +73,16 @@ const OrderDetailPage = () => {
     { value: "canceled", label: "Canceled", color: "bg-red-100 text-red-800" },
   ];
 
+  const statusFlow = [
+    "pending",
+    "confirmed",
+    "shipped",
+    "out_for_delivery",
+    "delivered",
+  ];
+
+  const currentStatusIndex = statusFlow.indexOf(orderData.status);
+
   const paymentStatusColors = {
     pending: "bg-yellow-100 text-yellow-800",
     paid: "bg-green-100 text-green-800",
@@ -64,12 +92,10 @@ const OrderDetailPage = () => {
 
   const handleStatusChange = async (data) => {
     try {
-
       const res = await changeOrderStatus(data, id);
 
       toast.success(res.data.message);
       QueryClient.invalidateQueries("order-details-admin");
-
     } catch (error) {
       toast.error(error.response.data.message);
     }
@@ -112,33 +138,26 @@ const OrderDetailPage = () => {
   };
 
   const handleReturnReject = async (orderId, itemId) => {
-
     try {
-
       const res = await rejectReturn(orderId, itemId);
       toast.success("Return Rejected");
       QueryClient.invalidateQueries(["order-details-admin", id]);
-      
     } catch (err) {
       toast.error("Error rejecting return");
     }
   };
 
   const handleReturnComplete = async (orderId, itemId) => {
-    
     try {
-
       const res = await completeReturn(orderId, itemId);
 
       toast.success("Return Completed");
 
       QueryClient.invalidateQueries(["order-details-admin", id]);
-
     } catch (err) {
-
-      toast.error("Error rejecting return",err);
+      toast.error("Error rejecting return", err);
     }
-  }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 p-10">
@@ -160,28 +179,51 @@ const OrderDetailPage = () => {
                 Order ID: {orderData.orderId}
               </p>
             </div>
-            {orderData.status != "canceled" && (
-              <form onSubmit={handleSubmit(handleStatusChange)}>
-                <div className="flex items-center gap-2">
-                  <select
-                    {...register("status")}
-                    className="px-3 py-1.5 cursor-pointer text-sm font-bold border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <option value="pending">Pending</option>
-                    <option value="confirmed">Confirmed</option>
-                    <option value="shipped">Shipped</option>
-                    <option value="out_for_delivery">Out for Delivery</option>
-                    <option value="delivered">Delivered</option>
-                  </select>
-                  <button
-                    type="submit"
-                    className="px-3 py-1 text-white text-sm bg-gray-600 transition-colors cursor-pointer"
-                  >
-                    Update
-                  </button>
+            {orderData.status !== "canceled" &&
+              orderData.payment_status !== "failed" && (
+                <form onSubmit={handleSubmit(handleStatusChange)}>
+                  <div className="flex items-center gap-2">
+                    <select
+                      {...register("status")}
+                      defaultValue={orderData.status}
+                      className="px-3 py-1.5 cursor-pointer text-sm font-bold border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      {statusFlow.map((status, index) => (
+                        <option
+                          key={status}
+                          value={status}
+                          disabled={index < currentStatusIndex}
+                        >
+                          {status.replaceAll("_", " ").toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+
+                    <button
+                      type="submit"
+                      className="px-3 py-1 text-white text-sm bg-gray-600 transition-colors cursor-pointer"
+                    >
+                      Update
+                    </button>
+                  </div>
+                </form>
+              )}
+            <div className="flex items-center justify-center p-4">
+              {orderData.payment_status === "failed" &&  (
+                <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-2.5 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                  <p className="text-sm font-medium">Razorpay payment failed</p>
                 </div>
-              </form>
-            )}
+              )}
+
+              {orderData.status === "canceled" &&  (
+                <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-2.5 rounded-lg">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+                  <p className="text-sm font-medium">Order Cancelled</p>
+                </div>
+              )}
+
+            </div>
           </div>
         </div>
 
@@ -290,6 +332,7 @@ const OrderDetailPage = () => {
                           </p>
                         </>
                       ) : null}
+
                       {item.return_status && (
                         <div className="mt-2 text-right">
                           <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
@@ -363,7 +406,6 @@ const OrderDetailPage = () => {
                         </div>
 
                         <div className="flex gap-2 items-center">
-                        
                           {item.return_status === "Requested" && (
                             <>
                               <button
@@ -393,11 +435,10 @@ const OrderDetailPage = () => {
                                 handleReturnComplete(orderData._id, item._id)
                               }
                             >
-                              Complete Return ✓
+                              Complete Refund ✓
                             </button>
                           )}
 
-                          
                           {item.return_status === "Rejected" && (
                             <p className="text-xs font-semibold text-red-700">
                               Rejected
@@ -417,9 +458,7 @@ const OrderDetailPage = () => {
             )}
           </div>
 
-          
           <div className="space-y-4">
-            
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="flex items-center gap-1.5 mb-3">
                 <User className="w-4 h-4 text-gray-600" />
@@ -449,7 +488,6 @@ const OrderDetailPage = () => {
               </div>
             </div>
 
-          
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="flex items-center gap-1.5 mb-3">
                 <MapPin className="w-4 h-4 text-gray-600" />
@@ -504,7 +542,25 @@ const OrderDetailPage = () => {
               </div>
             </div>
 
-           
+            {orderData.coupon_id && (
+              <div className="mb-2 p-2 rounded-md bg-green-50 border border-green-200">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-semibold text-green-700">
+                    Coupon Applied
+                  </span>
+                  <span className="font-bold text-green-800">
+                    {orderData.coupon_id.code}
+                  </span>
+                </div>
+
+                <div className="mt-1 text-[11px] text-green-700">
+                  {orderData.coupon_id.type === "percentage"
+                    ? `${orderData.coupon_id.value}% off`
+                    : `₹${orderData.coupon_id.value} off`}
+                </div>
+              </div>
+            )}
+
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h2 className="text-sm font-semibold text-gray-900 mb-3">
                 Order Summary

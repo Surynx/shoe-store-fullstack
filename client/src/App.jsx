@@ -36,6 +36,10 @@ import OrderManagement from "./pages/admin/OrderManagment"
 import OrderDetailPage from "./pages/admin/OrderDetail"
 import WishList from "./pages/user/WishList"
 import CouponManagment from "./pages/admin/CouponManagment"
+import Wallet from "./pages/user/MyWallet"
+import AddWalletAmount from "./pages/user/AddWalletAmount"
+import PaymentFailed from "./pages/user/OrderFailed"
+import AuthRedirect from "./components/user/AuthRedirect"
 
 
 function App() {
@@ -44,11 +48,12 @@ function App() {
     <>
       <main>
         <Routes>
+          
           {/* Admin Route */}
 
             <Route path="/admin/login" element={<Login/>}></Route>
             <Route path="/admin" element={<AdminProtected><Layout/></AdminProtected>}>
-              <Route path="dashboard" element={<Dashboard/>}/>
+              <Route index element={<Dashboard/>}/>
               <Route path="users" element={<UserManagment/>}/>
               <Route path="category" element={<CategoryManagment/>}/>
               <Route path="category/add" element={<AddCategory/>}/>
@@ -69,18 +74,19 @@ function App() {
           
           <Route path="/" element={<UserLayout/>}>
             <Route index element={<Home/>}/>
-            <Route path="login" element={<UserLogin/>}/>
-            <Route path="signup" element={<Signup/>}/>
-            <Route path="verify" element={<Verify/>}/>
-            <Route path="forgotpassword" element={<ForgetPassword/>}/>
-            <Route path="resetpassword" element={<ResetPassword/>}/>
+            <Route path="login" element={<AuthRedirect><UserLogin/></AuthRedirect>}/>
+            <Route path="signup" element={<AuthRedirect><Signup/></AuthRedirect>}/>
+            <Route path="verify" element={<AuthRedirect><Verify/></AuthRedirect>}/>
+            <Route path="forgotpassword" element={<AuthRedirect><ForgetPassword/></AuthRedirect>}/>
+            <Route path="resetpassword" element={<AuthRedirect><ResetPassword/></AuthRedirect>}/>
             <Route path="shop" element={<Shop/>}/>
             <Route path="shop/product/:id" element={<Product/>}/>
             <Route path="product/:id" element={<Product/>}/>
             <Route path="Cart" element={<UserProtected><Cart/></UserProtected>}/>
-            <Route path="checkout" element={<CheckoutPage/>}/>
+            <Route path="checkout" element={<UserProtected><CheckoutPage/></UserProtected>}/>
             <Route path="order/success/:id" element={<OrderSuccess/>}/>
-            <Route path="wishlist" element={<WishList/>}/>
+            <Route path="wishlist" element={<UserProtected><WishList/></UserProtected>}/>
+            <Route path="payment/failed/:id" element={<PaymentFailed/>}/>
             <Route path="/account" element={<UserProtected><Profile/></UserProtected>}>
               <Route index path="profile" element={<UserInfo/>}/>
               <Route path="edit" element={<EditProfile/>}/>
@@ -89,6 +95,8 @@ function App() {
               <Route path="address/:id" element={<AddressForm/>}/>
               <Route path="orders" element={<OrderListing/>}/>
               <Route path="order/detail/:id" element={<OrderDetail/>}/>
+              <Route path="wallet" element={<Wallet/>}/>
+              <Route path="wallet/addmoney" element={<AddWalletAmount/>}/>
             </Route>
           </Route>
           <Route path="auth/google/success/:id" element={<AuthSuccess/>}/>

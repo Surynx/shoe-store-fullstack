@@ -1,11 +1,11 @@
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 import { changeCouponStatus } from "../../../Services/admin.api";
-import toast from "react-hot-toast";
-import { queryOptions, useQueryClient } from "@tanstack/react-query";
+import { useQueryClient } from "@tanstack/react-query";
+import { Tag } from "lucide-react";
 
-function CouponTable({ data, isLoading }) {
+function CouponTable({ data, isLoading,setEditCoupon,setOpenModal }) {
 
-  const QueryClient= useQueryClient();
+  const QueryClient = useQueryClient();
 
   const getStatusColor = (status) => {
     return status === true
@@ -15,16 +15,12 @@ function CouponTable({ data, isLoading }) {
 
   const displayCoupons = data?.data?.docs || [];
 
-  const handleCouponStatus= async (id) => {
-    
-    const res= await changeCouponStatus(id);
+  const handleEditCoupon = async (coupon) => {
 
-    if(res) {
+    setEditCoupon(coupon);
+    setOpenModal(true);
 
-        toast.success(res.data.message);
-        QueryClient.invalidateQueries("coupon-data");
-    }
-  }
+  };
 
   if (isLoading) {
     return (
@@ -38,57 +34,52 @@ function CouponTable({ data, isLoading }) {
     <div className="bg-white rounded-md shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
         <table className="w-full">
-          <thead className="bg-gray-50 border-b border-gray-200">
+          <thead className="bg-gray-50 text-gray-600 uppercase text-xs tracking-wider border-b border-gray-200">
             <tr>
-              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Coupon Code
+              <th className="py-3 px-5 text-center w-[15%]">Coupon Code</th>
+              <th className="py-3 px-5 text-center w-[10%]">Usage Count</th>
+              <th className="py-3 px-5 text-center w-[15%]">
+                Minimum Purchase
               </th>
-              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Usage Count
-              </th>
-              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Minimum-Purchase
-              </th>
-              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Discount Value
-              </th>
-              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Expiry Date
-              </th>
-              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Status
-              </th>
-              <th className="px-6 py-4 text-center text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                Actions
-              </th>
+              <th className="py-3 px-5 text-center w-[15%]">Discount Value</th>
+              <th className="py-3 px-5 text-center w-[15%]">Expiry Date</th>
+              <th className="py-3 px-5 text-center w-[10%]">Status</th>
+              <th className="py-3 px-2 text-center w-[10%]">Actions</th>
             </tr>
           </thead>
+
           <tbody className="bg-white divide-y divide-gray-100">
             {displayCoupons.map((coupon) => (
               <tr key={coupon.id} className="hover:bg-gray-50 transition">
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span className="text-sm font-bold text-gray-900">
-                    {coupon.code}
+                  <span className="text-sm font-bold text-green-900 flex gap-2 items-center">
+                   <Tag className="fill-green-50" size={18}/> {coupon.code}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span className="text-sm text-gray-700">{coupon.usageCount}</span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
                   <span className="text-sm text-gray-700">
+                    {coupon.usageCount}
+                  </span>
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap text-center font-bold">
+                  <span className="text-sm text-blue-700">
                     ₹ {coupon.min_purchase}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span className="text-sm font-semibold text-gray-900">
+                  <span className="text-sm font-semibold text-amber-700">
                     {coupon.type == "percentage"
                       ? `${coupon.value}% OFF`
                       : `₹${coupon.value} FLAT`}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span className="text-sm text-gray-700">
-                    {coupon.end_date.substring(0, 10)}
+                  <span className="text-xs text-gray-700 font-bold">
+                    {new Date(coupon?.end_date)?.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                  })}
                   </span>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
@@ -102,21 +93,11 @@ function CouponTable({ data, isLoading }) {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-center">
                   <button
-                    onClick={()=>handleCouponStatus(coupon._id)}
-                    className={`relative inline-flex h-5 w-10 items-center rounded-full transition-colors ${
-                      coupon.status
-                        ? "bg-green-600"
-                        : "bg-gray-300"
-                    }`}
-                    title={`Toggle status`}
+                    onClick={() => handleEditCoupon(coupon)}
+                    className="p-1.5 text-blue-600 rounded transition cursor-pointer"
+                    title="Edit Coupon"
                   >
-                    <span
-                      className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
-                        coupon.status
-                          ? "translate-x-6"
-                          : "translate-x-1"
-                      }`}
-                    />
+                    <FaEdit size={16} />
                   </button>
                 </td>
               </tr>

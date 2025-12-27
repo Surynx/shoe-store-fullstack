@@ -232,9 +232,52 @@ const validateCoupon= async (data) => {
     return res;
 }
 
+const createRazorpayOrder= async (data) => {
+    
+    const res= await api.post("/user/wallet/create-order",data);
+    return res;
+}
 
-export { registerApi,verifyEmail,verifyUser,userLogin,resetPassword,getAllLatestProducts,getShopProductList,getAllCategoryForUser,
+const verifyPayment= async (response) => {
+
+    const res= await api.post("/user/wallet/addmoney",response);
+    return res;
+}
+
+const getWalletInfo= async () => {
+    
+    const res= await api.get("/user/wallet");
+    return res;
+}
+
+const createCheckoutOrder= async (data) => {
+    
+    const res= await api.post("/user/payment/create-order",data);
+    return res;
+}
+
+const verifyCheckoutPayment= async (data) => {
+    
+    const res= await api.post("/user/payment/verify",data);
+    return res;
+}
+
+const markPaymentFailed = async (data) => {
+    
+    const res= await api.post("/user/payment/failed",data);
+    return res;
+}
+
+const createPaymentRetryOrder = async (data) => {
+    
+    const res= await api.get("/user/payment/failed",data);
+}
+
+export { 
+    registerApi,verifyEmail,verifyUser,userLogin,resetPassword,getAllLatestProducts,getShopProductList,getAllCategoryForUser,
     getAllBrandForUser,getProductData,getUserInfo,editUserInfo,sentOtpToPhone,verifyPhone,sendOtpToEmail,verifyEmailOtp,addNewAddress,
     getAllAddress,deleteAddress,updateAddress,changePassword,addToCart,fetchCartInfo,removeProductFromCart,increaseQty,decreaseQty,getCartCount,
     getCheckoutInfo,placeNewOrder,validateCartItems,getOrderDetails ,getAllOrders,cancelOrder,cancelSingleItem,handleReturnItem,addToFavourite,
-    fetchWishListInfo,removeItemFromWishlist,validateCoupon }
+    fetchWishListInfo,removeItemFromWishlist,validateCoupon,createRazorpayOrder,verifyPayment,getWalletInfo,createCheckoutOrder,
+    verifyCheckoutPayment,markPaymentFailed 
+}

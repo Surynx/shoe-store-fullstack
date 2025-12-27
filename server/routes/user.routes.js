@@ -13,6 +13,8 @@ import { getCheckoutData } from "../controller/user/checkout.controller.js";
 import { fetchAllOrders, generateInvoice, getOrderDetails, handleCancelItem, handleCancelOrder, handleReturnProduct, placeNewOrder } from "../controller/user/order.controller.js";
 import { addProductToWishlist, fetchWishlistInfo, removeItemFromWishlist } from "../controller/user/wishlist.controller.js";
 import { validateCoupon } from "../controller/admin/coupon.controller.js";
+import { createWalletOrder, fetchWalletInfo, verifyWalletPayment } from "../controller/user/wallet.controller.js";
+import { createCheckoutOrder, markPaymentFailed, verifyCheckoutPayment } from "../controller/user/payment.controller.js";
 
 const route=express.Router();
 
@@ -102,5 +104,17 @@ route.get(ROUTES.USER.WISHLIST.FETCH,isUser,fetchWishlistInfo);
 route.patch(ROUTES.USER.WISHLIST.REMOVE,isUser,removeItemFromWishlist);
 
 route.post(ROUTES.USER.COUPON.VALIDATE,isUser,validateCoupon);
+
+route.post(ROUTES.USER.WALLET.CREATE_ORDER,isUser,createWalletOrder);
+
+route.post(ROUTES.USER.WALLET.ADD_MONEY,isUser,verifyWalletPayment);
+
+route.get(ROUTES.USER.WALLET.FETCH,isUser,fetchWalletInfo);
+
+route.post(ROUTES.USER.PAYMENT.CREATE_ORDER,isUser,createCheckoutOrder);
+
+route.post(ROUTES.USER.PAYMENT.VERIFY_PAYMENT,isUser,verifyCheckoutPayment);
+
+route.post(ROUTES.USER.PAYMENT.FAILED_PAYMENT,isUser,markPaymentFailed);
 
 export default route;

@@ -5,4 +5,4 @@ function ErrorMessage({ elem }) {
   )
 }
 
-export default ErrorMessage
+export default ErrorMessage;

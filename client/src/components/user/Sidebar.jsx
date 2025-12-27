@@ -1,8 +1,9 @@
 import { NavLink, replace, useNavigate } from "react-router-dom";
-import { User, MapPin, Package, LogOut, Edit } from "lucide-react";
+import { User, MapPin, Package, LogOut, Edit, Wallet } from "lucide-react";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";
 import Loading from "./Loading";
+import { BiMoney } from "react-icons/bi";
 
 export default function Sidebar({ name, email,avatar }) {
   const nav = useNavigate();
@@ -72,6 +73,18 @@ export default function Sidebar({ name, email,avatar }) {
         >
           <MapPin className="w-4 h-4" />
           Addresses
+        </NavLink>
+
+        <NavLink
+          to="/account/wallet"
+          className={({ isActive }) =>
+            `flex items-center gap-3 px-4 py-2 rounded-md transition ${
+              isActive ? "bg-gray-100 font-semibold" : "hover:bg-gray-100"
+            }`
+          }
+        >
+          <Wallet className="w-4 h-4" />
+          My Wallet
         </NavLink>
 
         <NavLink

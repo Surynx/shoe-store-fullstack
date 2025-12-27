@@ -25,6 +25,7 @@ export const isAdmin= async(req,res,next)=>{
         return res.status(STATUS.ERROR.FORBIDDEN).send("UnAuthorized Access Denied");
     }
     }catch(error) {
+        
         error.response.redirect("/admin/login");
     }
 }

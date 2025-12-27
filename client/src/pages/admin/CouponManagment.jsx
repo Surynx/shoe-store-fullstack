@@ -2,7 +2,7 @@ import { FaPlus } from "react-icons/fa";
 import Pagination from "../../components/admin/Pagination";
 import SearchBox from "../../components/admin/SearchBox";
 import { useState } from "react";
-import AddCouponModal from "../../components/admin/modal/Coupon";
+import CouponModal from "../../components/admin/modal/Coupon";
 import CouponTable from "../../components/admin/Tables/CouponTable";
 import { useQuery } from "@tanstack/react-query";
 import useDebounce from "../../hooks/useDebounce";
@@ -14,6 +14,8 @@ function CouponManagment() {
 
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
+
+  const [editCoupon,setEditCoupon] = useState(null);
 
   const debounce = useDebounce(search);
 
@@ -51,9 +53,11 @@ function CouponManagment() {
       <CouponTable 
         data={data}
         isLoading={isLoading}
+        setEditCoupon={setEditCoupon}
+        setOpenModal={setOpenModal}
         />
       <Pagination page={page} setPage={setPage} totalPages={totalPages} />
-      <AddCouponModal isOpen={openModal} onClose={() => setOpenModal(false)} />
+      <CouponModal isOpen={openModal} onClose={() => setOpenModal(false)} editCoupon={editCoupon} setEditCoupon={setEditCoupon}/>
     </div>
   );
 }

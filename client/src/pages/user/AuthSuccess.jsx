@@ -11,6 +11,7 @@ function AuthSuccess() {
     useEffect(()=>{
 
         localStorage.setItem("userToken",id);
+
         nav("/",{replace:true});
 
         toast.success("Login");

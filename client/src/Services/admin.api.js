@@ -193,13 +193,57 @@ const getAllCoupon= async(search,page)=> {
 }
 
 
-const changeCouponStatus= async(id)=> {
+const changeCouponStatus= async(id,data)=> {
 
-    const res= await api.patch(`/admin/coupon/${id}`);
+    const res= await api.patch(`/admin/coupon/${id}`,data);
     return res;
 }
 
-export { verifyAdmin,getAllusers,blockUser,addCategory,getAllCategory,editCategory,addBrand,getAllbrand,editBrand,addProduct,
+const getDashboardInfo= async () => {
+
+    const res= await api.get("/admin/dashboard");
+    return res;
+}
+
+const getSalesOverview= async (range) => {
+    
+    const res= await api.get("/admin/sales-report",{
+        params:{range}
+    });
+    return res
+}
+
+const getCustomSalesOverview = async (customStartDate,customEndDate) => {
+    
+    const res= await api.get("/admin/sales-report-custom",{
+        params:{ start:customStartDate,end:customEndDate }
+    });
+    return res
+}
+
+const downloadExcelReport= async (range,start=null,end=null) => {
+    
+    const res= await api.get("/admin/sales-report/excel",{
+        params:{range,start,end},
+        responseType:"blob"
+    });
+    return res;
+}
+
+const downloadPdfReport= async (range,start=null,end=null) => {
+    
+    const res= await api.get("/admin/sales-report/pdf",{
+        params:{range,start,end},
+        responseType:"blob"
+    });
+    return res;
+}
+
+export { 
+    verifyAdmin,getAllusers,blockUser,addCategory,getAllCategory,editCategory,addBrand,getAllbrand,editBrand,addProduct,
     getAllProduct,editProduct,addVariant,getAllVariant,removeVariant,updateVariant,getAllOrders,getOrderDetailsForAdmin,changeOrderStatus,
     approveReturn,completeReturn,rejectReturn,addOfferForCategory,getAllOfferOfCategory,deleteOffer,addOfferForProduct,
-    getAllOfferOfProduct,addNewCoupon,getAllCoupon,changeCouponStatus }
+    getAllOfferOfProduct,addNewCoupon,getAllCoupon,changeCouponStatus,getDashboardInfo,getSalesOverview,getCustomSalesOverview,
+    downloadExcelReport,downloadPdfReport
+
+}

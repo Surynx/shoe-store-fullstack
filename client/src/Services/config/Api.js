@@ -1,6 +1,4 @@
 import axios from "axios";
-import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 
 const api=axios.create({
     baseURL: import.meta.env.VITE_BASE_URL
@@ -16,7 +14,7 @@ api.interceptors.request.use(
 
         }else if (res.url.startsWith("/user/account") || res.url.startsWith("/user/address") || res.url.startsWith("/user/cart") 
                 || res.url.startsWith("/user/checkout") || res.url.startsWith("/user/order") || res.url.startsWith("/user/wishlist") || 
-                res.url.startsWith("/user/coupon") ) {
+                res.url.startsWith("/user/coupon") || res.url.startsWith("/user/wallet") || res.url.startsWith("/user/payment")) {
 
             const token= localStorage.getItem("userToken");
             res.headers.authorization= `Bearer ${token}`

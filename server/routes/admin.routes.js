@@ -7,9 +7,10 @@ import ROUTES from "../constants/routes.constant.js";
 import { addcategory, editCategory, fetchCategory } from "../controller/admin/category.contoller.js";
 import { addProduct, editProduct, fetchProduct } from "../controller/admin/product.controller.js";
 import { addBrand, editBrand, fetchBrands } from "../controller/Admin/brand.controller.js";
-import { approveReturn, changeOrderStatus, completeReturn, fetchOrdersInfo, getDetailsOfOrder, rejectReturn } from "../controller/Admin/order.controller.js";
+import { approveReturn, changeOrderStatus, completeReturn, fetchOrdersInfo, getDetailsOfOrder, rejectReturn } from "../controller/admin/order.controller.js";
 import { addNewOfferForCategory, addNewOfferForProduct, getAllOfferOfCategory, getAllOfferOfProduct, removeOffer } from "../controller/admin/offer.controller.js";
 import { addNewCoupon, changeCouponStatus, getAllCoupon } from "../controller/admin/coupon.controller.js";
+import { getDashboardInfo, getExcelSalesReport, getPdfSalesReport, getSalesOverview, getSalesOverviewCustom } from "../controller/admin/dashboard.controller.js";
 
 const route=express.Router();
 
@@ -74,5 +75,15 @@ route.post(ROUTES.ADMIN.COUPON.ADD,isAdmin,addNewCoupon);
 route.get(ROUTES.ADMIN.COUPON.GET,isAdmin,getAllCoupon);
 
 route.patch(ROUTES.ADMIN.COUPON.CHNAGE_STATUS,isAdmin,changeCouponStatus);
+
+route.get(ROUTES.ADMIN.DASHBOARD.FETCH,isAdmin,getDashboardInfo);
+
+route.get(ROUTES.ADMIN.DASHBOARD.SALES_OVERVIEW,isAdmin,getSalesOverview);
+
+route.get(ROUTES.ADMIN.DASHBOARD.SALES_OVERVIEW_CUSTOM,isAdmin,getSalesOverviewCustom);
+
+route.get(ROUTES.ADMIN.DASHBOARD.DOWNLOAD_EXCEL_REPORT,isAdmin,getExcelSalesReport);
+
+route.get(ROUTES.ADMIN.DASHBOARD.DOWNLOAD_PDF_REPORT,isAdmin,getPdfSalesReport);
 
 export default route;

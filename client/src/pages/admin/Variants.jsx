@@ -7,67 +7,66 @@ import { addVariant, updateVariant } from "../../Services/admin.api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { getAllVariant } from "../../Services/admin.api";
 import { toast } from "react-toastify";
+import ErrorMessage from "../../components/admin/ErrorMessage";
 
 export default function AddVariant() {
   const { id } = useParams();
 
-  const QueryClient= useQueryClient();
+  const QueryClient = useQueryClient();
 
-  const { data,isLoading }= useQuery({
-    queryKey:["varientInfo"],
-    queryFn:()=>getAllVariant(id),
+  const { data, isLoading } = useQuery({
+    queryKey: ["varientInfo"],
+    queryFn: () => getAllVariant(id),
   });
 
   const { state } = useLocation();
 
   const navigate = useNavigate();
 
-  const { handleSubmit, reset, register } = useForm();
+  const {
+    handleSubmit,
+    reset,
+    register,
+    formState: { errors },
+  } = useForm();
 
   //edit logic
-  const [ editVarient,setEditVarient ] = useState(null);
+  const [editVarient, setEditVarient] = useState(null);
 
-  useEffect(()=>{
-    
-    if(editVarient != null){
+  useEffect(() => {
+    if (editVarient != null) {
       reset(editVarient);
-
-    }else {
-
+    } else {
       reset({
-      size: "",
-      stock: "",
-      original_price: "",
-      sales_price: "",
-      discount: "",
-    });
+        size: "",
+        stock: "",
+        original_price: "",
+        sales_price: "",
+        discount: "",
+      });
     }
-    
-  },[editVarient]);
+  }, [editVarient]);
 
   const submit = async (data) => {
-  try { 
+    try {
+      let res;
 
-    let res;
+      if (editVarient) {
+        res = await updateVariant(data, id);
+        setEditVarient(null);
+        reset();
+      } else {
+        res = await addVariant(data, id);
+      }
 
-    if(editVarient) {
-      res= await updateVariant(data, id);
-      setEditVarient(null);
-      reset();
-
-    }else {
-      res = await addVariant(data, id);
+      if (res) {
+        toast.success(res.data.message);
+        QueryClient.invalidateQueries("varientInfo");
+        reset();
+      }
+    } catch (error) {
+      toast.warn(error.response.data.message);
     }
-
-    if(res) {
-      
-      toast.success(res.data.message);
-      QueryClient.invalidateQueries("varientInfo");
-      reset();
-    }
-  }catch(error) {
-    toast.warn(error.response.data.message);
-  }
   };
 
   return (
@@ -93,14 +92,13 @@ export default function AddVariant() {
         className="bg-white border border-green-700 rounded-lg p-5 mb-8 text-xs"
       >
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
-        
+          {/* Size */}
           <div className="flex flex-col">
-            <label htmlFor="size" className="mb-1 text-gray-700 font-semibold">
-              Size
-            </label>
+            <label className="mb-1 text-gray-700 font-semibold">Size</label>
             <select
-              id="size"
-              {...register("size", { required: true })}
+              {...register("size", {
+                required: "Size is required",
+              })}
               disabled={editVarient != null}
               className="border text-sm p-2 rounded-md outline-none"
             >
@@ -111,84 +109,105 @@ export default function AddVariant() {
               <option value="UK 6">UK 6</option>
               <option value="UK 7">UK 7</option>
             </select>
+            <ErrorMessage elem={errors.size} />
           </div>
 
-         
+          {/* Stock */}
           <div className="flex flex-col">
-            <label htmlFor="stock" className="mb-1 text-gray-700 font-semibold">
-              Stock
-            </label>
+            <label className="mb-1 text-gray-700 font-semibold">Stock</label>
             <input
-              id="stock"
               type="number"
               placeholder="Stock"
-              {...register("stock", { required: true })}
+              {...register("stock", {
+                required: "Stock is required",
+                min: {
+                  value: 0,
+                  message: "Stock cannot be negative",
+                },
+              })}
               className="border text-sm p-2 rounded-md outline-none"
             />
-          </div>
-
-          
-          <div className="flex flex-col">
-            <label
-              htmlFor="original_price"
-              className="mb-1 text-gray-700 font-semibold"
-            >
-              Original Price
-            </label>
-            <input
-              id="original_price"
-              type="number"
-              placeholder="Original Price"
-              {...register("original_price", { required: true })}
-              className="border text-sm p-2 rounded-md outline-none"
-            />
-          </div>
-
-          
-          <div className="flex flex-col">
-            <label
-              htmlFor="sales_price"
-              className="mb-1 text-gray-700 font-semibold"
-            >
-              Sales Price
-            </label>
-            <input
-              id="sales_price"
-              type="number"
-              placeholder="Sales Price"
-              {...register("sales_price", { required: true })}
-              className="border text-sm p-2 rounded-md outline-none"
-            />
+            <ErrorMessage elem={errors.stock} />
           </div>
 
        
           <div className="flex flex-col">
-            <label
-              htmlFor="discount"
-              className="mb-1 text-gray-700 font-semibold"
-            >
+            <label className="mb-1 text-gray-700 font-semibold">
+              Original Price
+            </label>
+            <input
+              type="number"
+              placeholder="Original Price"
+              {...register("original_price", {
+                required: "Original price is required",
+                min: {
+                  value: 1,
+                  message: "Price must be greater than 0",
+                },
+              })}
+              className="border text-sm p-2 rounded-md outline-none"
+            />
+            <ErrorMessage elem={errors.original_price} />
+          </div>
+
+          {/* Sales Price */}
+          <div className="flex flex-col">
+            <label className="mb-1 text-gray-700 font-semibold">
+              Sales Price
+            </label>
+            <input
+              type="number"
+              placeholder="Sales Price"
+              {...register("sales_price", {
+                required: "Sales price is required",
+                min: {
+                  value: 1,
+                  message: "Sales price must be greater than 0",
+                },
+                validate: (value, formValues) =>
+                  Number(value) <= Number(formValues.original_price) ||
+                  "Sales price cannot be greater than original price",
+              })}
+              className="border text-sm p-2 rounded-md outline-none"
+            />
+            <ErrorMessage elem={errors.sales_price} />
+          </div>
+
+          {/* Discount */}
+          <div className="flex flex-col">
+            <label className="mb-1 text-gray-700 font-semibold">
               Discount (%)
             </label>
             <input
-              id="discount"
               type="number"
               placeholder="Discount %"
-              {...register("discount")}
+              {...register("discount", {
+                min: {
+                  value: 0,
+                  message: "Discount cannot be negative",
+                },
+                max: {
+                  value: 100,
+                  message: "Discount cannot exceed 100%",
+                },
+              })}
               className="border text-sm p-2 rounded-md outline-none"
             />
+            <ErrorMessage elem={errors.discount} />
           </div>
         </div>
 
+        {/* Submit Button */}
         <div className="flex justify-end mt-4">
           <button
             type="submit"
-            className={`px-2 py-1.5 flex gap-1 rounded-md text-xs text-white font-medium transition cursor-pointer ${
-              editVarient !== null
+            className={`px-2 py-1.5 rounded-md text-xs text-white font-medium ${
+              editVarient
                 ? "bg-yellow-500 hover:bg-yellow-600"
                 : "bg-blue-600 hover:bg-blue-700"
             }`}
           >
-            {editVarient !== null ? "Update Variant" : "Add Variant"}
+            {editVarient ? "Update Variant" : "Add Variant"}
           </button>
         </div>
 
@@ -199,7 +218,11 @@ export default function AddVariant() {
         </span>
       </form>
 
-      <VariantsList data={data} QueryClient={QueryClient} setEditVarient={setEditVarient}/>
+      <VariantsList
+        data={data}
+        QueryClient={QueryClient}
+        setEditVarient={setEditVarient}
+      />
     </div>
   );
 }

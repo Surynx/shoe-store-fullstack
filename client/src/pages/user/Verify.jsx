@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { verifyEmail, verifyUser } from "../../Services/user.api";
 import toast from "react-hot-toast";
@@ -7,6 +7,15 @@ import { generateOtp } from "../../Services/otp.api";
 import Countdown from "react-countdown";
 
 function Verify() {
+
+
+  useEffect(()=>{
+
+    if(!localStorage.getItem("flow")) {
+      nav("/login");
+    }
+  },[]);
+
   const { register, handleSubmit, reset } = useForm();
   const nav = useNavigate();
 
@@ -39,12 +48,13 @@ function Verify() {
         if (flow == "forgot") {
           nav("/resetpassword", { replace: true });
         } else if (flow == "signup") {
-          nav("/login");
+          nav("/login",{replace:true});
         }
 
         localStorage.removeItem("flow");
       }
     } catch (error) {
+
       toast.error(error.response.data.message);
     }
   };
@@ -74,44 +84,44 @@ function Verify() {
             <input
               type="text"
               maxLength="1"
-              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
               {...register("one")}
             />
             <input
               type="text"
               maxLength="1"
-              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
               {...register("two")}
             />
             <input
               type="text"
               maxLength="1"
-              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
               {...register("three")}
             />
             <input
               type="text"
               maxLength="1"
-              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
               {...register("four")}
             />
             <input
               type="text"
               maxLength="1"
-              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
               {...register("five")}
             />
             <input
               type="text"
               maxLength="1"
-              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-black"
+              className="w-12 h-12 text-center text-xl font-medium border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-black"
               {...register("six")}
             />
           </div>
 
           <button
             type="submit"
-            className="w-full bg-black text-white font-semibold py-3 rounded-md hover:bg-gray-800 transition cursor-pointer"
+            className="w-full bg-black text-white font-semibold py-3 rounded hover:bg-gray-800 transition cursor-pointer"
           >
             Verify Email
           </button>

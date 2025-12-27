@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Search,Package, Calendar, Eye, AlertCircle,CheckCircle,Clock,Truck,XCircle,IndianRupee,Dot,X } from "lucide-react";
+import { Search,Package, Calendar, Eye, AlertCircle,CheckCircle,Clock,Truck,XCircle,IndianRupee,Dot,X, RotateCcw, RefreshCcw } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { cancelOrder,cancelSingleItem,getAllOrders,handleReturnItem } from "../../Services/user.api";
 import { useNavigate } from "react-router-dom";
@@ -126,6 +126,11 @@ const OrderListingPage = () => {
     setShowReturnModal(false);
   };
 
+  const handleRetryPayment = (id) => {
+    
+    const razorpayRes = await createPaymentRetryOrder(id);
+  };
+
   const filteredOrders = orders.filter(
     (order) =>
       order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -192,6 +197,23 @@ const OrderListingPage = () => {
               </span>
             </div>
 
+            {order.payment_status === "failed" && (
+              <div className="mb-3 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-600" />
+                    <span className="text-sm font-medium text-red-800">Payment Failed</span>
+                  </div>
+                  <button
+                    onClick={()=>handleRetryPayment(order._id)}
+                    className="px-3 py-1.5 text-xs text-white rounded-sm cursor-pointer flex gap-1 items-center border bg-gray-600"
+                  >
+                    Retry Payment <RefreshCcw size={15}/>
+                  </button>
+                </div>
+              </div>
+            )}
+
             <div className="space-y-2 mb-3">
               {order.items.map((item, idx) => (
                 <div
@@ -215,7 +237,8 @@ const OrderListingPage = () => {
 
                   {(order.status === "pending" ||
                     order.status === "confirmed") &&
-                    item.status != "canceled" && (
+                    item.status != "canceled" &&
+                    order.payment_status !== "failed" && (
                       <button
                         onClick={() => handleCancelOrder(order._id, item._id)}
                         className="text-red-600 text-xs  border px-2 py-1 font-medium cursor-pointer"
@@ -229,7 +252,7 @@ const OrderListingPage = () => {
                         <Dot size={28} />
                         Canceled
                       </p>
-
+                      {order.payment_method != "cod" ? <span className="text-green-700 font-bold ml-2 text-xs">Amount Credited To Wallet</span> : null}
                       <p className="text-xs font-bold text-gray-600">
                         {new Date(item?.cancelledAt).toLocaleDateString(
                           "en-US",
@@ -253,7 +276,7 @@ const OrderListingPage = () => {
                           "Return Requested"}
                         {item.return_status === "Approved" && "Return Approved"}
                         {item.return_status === "Rejected" && "Return Rejected"}
-                        {item.return_status === "Completed" && "Return Completed"}
+                        {item.return_status === "Completed" && "Amount Refund To Wallet"}
                       </p>
 
                       <p className="text-xs font-bold text-gray-600">
@@ -308,7 +331,8 @@ const OrderListingPage = () => {
                 )} */}
 
                 {(order.status === "pending" ||
-                  order.status === "confirmed") && (
+                  order.status === "confirmed") &&
+                  order.payment_status !== "failed" && (
                   <button
                     onClick={() => handleCancelOrder(order._id)}
                     className="px-3 py-1.5 text-xs bg-red-50 text-red-700 rounded-lg cursor-pointer"

@@ -1,11 +1,10 @@
-import { useQuery } from '@tanstack/react-query';
 import { Package } from 'lucide-react';
-import { useEffect } from 'react';
 import { useLocation, useNavigate, useParams } from 'react-router-dom';
 
 export default function OrderSuccess() {
 
   const nav= useNavigate();
+  
   const {id}= useParams();
 
   const {state}= useLocation();
@@ -103,7 +102,7 @@ export default function OrderSuccess() {
         <div className="flex flex-col sm:flex-row gap-3">
           <button
             onClick={()=>nav("/account/orders")}
-            className="flex-1 bg-white hover:bg-gray-50 text-gray-800 font-medium py-3 px-5 rounded-lg border border-gray-300 transition-all duration-200 hover:shadow- flex items-center justify-center gap-2 text-sm"
+            className="flex-1 bg-white cursor-pointer hover:bg-gray-50 text-gray-800 font-medium py-3 px-5 rounded-lg border border-gray-300 transition-all duration-200 hover:shadow- flex items-center justify-center gap-2 text-sm"
           >
             <Package className="w-4 h-4" />
             View Order Details

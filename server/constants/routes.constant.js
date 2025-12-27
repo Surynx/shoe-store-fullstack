@@ -48,6 +48,13 @@ const ROUTES= {
             ADD:"/coupon",
             GET:"/coupon",
             CHNAGE_STATUS:"/coupon/:id"
+        },
+        DASHBOARD:{
+            FETCH:"/dashboard",
+            SALES_OVERVIEW:"/sales-report",
+            SALES_OVERVIEW_CUSTOM:"/sales-report-custom",
+            DOWNLOAD_EXCEL_REPORT:"/sales-report/excel",
+            DOWNLOAD_PDF_REPORT:"/sales-report/pdf"
         }
     },
     USER:{
@@ -115,6 +122,16 @@ const ROUTES= {
         },
         COUPON:{
             VALIDATE:"/coupon"
+        },
+        WALLET:{
+            CREATE_ORDER:"/wallet/create-order",
+            ADD_MONEY:"/wallet/addmoney",
+            FETCH:"/wallet"
+        },
+        PAYMENT:{
+            CREATE_ORDER:"/payment/create-order",
+            VERIFY_PAYMENT:"/payment/verify",
+            FAILED_PAYMENT:"/payment/failed"
         }
     }
 }

@@ -13,6 +13,7 @@ export default function UserInfo() {
 
   const [user, setUser] = useState();
   const [ totalReferral,setTotalReferral ]= useState();
+  const [walletBalance,setWalletBalance]= useState(0);
 
   const nav = useNavigate();
 
@@ -20,13 +21,7 @@ export default function UserInfo() {
 
   const [ openModal,setOpenModal ]= useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors },
-    watch,
-  } = useForm();
+  const { register, handleSubmit, reset,formState: { errors }, watch} = useForm();
 
   const newPassword = watch("newPassword");
 
@@ -35,6 +30,7 @@ export default function UserInfo() {
 
       setUser(data.data.userInfo);
       setTotalReferral(data.data.referralCount);
+      setWalletBalance(data.data.balance || 0);
     }
   }, [data]);
 
@@ -125,10 +121,10 @@ export default function UserInfo() {
             </div>
             <div>
               <p className="text-sm text-gray-500">Wallet Balance</p>
-              <h3 className="text-2xl font-bold">₹500</h3>
+              <h3 className="text-2xl font-bold">₹{walletBalance.toFixed()}</h3>
             </div>
           </div>
-          <p className="text-blue-600 text-sm cursor-pointer">See details →</p>
+          <p className="text-blue-600 text-sm cursor-pointer" onClick={()=>nav("/account/wallet")}>See details →</p>
         </div>
         <div className="bg-white p-6 rounded-lg shadow-sm border flex justify-between items-center">
           <div className="flex items-center gap-3">

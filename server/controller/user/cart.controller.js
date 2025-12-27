@@ -26,7 +26,7 @@ const addToCart= async(req,res)=> {
         return res.status(STATUS.ERROR.CONFLICT).send({success:false,message:`${productDoc.name} is currentlty unavailable`});
     }
 
-    if(variantDoc.stock == 0) {
+    if(variantDoc.stock <= 0) {
 
         return res.status(STATUS.ERROR.CONFLICT).send({success:false,message:`The ${variantDoc.size} Size is unavailable for this product!`})
     }
@@ -67,6 +67,8 @@ const fetchCartInfo= async(req,res)=> {
 
     const cartItems= cleanCartDoc(cartDoc);
 
+    const itemCount= cartItems.length || 0;
+
     const cartItemsWithOffers= await Promise.all(cartItems.map( async(item)=> {
 
         const offers= await Offer.find({$or:[{category_id:item.category_id},{product_id:item.product_id}], start_date:{ $lte:new Date() },end_date:{ $gte:new Date()}})
@@ -75,7 +77,7 @@ const fetchCartInfo= async(req,res)=> {
         return {...item,bestOffer:bestOffer}
     }));
 
-    res.status(STATUS.SUCCESS.OK).send({cartItemsWithOffers});
+    res.status(STATUS.SUCCESS.OK).send({cartItemsWithOffers,itemCount});
 }
 
 const removeItemFromCart= async(req,res)=> {
@@ -155,11 +157,16 @@ const validateCartItems= async(req,res)=> {
 
     const cartDoc= await Cart.findOne({user_id:user._id}).populate("items.product_id").populate("items.variant_id");
 
+    if( !cartDoc || cartDoc.items.length <= 0 ) {
+
+        res.status(STATUS.ERROR.BAD_REQUEST).send({success:false,message:"Looks like your cart is empty. Add some items to continue to checkout!"});
+    }
+
     const cartItems= cleanCartDoc(cartDoc);
 
     const unlisted_product= cartItems.find((item)=> !item.status);
 
-    const out_of_stock= cartItems.find(item=> item.stock == 0);
+    const out_of_stock= cartItems.find(item=> item.stock <= 0);
 
     if(out_of_stock) {
         res.status(STATUS.ERROR.CONFLICT).send({success:false,message:`${out_of_stock.size} size is out of stock for ${out_of_stock.name} please remove the product from bag!`});

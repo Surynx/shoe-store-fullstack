@@ -13,6 +13,14 @@ const addVariant= async(req,res)=>{
         return res.status(STATUS.ERROR.CONFLICT).send({message:"Size Already Exist!"});
     }
 
+    if( stock < 0 ) {
+        return res.status(STATUS.ERROR.CONFLICT).send({message:"Stock is not valid!"});
+    }
+
+    if(sales_price > original_price) {
+        return res.status(STATUS.ERROR.CONFLICT).send({message:"Pricing is not valid!"});
+    }
+
     await Variant.create({
         product_id:id,
         size,
@@ -64,7 +72,16 @@ const updateVariant= async(req,res)=> {
     try{
 
         const {id} = req.params;
+
         const { discount,original_price,sales_price,size,stock }= req.body;
+
+        if(sales_price > original_price) {
+        return res.status(STATUS.ERROR.CONFLICT).send({message:"Give a Valid Pricing!"});
+        }
+
+        if( stock < 0 ) {
+        return res.status(STATUS.ERROR.CONFLICT).send({message:"Stock is not valid!"});
+        }
 
         await Variant.updateOne({product_id:id,size:size},{
             stock,

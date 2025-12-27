@@ -3,11 +3,14 @@ import { Plus, Check, Truck, Download, X, Edit, Tag, Gift } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addNewAddress,
+  createCheckoutOrder,
   getCheckoutInfo,
+  markPaymentFailed,
   placeNewOrder,
   updateAddress,
   validateCartItems,
   validateCoupon,
+  verifyCheckoutPayment,
 } from "../../Services/user.api";
 import { useForm } from "react-hook-form";
 import ErrorMessage from "../../components/admin/ErrorMessage";
@@ -36,9 +39,15 @@ export default function CheckoutPage() {
   const [showAddressForm, setShowAddressForm] = useState(false);
 
   const [isEditing, setIsEditing] = useState(false);
+
   const [editAddress_id, setEditAddress_id] = useState(null);
 
-  const { reset, handleSubmit,register,formState: { errors } } = useForm();
+  const {
+    reset,
+    handleSubmit,
+    register,
+    formState: { errors },
+  } = useForm();
 
   const { data, isLoading } = useQuery({
     queryKey: ["checkout-data"],
@@ -53,13 +62,12 @@ export default function CheckoutPage() {
   const coupons = data?.data?.coupon || [];
 
   useEffect(() => {
-
     if (addresses.length > 0 && !selectedAddress) {
       setSelectedAddress(addresses[0]._id);
     }
   }, [addresses]);
 
-  const [selectedPayment, setSelectedPayment] = useState("card");
+  const [selectedPayment, setSelectedPayment] = useState("razorpay");
 
   const [couponCode, setCouponCode] = useState("");
 
@@ -147,28 +155,25 @@ export default function CheckoutPage() {
     }
   };
 
-  const handleApplyCoupon = async(data) => {
-    
-    try{
-    const res= await validateCoupon(data);
+  const handleApplyCoupon = async (data) => {
+    try {
+      const res = await validateCoupon(data);
 
-    if(res?.data?.success) {
+      if (res?.data?.success) {
+        const coupon = res.data.coupon[0];
 
-      const coupon= res.data.coupon[0]
+        toast.success(res.data.message);
 
-      toast.success(res.data.message);
+        setAppliedCoupon(coupon);
 
-      setAppliedCoupon(coupon);
+        const discount_value =
+          coupon.type == "flat" ? coupon.value : (total * coupon.value) / 100;
 
-      const discount_value = coupon.type == "flat" ? coupon.value : (total*coupon.value) / 100 ;
-
-      setCouponDiscount(discount_value);
+        setCouponDiscount(discount_value);
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
     }
-  }catch(error) {
-
-    toast.error(error.response.data.message);
-  }
-    
   };
 
   const handleRemoveCoupon = () => {
@@ -180,25 +185,93 @@ export default function CheckoutPage() {
 
   const handlePlaceOrder = async () => {
     try {
+      if (selectedPayment == "razorpay") {
+
+        const razorpayRes = await createCheckoutOrder({ selectedAddress,selectedPayment,appliedCoupon });
+
+        if (razorpayRes && razorpayRes.data.success) {
+
+          const order = razorpayRes.data.order;
+
+          const options = {
+            key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+            amount: order.amount,
+            currency: "INR",
+            name: "Comet",
+            description: "Place New Order",
+            order_id: order.id,
+
+            handler: async (response) => {
+              try {
+                const {
+                  razorpay_order_id,
+                  razorpay_payment_id,
+                  razorpay_signature,
+                } = response;
+
+                const res = await verifyCheckoutPayment({
+                  razorpay_order_id,
+                  razorpay_payment_id,
+                  razorpay_signature,
+                });
+
+                if (res && res.data.success) {
+
+                  const orderId = res.data.orderId;
+                  nav(`/order/success/${orderId}`, { state: total });
+
+                }
+              } catch (error) {
+                console.log(error);
+              }
+            },
+            modal:{
+              ondismiss: async ()=> {
+                try {
+
+                  const res = await markPaymentFailed({razorpay_order_id:order.id});
+
+                  if (res && res.data.success) {
+
+                  const orderId = res.data.orderId;
+                  nav(`/payment/failed/${orderId}`, { state: total });
+                  }     
+                    
+                } catch (error) {
+                  console.log(error);
+                }
+            }},
+
+            theme: {
+              color: "#0f172a",
+            },
+          };
+
+          const razorpay = new window.Razorpay(options);
+          razorpay.open();
+        }
+
+        return;
+      }
 
       let res;
 
-      if(appliedCoupon) {
-
-        res = await placeNewOrder({ selectedAddress, selectedPayment, appliedCoupon });
-
-      }else {
-
+      if (appliedCoupon) {
+        res = await placeNewOrder({
+          selectedAddress,
+          selectedPayment,
+          appliedCoupon,
+        });
+      } else {
         res = await placeNewOrder({ selectedAddress, selectedPayment });
       }
 
       if (res && res.data.success) {
-
         const orderId = res.data.orderId;
         nav(`/order/success/${orderId}`, { state: total });
-
       }
     } catch (error) {
+      console.log(error);
       toast.error(error.response.data.message);
     }
   };
@@ -550,11 +623,17 @@ export default function CheckoutPage() {
               <div className="space-y-2.5">
                 {[
                   {
-                    id: "card",
-                    label: "Credit/Debit Card",
-                    desc: "Pay securely with your card",
+                    id: "razorpay",
+                    label: "",
+                    desc: "Pay securely with Razorpay",
+                    logo: (
+                      <img
+                        src="https://upload.wikimedia.org/wikipedia/commons/8/89/Razorpay_logo.svg"
+                        alt="Razorpay"
+                        className="h-4"
+                      />
+                    ),
                   },
-                  { id: "upi", label: "UPI", desc: "Pay using UPI apps" },
                   {
                     id: "wallet",
                     label: "Wallets",
@@ -587,11 +666,26 @@ export default function CheckoutPage() {
                           <Check size={12} className="text-white" />
                         )}
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold text-gray-900">
-                          {method.label}
-                        </p>
-                        <p className="text-xs text-gray-600">{method.desc}</p>
+                      <div className="flex items-center gap-2 flex-1">
+                        {method.logo ? (
+                          <div className="flex flex-col gap-1">
+                            <div>{method.logo}</div>
+                            <p className="text-xs text-gray-600">
+                              {method.desc}
+                            </p>
+                          </div>
+                        ) : (
+                          <div>
+                            {method.label && (
+                              <p className="text-sm font-semibold text-gray-900">
+                                {method.label}
+                              </p>
+                            )}
+                            <p className="text-xs text-gray-600">
+                              {method.desc}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
@@ -664,9 +758,7 @@ export default function CheckoutPage() {
                           type="text"
                           placeholder="Enter coupon code"
                           className="w-full pl-9 pr-3 py-2 border border-gray-300 text-sm outline-none focus:border-gray-900 transition-colors"
-                          {...register("code", {
-                            
-                          })}                 
+                          {...register("code", {})}
                         />
                       </div>
 
@@ -680,7 +772,7 @@ export default function CheckoutPage() {
 
                     <div className="p-2.5 bg-gray-50 rounded-lg">
                       <p className="text-[12px] text-gray-600 mb-1.5 font-medium flex gap-1 items-center">
-                      Available Coupons:
+                        Available Coupons:
                       </p>
                       {coupons.length > 0 ? (
                         <div className="space-y-1">
@@ -703,7 +795,6 @@ export default function CheckoutPage() {
                         </div>
                       )}
                     </div>
-                    
                   </div>
                 ) : (
                   <div className="border-2 border-green-500 bg-green-50 rounded-lg p-3">

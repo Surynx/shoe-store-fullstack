@@ -89,6 +89,7 @@ function FavoritesPage() {
                     src={item.product_image}
                     alt={item.name}
                     className="w-full h-full object-cover transition-transform duration-300"
+                    
                   />
                 </div>
 

@@ -33,6 +33,7 @@ const OrderDetail = () => {
     card: "Credit/Debit Card",
     upi: "UPI Payment",
     wallet: "Wallet",
+    razorpay:"Razorpay Payment"
   };
 
   const paymentStatusColors = {
@@ -285,7 +286,7 @@ const OrderDetail = () => {
                             <Dot size={20} />
                             Canceled
                           </p>
-
+                          {order.payment_method != "cod" ? <span className="text-green-700 font-bold ml-2 text-xs">Amount Credited To Wallet</span> : null}
                           <p className="text-xs font-semibold text-gray-600">
                             {new Date(item?.cancelledAt).toLocaleDateString(
                               "en-US",
@@ -310,7 +311,7 @@ const OrderDetail = () => {
                               "Return Approved"}
                             {item.return_status === "Rejected" &&
                               "Return Rejected"}
-                            {item.return_status === "Completed" && "Return Completed"}
+                            {item.return_status === "Completed" && "Amount Refund To Wallet"}
                           </p>
 
                           <p className="text-xs font-semibold text-gray-600">

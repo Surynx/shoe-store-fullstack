@@ -182,7 +182,7 @@ export default function EditProfile() {
 
   return (
     <div className="w-full">
-      <div className="space-y-6 bg-white p-6 rounded-xl shadow-sm">
+      <div className="space-y-6  p-6">
         <form onSubmit={handleProfileInfo.handleSubmit(handleProfileSubmit)}>
           <div className="space-y-5 border p-5 rounded-xl">
             <h2 className="text-lg font-semibold">Update Information</h2>

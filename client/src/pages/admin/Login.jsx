@@ -71,7 +71,7 @@ export default function Login() {
                         <input
                             type="email"
                             placeholder="Enter you Mail"
-                            className="w-full border border-gray-300 px-3 py-1 text-sm outline-none"
+                            className="w-full border border-gray-300 px-3 py-2 text-sm outline-none"
                             {...register("email", { required: "field is required", pattern: { value: /^\S+@\S+$/i, message: "Invalid mail" } })}
                         />
                         <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.email?.message ? `${formState.errors.email?.message}` : null}</p>
@@ -85,7 +85,7 @@ export default function Login() {
                             <input
                                 type="password"
                                 placeholder="Enter your password"
-                                className="w-full border border-gray-300 px-3 py-1 text-sm outline-none"
+                                className="w-full border border-gray-300 px-3 py-2 text-sm outline-none"
                                 {...register("password", { required: "field is required" })}
                             />
                             <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.password?.message ? `${formState.errors.password?.message}` : null}</p>

@@ -31,8 +31,10 @@ export default function Signup() {
             toast('Please Verify Your Mail', {
                 icon: '📩',
             });
+
             await generateOtp({email:data.email});
-            nav("/verify");
+            
+            nav("/verify",{replace:true});
 
         }
 
