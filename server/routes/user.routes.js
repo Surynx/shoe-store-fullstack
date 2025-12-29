@@ -12,9 +12,9 @@ import { addToCart, countCartItems, decQuantity, fetchCartInfo, incQuantity, rem
 import { getCheckoutData } from "../controller/user/checkout.controller.js";
 import { fetchAllOrders, generateInvoice, getOrderDetails, handleCancelItem, handleCancelOrder, handleReturnProduct, placeNewOrder } from "../controller/user/order.controller.js";
 import { addProductToWishlist, fetchWishlistInfo, removeItemFromWishlist } from "../controller/user/wishlist.controller.js";
-import { validateCoupon } from "../controller/admin/coupon.controller.js";
 import { createWalletOrder, fetchWalletInfo, verifyWalletPayment } from "../controller/user/wallet.controller.js";
-import { createCheckoutOrder, markPaymentFailed, verifyCheckoutPayment } from "../controller/user/payment.controller.js";
+import { createCheckoutOrder, createPaymentRetryOrder, markPaymentFailed, verifyCheckoutPayment } from "../controller/user/payment.controller.js";
+import { validateCoupon } from "../controller/user/coupon.controller.js";
 
 const route=express.Router();
 
@@ -116,5 +116,7 @@ route.post(ROUTES.USER.PAYMENT.CREATE_ORDER,isUser,createCheckoutOrder);
 route.post(ROUTES.USER.PAYMENT.VERIFY_PAYMENT,isUser,verifyCheckoutPayment);
 
 route.post(ROUTES.USER.PAYMENT.FAILED_PAYMENT,isUser,markPaymentFailed);
+
+route.post(ROUTES.USER.PAYMENT.RETRY_PAYMENT,isUser,createPaymentRetryOrder);
 
 export default route;

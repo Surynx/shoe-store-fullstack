@@ -268,9 +268,10 @@ const markPaymentFailed = async (data) => {
     return res;
 }
 
-const createPaymentRetryOrder = async (data) => {
+const createPaymentRetryOrder = async (id) => {
     
-    const res= await api.get("/user/payment/failed",data);
+    const res= await api.post(`/user/payment/retry/${id}`);
+    return res;
 }
 
 export { 
@@ -279,5 +280,5 @@ export {
     getAllAddress,deleteAddress,updateAddress,changePassword,addToCart,fetchCartInfo,removeProductFromCart,increaseQty,decreaseQty,getCartCount,
     getCheckoutInfo,placeNewOrder,validateCartItems,getOrderDetails ,getAllOrders,cancelOrder,cancelSingleItem,handleReturnItem,addToFavourite,
     fetchWishListInfo,removeItemFromWishlist,validateCoupon,createRazorpayOrder,verifyPayment,getWalletInfo,createCheckoutOrder,
-    verifyCheckoutPayment,markPaymentFailed 
+    verifyCheckoutPayment,markPaymentFailed ,createPaymentRetryOrder
 }

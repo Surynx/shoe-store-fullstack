@@ -1,12 +1,34 @@
 import React, { useEffect, useState } from "react";
-import { Search,Package, Calendar, Eye, AlertCircle,CheckCircle,Clock,Truck,XCircle,IndianRupee,Dot,X, RotateCcw, RefreshCcw } from "lucide-react";
+import {
+  Search,
+  Package,
+  Calendar,
+  Eye,
+  AlertCircle,
+  CheckCircle,
+  Clock,
+  Truck,
+  XCircle,
+  IndianRupee,
+  Dot,
+  X,
+  RotateCcw,
+  RefreshCcw,
+} from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
-import { cancelOrder,cancelSingleItem,getAllOrders,handleReturnItem } from "../../Services/user.api";
+import {
+  cancelOrder,
+  cancelSingleItem,
+  createPaymentRetryOrder,
+  getAllOrders,
+  handleReturnItem,
+  markPaymentFailed,
+  verifyCheckoutPayment,
+} from "../../Services/user.api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 
 const OrderListingPage = () => {
-
   const { data } = useQuery({
     queryKey: ["orderListing"],
     queryFn: getAllOrders,
@@ -70,7 +92,6 @@ const OrderListingPage = () => {
   };
 
   const handleCancelOrder = (order_id, item_id = null) => {
-
     if (item_id) {
       setCancelTarget({ order_id, item_id });
     } else {
@@ -101,14 +122,12 @@ const OrderListingPage = () => {
   };
 
   const handleReturnOrder = (order_id, item_id) => {
-
     setReturnTarget({ order_id, item_id });
     setReturnReason("");
     setShowReturnModal(true);
   };
 
   const confirmReturn = async () => {
-
     if (!returnReason.trim()) {
       toast.error("Should provide a Reason to return a product!");
       return;
@@ -119,19 +138,110 @@ const OrderListingPage = () => {
 
       toast.success(res?.data?.message);
       QueryClient.invalidateQueries("orderListing");
-      
     } catch (error) {
       toast.error(error.response.data.message);
     }
     setShowReturnModal(false);
   };
 
-  const handleRetryPayment = (id) => {
-    
-    const razorpayRes = await createPaymentRetryOrder(id);
+  const handleRetryPayment = async (id) => {
+    try {
+      const razorpayRes = await createPaymentRetryOrder(id);
+
+      if (razorpayRes && razorpayRes.data.success) {
+        const order = razorpayRes.data.order;
+
+        let total_amount = order.amount / 100;
+
+        const options = {
+          key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+          amount: order.amount,
+          currency: "INR",
+          name: "Comet",
+          description: "Retry Failed Payment",
+          order_id: order.id,
+
+          handler: async (response) => {
+            try {
+              const {
+                razorpay_order_id,
+                razorpay_payment_id,
+                razorpay_signature,
+              } = response;
+
+              const res = await verifyCheckoutPayment({
+                razorpay_order_id,
+                razorpay_payment_id,
+                razorpay_signature,
+                source: "retry",
+              });
+
+              if (res && res.data.success) {
+                
+                const orderId = res.data.orderId;
+                nav(`/order/success/${orderId}`, { state: total_amount });
+              }
+            } catch (error) {
+              
+              console.log(error);
+              toast.error(error.response.data.message);
+            }
+          },
+          modal: {
+            ondismiss: async () => {
+
+            toast.error("Payment cancelled. You can try again.");
+            },
+          },
+
+          theme: {
+            color: "#0f172a",
+          },
+        };
+
+        const razorpay = new window.Razorpay(options);
+
+        //error handling
+        razorpay.on("payment.failed", async (response) => {
+          try {
+            razorpay.close();
+
+            console.log(response);
+
+            const res = await markPaymentFailed({
+              razorpay_order_id: order.id,
+            });
+
+            if (res && res.data.success) {
+              const orderId = res.data.orderId;
+              const id = res.data.id;
+              const total = res.data.total;
+
+              sessionStorage.setItem(
+                "payment_failed_data",
+                JSON.stringify({ total, orderId })
+              );
+
+              setTimeout(() => {
+                window.location.replace(`/payment/failed/${id}`);
+              }, 500);
+            }
+          } catch (error) {
+            console.log(error);
+          }
+        });
+
+        razorpay.open();
+      }
+    } catch (error) {
+      
+      console.log(error);
+      toast.error(error.response.data.message);
+    }
   };
 
   const filteredOrders = orders.filter(
+
     (order) =>
       order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.items.some((item) =>
@@ -145,18 +255,17 @@ const OrderListingPage = () => {
         <h1 className="text-2xl font-bold text-gray-900">My Orders</h1>
         <p className="text-sm text-gray-500">Track and manage your orders</p>
       </div>
-    <div>
-      <div className="relative">
-        <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-        <input
-          type="text"
-          placeholder="Search by order ID or product name..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-lg outline-none"
-        />
-      </div>
-      
+      <div>
+        <div className="relative">
+          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
+          <input
+            type="text"
+            placeholder="Search by order ID or product name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-lg outline-none"
+          />
+        </div>
       </div>
       {filteredOrders.length === 0 && (
         <div className="text-center py-12">
@@ -202,13 +311,15 @@ const OrderListingPage = () => {
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <AlertCircle className="w-4 h-4 text-red-600" />
-                    <span className="text-sm font-medium text-red-800">Payment Failed</span>
+                    <span className="text-sm font-medium text-red-800">
+                      Payment Failed
+                    </span>
                   </div>
                   <button
-                    onClick={()=>handleRetryPayment(order._id)}
-                    className="px-3 py-1.5 text-xs text-white rounded-sm cursor-pointer flex gap-1 items-center border bg-gray-600"
+                    onClick={() => handleRetryPayment(order._id)}
+                    className="px-3 py-1.5 text-xs text-white rounded-sm cursor-pointer flex gap-1 items-center border bg-gray-600 hover:bg-gray-700"
                   >
-                    Retry Payment <RefreshCcw size={15}/>
+                    Retry Payment <RefreshCcw size={15} />
                   </button>
                 </div>
               </div>
@@ -252,7 +363,11 @@ const OrderListingPage = () => {
                         <Dot size={28} />
                         Canceled
                       </p>
-                      {order.payment_method != "cod" ? <span className="text-green-700 font-bold ml-2 text-xs">Amount Credited To Wallet</span> : null}
+                      {order.payment_method != "cod" ? (
+                        <span className="text-green-700 font-bold ml-2 text-xs">
+                          Amount Credited To Wallet
+                        </span>
+                      ) : null}
                       <p className="text-xs font-bold text-gray-600">
                         {new Date(item?.cancelledAt).toLocaleDateString(
                           "en-US",
@@ -276,7 +391,8 @@ const OrderListingPage = () => {
                           "Return Requested"}
                         {item.return_status === "Approved" && "Return Approved"}
                         {item.return_status === "Rejected" && "Return Rejected"}
-                        {item.return_status === "Completed" && "Amount Refund To Wallet"}
+                        {item.return_status === "Completed" &&
+                          "Amount Refund To Wallet"}
                       </p>
 
                       <p className="text-xs font-bold text-gray-600">
@@ -330,16 +446,15 @@ const OrderListingPage = () => {
                   </button>
                 )} */}
 
-                {(order.status === "pending" ||
-                  order.status === "confirmed") &&
+                {(order.status === "pending" || order.status === "confirmed") &&
                   order.payment_status !== "failed" && (
-                  <button
-                    onClick={() => handleCancelOrder(order._id)}
-                    className="px-3 py-1.5 text-xs bg-red-50 text-red-700 rounded-lg cursor-pointer"
-                  >
-                    Cancel Order
-                  </button>
-                )}
+                    <button
+                      onClick={() => handleCancelOrder(order._id)}
+                      className="px-3 py-1.5 text-xs bg-red-50 text-red-700 rounded-lg cursor-pointer"
+                    >
+                      Cancel Order
+                    </button>
+                  )}
               </div>
             </div>
           </div>

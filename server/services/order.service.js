@@ -4,9 +4,10 @@ import Offer from "../models/offer.model.js";
 import Order from "../models/order.model.js";
 import Product from "../models/product.model.js";
 import Variant from "../models/variant.model.js";
+import Wallet from "../models/wallet.model.js";
 
 
-const createOrderService= async ( address_id,payment_method,coupon,user,cartItems,razorpay_payment_id=null ) => {
+const createOrderService = async (address_id, payment_method, coupon, user, cartItems, razorpay_payment_id = null) => {
 
     const cartItemsWithOffers = await Promise.all(cartItems.map(async (item) => {
 
@@ -46,7 +47,7 @@ const createOrderService= async ( address_id,payment_method,coupon,user,cartItem
 
     const discount = original_price_total - sales_price_total;
 
-    const delivery_charge = (payment_method == "cod") ? 7 : 0; 
+    const delivery_charge = (payment_method == "cod") ? 7 : 0;
 
     let total_amount = original_price_total - discount;
 
@@ -69,6 +70,16 @@ const createOrderService= async ( address_id,payment_method,coupon,user,cartItem
 
     total_amount = total_amount + tax + delivery_charge;
 
+    if (payment_method === "wallet") {
+
+        const wallet = await Wallet.findOne({ user_id: user._id });
+
+        if (!wallet || wallet.balance < total_amount) {
+
+            return { success: false, error: "Insufficient wallet balance" };
+        }
+    }
+
     const newOrder = await Order.create({
         user_id: user._id,
         address_id,
@@ -79,7 +90,7 @@ const createOrderService= async ( address_id,payment_method,coupon,user,cartItem
         total_amount,
         tax,
         delivery_charge,
-        payment_id:razorpay_payment_id
+        payment_id: razorpay_payment_id
     });
 
     if (coupon) {
@@ -89,8 +100,8 @@ const createOrderService= async ( address_id,payment_method,coupon,user,cartItem
         await newOrder.save();
     }
 
-    return newOrder;
+    return {success:true,newOrder};
 
 }
 
-export {createOrderService}
+export { createOrderService }

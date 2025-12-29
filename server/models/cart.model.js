@@ -24,7 +24,8 @@ const cartSchema= new moongose.Schema({
         required:true,
         ref:"users"
     },
-    items:[itemSchema],
+
+    items:[itemSchema]
 
 },{timestamps:true});
 

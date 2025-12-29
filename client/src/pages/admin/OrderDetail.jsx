@@ -208,22 +208,25 @@ const OrderDetailPage = () => {
                   </div>
                 </form>
               )}
-            <div className="flex items-center justify-center p-4">
+
               {orderData.payment_status === "failed" &&  (
+                <div className="flex items-center justify-center p-4">
                 <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-2.5 rounded-lg">
                   <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
                   <p className="text-sm font-medium">Razorpay payment failed</p>
                 </div>
+                </div>
               )}
 
               {orderData.status === "canceled" &&  (
+                <div className="flex items-center justify-center p-4">
                 <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-2.5 rounded-lg">
                   <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
                   <p className="text-sm font-medium">Order Cancelled</p>
                 </div>
+                </div>
               )}
-
-            </div>
+              
           </div>
         </div>
 

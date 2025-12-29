@@ -17,6 +17,8 @@ const placeNewOrder = async (req, res) => {
 
     const user = await User.findOne({ email });
 
+    const orderCount = await Order.countDocuments({ user_id: user._id });
+
     const cart = await Cart.findOne({ user_id: user._id });
 
     const cartItems = cart?.items;
@@ -26,23 +28,20 @@ const placeNewOrder = async (req, res) => {
         return res.status(STATUS.ERROR.BAD_REQUEST).json({ success: false, message: "Cart is empty!" });
     }
 
-    const orderCount = await Order.countDocuments({ user_id: user._id });
+    let out_of_stock = false;
 
-    if (orderCount == 0 && user.referred_by) {
+    for(let item of cartItems) {
 
-        let referrer = await User.findOne({ _id: user.referred_by });
+        const variant = await Variant.findById(item.variant_id);
 
-        await Coupon.create({
-            code: `REF-${referrer.referral_code}`,
-            type: "flat",
-            value: 200,
-            min_purchase: 1000,
-            usageLimit: 1,
-            start_date: new Date(),
-            end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            status: true,
-            createdFor: referrer._id
-        });
+        if(variant.stock <= 0) {
+            out_of_stock = true;
+        }
+    }
+
+    if(out_of_stock) {
+
+        return res.status(STATUS.ERROR.BAD_REQUEST).json({ success: false, message: "Cannot complete checkout since an item in your bag is currently out of stock" });
     }
 
     const { selectedAddress: address_id, selectedPayment: payment_method, appliedCoupon: coupon } = req.body;
@@ -64,24 +63,24 @@ const placeNewOrder = async (req, res) => {
 
     }
 
-    const newOrder = await createOrderService(address_id,payment_method,coupon,user,cartItems);
+    const result = await createOrderService(address_id,payment_method,coupon,user,cartItems);
+
+    if(!result.success && result.error) {
+
+         return res.status(STATUS.ERROR.BAD_REQUEST).json({ success: false,message: result.error });
+    }
 
     if (payment_method == "wallet") {
 
-        if (wallet.balance < newOrder.total_amount) {
-
-            return res.status(STATUS.ERROR.BAD_REQUEST).json({ success: false, message: "Insufficient wallet balance" });
-        }
-
-        wallet.balance -= newOrder.total_amount;
+        wallet.balance -= result.newOrder.total_amount;
         wallet.lastTransactionAt = new Date();
 
         await wallet.save();
 
         await WalletLedger.create({
             wallet_id: wallet._id,
-            orderId: newOrder.orderId,
-            amount: newOrder.total_amount,
+            orderId: result.newOrder.orderId,
+            amount: result.newOrder.total_amount,
             transaction_type: "debited",
             reason: "Purchase",
             status: "completed",
@@ -90,19 +89,36 @@ const placeNewOrder = async (req, res) => {
 
     }
 
+    if (orderCount == 0 && user.referred_by) {
+
+        let referrer = await User.findOne({ _id: user.referred_by });
+
+        await Coupon.create({
+            code: `REF-${referrer.referral_code}`,
+            type: "flat",
+            value: 200,
+            min_purchase: 1000,
+            usageLimit: 1,
+            start_date: new Date(),
+            end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            status: true,
+            createdFor: referrer._id
+        });
+    }
+
     if (coupon) {
 
         await Coupon.updateOne({ code: coupon.code },{ $inc: { usageCount: 1 }} );
     }
 
-    for (let item of newOrder.items) {
+    for (let item of result.newOrder.items) {
 
         await Variant.updateOne({ _id: item.variant_id }, { $inc: { stock: -item.quantity } });
     }
 
-    await Cart.updateOne({ user_id: newOrder.user_id }, { $set: { items: [] } });
+    await Cart.updateOne({ user_id: result.newOrder.user_id }, { $set: { items: [] } });
 
-    return res.status(STATUS.SUCCESS.CREATED).send({ success: true, orderId: newOrder.orderId });
+    return res.status(STATUS.SUCCESS.CREATED).send({ success: true, orderId: result.newOrder.orderId });
 
 }
 

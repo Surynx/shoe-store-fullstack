@@ -131,7 +131,8 @@ const ROUTES= {
         PAYMENT:{
             CREATE_ORDER:"/payment/create-order",
             VERIFY_PAYMENT:"/payment/verify",
-            FAILED_PAYMENT:"/payment/failed"
+            FAILED_PAYMENT:"/payment/failed",
+            RETRY_PAYMENT:"/payment/retry/:id"
         }
     }
 }

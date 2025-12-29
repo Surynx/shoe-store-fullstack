@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Plus, Check, Truck, Download, X, Edit, Tag, Gift } from "lucide-react";
+import { Plus, Check, X, Edit, Tag, Gift } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addNewAddress,
@@ -16,6 +16,7 @@ import { useForm } from "react-hook-form";
 import ErrorMessage from "../../components/admin/ErrorMessage";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import ConfirmModal from "../../components/user/modal/ConfirmOrder";
 
 export default function CheckoutPage() {
   useEffect(() => {
@@ -41,6 +42,8 @@ export default function CheckoutPage() {
   const [isEditing, setIsEditing] = useState(false);
 
   const [editAddress_id, setEditAddress_id] = useState(null);
+
+  const [openModal, setOpenModal] = useState(false);
 
   const {
     reset,
@@ -184,13 +187,18 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = async () => {
-    try {
-      if (selectedPayment == "razorpay") {
 
-        const razorpayRes = await createCheckoutOrder({ selectedAddress,selectedPayment,appliedCoupon });
+    try {
+      setOpenModal(false);
+
+      if (selectedPayment == "razorpay") {
+        const razorpayRes = await createCheckoutOrder({
+          selectedAddress,
+          selectedPayment,
+          appliedCoupon,
+        });
 
         if (razorpayRes && razorpayRes.data.success) {
-
           const order = razorpayRes.data.order;
 
           const options = {
@@ -213,34 +221,41 @@ export default function CheckoutPage() {
                   razorpay_order_id,
                   razorpay_payment_id,
                   razorpay_signature,
+                  source: "checkout",
                 });
 
                 if (res && res.data.success) {
-
                   const orderId = res.data.orderId;
                   nav(`/order/success/${orderId}`, { state: total });
-
                 }
               } catch (error) {
                 console.log(error);
               }
             },
-            modal:{
-              ondismiss: async ()=> {
-                try {
+            modal: {
+              ondismiss: async () => {
 
-                  const res = await markPaymentFailed({razorpay_order_id:order.id});
+                toast.error("Payment cancelled. You can try again.");
+
+                try {
+                  const res = await markPaymentFailed({
+                    razorpay_order_id: order.id,
+                  });
 
                   if (res && res.data.success) {
+                    const orderId = res.data.orderId;
+                    const id = res.data.id;
+                    const total = res.data.total;
 
-                  const orderId = res.data.orderId;
-                  nav(`/payment/failed/${orderId}`, { state: total });
-                  }     
-                    
+                    sessionStorage.setItem("payment_failed_data", JSON.stringify({ total, orderId }));
+
+                    nav(`/payment/failed/${id}`);
+                  }
                 } catch (error) {
                   console.log(error);
                 }
-            }},
+              },
+            },
 
             theme: {
               color: "#0f172a",
@@ -248,6 +263,36 @@ export default function CheckoutPage() {
           };
 
           const razorpay = new window.Razorpay(options);
+
+          //error handling
+          razorpay.on("payment.failed", async (response) => {
+            try {
+              razorpay.close();
+
+              console.log(response);
+
+              const res = await markPaymentFailed({
+                razorpay_order_id: order.id,
+              });
+
+              if (res && res.data.success) {
+
+                const orderId = res.data.orderId;
+                const id = res.data.id;
+                const total = res.data.total;
+
+                sessionStorage.setItem("payment_failed_data", JSON.stringify({ total, orderId }));
+
+                setTimeout(() => {
+                  window.location.replace(`/payment/failed/${id}`);
+                }, 500);
+              }
+
+            } catch (error) {
+              console.log(error);
+            }
+          });
+
           razorpay.open();
         }
 
@@ -279,6 +324,21 @@ export default function CheckoutPage() {
   return (
     <div className="py-6 px-4">
       <div className="max-w-6xl mx-auto">
+        <ConfirmModal
+          isOpen={openModal}
+          onClose={() => setOpenModal(false)}
+          orderDetails={{
+            selectedPayment,
+            subtotal,
+            discount,
+            appliedCoupon,
+            shipping_charge,
+            tax,
+            total,
+            couponDiscount,
+          }}
+          placeOrder={handlePlaceOrder}
+        />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <div className="lg:col-span-2 space-y-5">
             <div className="bg-white rounded-md p-5 border border-gray-400">
@@ -825,7 +885,7 @@ export default function CheckoutPage() {
 
               <button
                 className="w-full bg-gray-900 text-white py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-800 transition-colors cursor-pointer mb-4"
-                onClick={handlePlaceOrder}
+                onClick={() => setOpenModal(true)}
               >
                 Place Order
               </button>

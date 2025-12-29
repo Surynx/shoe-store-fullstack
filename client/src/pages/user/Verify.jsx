@@ -14,6 +14,12 @@ function Verify() {
     if(!localStorage.getItem("flow")) {
       nav("/login");
     }
+
+    return ()=> {
+
+      localStorage.removeItem("flow");
+      localStorage.removeItem("endTime");
+    }
   },[]);
 
   const { register, handleSubmit, reset } = useForm();

@@ -78,20 +78,6 @@ const getAllCoupon= async (req,res) => {
     }
 }
 
-const validateCoupon= async (req,res) => {
-    
-    const {code}= req.body;
-
-    const coupon= await Coupon.find({code});
-
-    if(coupon.length <= 0) {
-
-        return res.status(STATUS.ERROR.BAD_REQUEST).send({message:"Invalid Coupon Code!"});
-    }
-
-    return res.status(STATUS.SUCCESS.OK).send({ success:true,message:`${coupon[0].code} Applied to your purchase amount!`,coupon });
-}
-
 const changeCouponStatus= async (req,res) => {
     
     const {id}= req.params;
@@ -143,4 +129,4 @@ const changeCouponStatus= async (req,res) => {
     return res.status(STATUS.SUCCESS.OK).send({success:true , message:"Coupon Updated successfully"});
 }
 
-export { addNewCoupon,getAllCoupon,validateCoupon,changeCouponStatus }
+export { addNewCoupon,getAllCoupon,changeCouponStatus }

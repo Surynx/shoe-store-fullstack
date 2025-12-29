@@ -38,8 +38,8 @@ import WishList from "./pages/user/WishList"
 import CouponManagment from "./pages/admin/CouponManagment"
 import Wallet from "./pages/user/MyWallet"
 import AddWalletAmount from "./pages/user/AddWalletAmount"
-import PaymentFailed from "./pages/user/OrderFailed"
 import AuthRedirect from "./components/user/AuthRedirect"
+import PaymentFailed from "./pages/user/PaymentFailed"
 
 
 function App() {
