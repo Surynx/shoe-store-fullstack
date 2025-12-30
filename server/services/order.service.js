@@ -93,6 +93,25 @@ const createOrderService = async (address_id, payment_method, coupon, user, cart
         payment_id: razorpay_payment_id
     });
 
+    const orderCount = await Order.countDocuments({ user_id: user._id,payment_status:"paid" });
+
+    if (orderCount == 1 && user.referred_by) {
+
+        let referrer = await User.findOne({ _id: user.referred_by });
+
+        await Coupon.create({
+            code: `REF-${referrer.referral_code}`,
+            type: "flat",
+            value: 200,
+            min_purchase: 1000,
+            usageLimit: 1,
+            start_date: new Date(),
+            end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+            status: true,
+            createdFor: referrer._id
+        });
+    }
+
     if (coupon) {
 
         newOrder.coupon_id = coupon._id;

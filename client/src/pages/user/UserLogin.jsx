@@ -4,10 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { userLogin } from '../../Services/user.api';
 import toast from 'react-hot-toast';
 import { generateOtp } from '../../Services/otp.api';
+import ErrorMessage from "../../components/admin/ErrorMessage";
 
 export default function UserLogin() {
 
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, formState:{errors} } = useForm();
   const nav = useNavigate();
 
   const onSubmit =  async(data) => {
@@ -61,12 +62,18 @@ export default function UserLogin() {
               Email
             </label>
             <input
-              {...register("email")}
-              type="email"
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^\S+@\S+\.\S+$/,
+                  message: "Enter a valid email address"
+                }
+              })}
+              type="text"
               placeholder="Enter your email"
               className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black"
-              required
             />
+             <ErrorMessage elem={errors.email} />
           </div>
 
           <div>
@@ -74,12 +81,18 @@ export default function UserLogin() {
               Password
             </label>
             <input
-              {...register("password")}
+              {...register("password", {
+                required: "Password is required",
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters"
+                }
+              })}
               type="password"
               placeholder="Enter your password"
               className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black"
-              required
             />
+             <ErrorMessage elem={errors.password} />
             <p className="text-right text-xs text-gray-500 mt-2 cursor-pointer hover:text-gray-600 font-bold focus:" onClick={()=>nav("/forgotpassword")}>
               Forgot Password?
             </p>

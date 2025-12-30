@@ -204,7 +204,7 @@ const fetchUserInfo = async (req, res) => {
 
         if (userInfo) {
 
-            res.status(STATUS.SUCCESS.OK).send({ userInfo, referralCount, balance:wallet.balance });
+            res.status(STATUS.SUCCESS.OK).send({ userInfo, referralCount, balance:wallet?.balance });
         } else {
 
             res.status(STATUS.ERROR.NOT_FOUND).send("User Not Found")

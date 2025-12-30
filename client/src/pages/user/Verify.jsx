@@ -36,6 +36,7 @@ function Verify() {
   }
 
   const submit = async (data) => {
+    
     let array_otp = Object.values(data);
     let otp = array_otp.join("");
     let email = localStorage.getItem("verifyEmail");

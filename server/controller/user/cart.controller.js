@@ -146,7 +146,7 @@ const countCartItems= async(req,res)=> {
     
     const cartDoc= await Cart.findOne({user_id:user._id});
 
-    return res.status(STATUS.SUCCESS.OK).send({count:cartDoc.items.length});
+    return res.status(STATUS.SUCCESS.OK).send({count:cartDoc?.items?.length});
 }
 
 const validateCartItems= async(req,res)=> {
@@ -159,27 +159,27 @@ const validateCartItems= async(req,res)=> {
 
     if( !cartDoc || cartDoc.items.length <= 0 ) {
 
-        res.status(STATUS.ERROR.BAD_REQUEST).send({success:false,message:"Looks like your cart is empty. Add some items to continue to checkout!"});
+       return res.status(STATUS.ERROR.BAD_REQUEST).send({success:false,message:"Looks like your cart is empty. Add some items to continue to checkout!"});
     }
 
     const cartItems= cleanCartDoc(cartDoc);
 
     const unlisted_product= cartItems.find((item)=> !item.status);
 
-    const out_of_stock= cartItems.find(item=> item.stock <= 0);
+    const out_of_stock= cartItems.find(item=> item.stock < item.quantity);
 
     if(out_of_stock) {
-        res.status(STATUS.ERROR.CONFLICT).send({success:false,message:`${out_of_stock.size} size is out of stock for ${out_of_stock.name} please remove the product from bag!`});
+
+        return res.status(STATUS.ERROR.CONFLICT).send({success:false,message:`${out_of_stock.size} size is out of stock for ${out_of_stock.name} please remove the product from bag!`});
     }
     
     if(unlisted_product) {
-        res.status(STATUS.ERROR.CONFLICT).send({success:false,message:`${unlisted_product.name} is currently unavailabe please remove the product from bag!`});
 
-    }else {
-
-        res.status(STATUS.SUCCESS.OK).send({success:true});
+       return res.status(STATUS.ERROR.CONFLICT).send({success:false,message:`${unlisted_product.name} is currently unavailabe please remove the product from bag!`});
 
     }
+
+    return res.status(STATUS.SUCCESS.OK).send({success:true});
 
 }
 

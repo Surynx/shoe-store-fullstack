@@ -19,11 +19,16 @@ import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../components/user/modal/ConfirmOrder";
 
 export default function CheckoutPage() {
+
   useEffect(() => {
     const validateCart = async () => {
+
       try {
+
         const res = await validateCartItems();
+
       } catch (err) {
+
         console.error(err);
         toast.error(err.response.data.message);
         nav("/cart", { replace: true });
@@ -113,6 +118,7 @@ export default function CheckoutPage() {
   const total = subtotal - discount - couponDiscount + shipping_charge + tax;
 
   const handleEditAddress = (addressId) => {
+
     setIsEditing(true);
     setShowAddressForm(true);
     setEditAddress_id(addressId);
@@ -160,6 +166,7 @@ export default function CheckoutPage() {
 
   const handleApplyCoupon = async (data) => {
     try {
+
       const res = await validateCoupon(data);
 
       if (res?.data?.success) {
@@ -169,8 +176,7 @@ export default function CheckoutPage() {
 
         setAppliedCoupon(coupon);
 
-        const discount_value =
-          coupon.type == "flat" ? coupon.value : (total * coupon.value) / 100;
+        const discount_value = coupon.type == "flat" ? coupon.value : (total * coupon.value) / 100;
 
         setCouponDiscount(discount_value);
       }
@@ -180,6 +186,7 @@ export default function CheckoutPage() {
   };
 
   const handleRemoveCoupon = () => {
+
     setCouponCode("");
     setAppliedCoupon(null);
     setCouponDiscount(0);

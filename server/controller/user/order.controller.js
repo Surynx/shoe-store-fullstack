@@ -17,8 +17,6 @@ const placeNewOrder = async (req, res) => {
 
     const user = await User.findOne({ email });
 
-    const orderCount = await Order.countDocuments({ user_id: user._id });
-
     const cart = await Cart.findOne({ user_id: user._id });
 
     const cartItems = cart?.items;
@@ -34,7 +32,7 @@ const placeNewOrder = async (req, res) => {
 
         const variant = await Variant.findById(item.variant_id);
 
-        if(variant.stock <= 0) {
+        if(variant.stock < item.quantity) {
             out_of_stock = true;
         }
     }
@@ -87,23 +85,6 @@ const placeNewOrder = async (req, res) => {
             balance_after: wallet.balance
         });
 
-    }
-
-    if (orderCount == 0 && user.referred_by) {
-
-        let referrer = await User.findOne({ _id: user.referred_by });
-
-        await Coupon.create({
-            code: `REF-${referrer.referral_code}`,
-            type: "flat",
-            value: 200,
-            min_purchase: 1000,
-            usageLimit: 1,
-            start_date: new Date(),
-            end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
-            status: true,
-            createdFor: referrer._id
-        });
     }
 
     if (coupon) {
@@ -193,7 +174,7 @@ const handleCancelOrder = async (req, res) => {
                 let wallet = await Wallet.findOne({ user_id: user._id });
 
                 if (!wallet) {
-                    Wallet.create({
+                    await Wallet.create({
                         user_id: user._id,
                         balance: refundAmount,
                         lastTransactionAt: new Date()

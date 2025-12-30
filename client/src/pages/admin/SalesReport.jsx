@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { 
   LineChart,
   Line,
@@ -22,36 +22,40 @@ import {
   downloadExcelReport,
   downloadPdfReport,
   getCustomSalesOverview,
-  getDashboardInfo,
   getSalesOverview,
+  getSalesPageInfo,
 } from "../../Services/admin.api";
 
 
 const Dashboard = () => {
-  const { data, isLoading } = useQuery({
-    queryKey: ["dashboard-info"],
-    queryFn: getDashboardInfo,
+
+  const { data } = useQuery({
+    queryKey: ["sales-info"],
+    queryFn: getSalesPageInfo,
   });
 
   const [dateFilter, setDateFilter] = useState("thisMonth");
 
   const [salesData, setSalesData] = useState([]);
 
+
   useEffect(() => {
     const handleSalesOverview = async () => {
+
       if (dateFilter != "custom") {
+
         const res = await getSalesOverview(dateFilter);
 
         if (res) {
+
           setSalesData(res.data.salesData);
         }
       }
     };
 
     handleSalesOverview();
-  }, [dateFilter]);
 
-  const admin = data?.data?.adminEmail;
+  }, [dateFilter]);
 
   const [customStartDate, setCustomStartDate] = useState("");
 
@@ -61,17 +65,23 @@ const Dashboard = () => {
 
   const stats = data?.data?.stats;
 
+  const orders = data?.data?.recentSuccessOrders;
+
   const handleFilterChange = (value) => {
+
     setDateFilter(value);
 
     if (value === "custom") {
+
       setShowCustomDate(true);
     } else {
+
       setShowCustomDate(false);
     }
   };
 
   const handleCoustomeDateFilter = async () => {
+
     const res = await getCustomSalesOverview(customStartDate, customEndDate);
 
     if (res) {
@@ -92,6 +102,7 @@ const Dashboard = () => {
     }
 
     if (res) {
+      
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -130,14 +141,10 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="w-full mt-2">
-      <div
-        className="relative overflow-hidden rounded-xl p-6 mb-5 text-white
-                bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900
-                shadow-sm shadow-black/40"
-      >
-        <h2 className="text-lg font-semibold mb-1">Welcome back, {admin} !</h2>
-        <p className="text-gray-300 text-xs">
+    <div className="w-full mt-5">
+      <div className="mb-5">
+        <h2 className="text-2xl font-bold text-gray-800">Sales Report</h2>
+        <p className="text-gray-500 text-sm mt-1">
           Here's your business overview for today
         </p>
       </div>
@@ -312,35 +319,70 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg shadow-sm p-5">
-        <h3 className="text-lg font-bold text-gray-800 mb-4">
-          Sales Report Summary
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-3 bg-purple-50 rounded-lg border border-purple-100">
-            <p className="text-xs text-gray-600 mb-1">Overall Sales Count</p>
-            <p className="text-xl font-bold text-purple-600">
-              {stats?.salesCount}
-            </p>
-          </div>
-          <div className="p-3 bg-green-50 rounded-lg border border-green-100">
-            <p className="text-xs text-gray-600 mb-1">Overall Order Amount</p>
-            <p className="text-xl font-bold text-green-600">
-              ₹{stats?.totalSalesAmount?.toFixed(2)}
-            </p>
-          </div>
-          <div className="p-3 bg-orange-50 rounded-lg border border-orange-100">
-            <p className="text-xs text-gray-600 mb-1">Product Discount</p>
-            <p className="text-xl font-bold text-orange-600">
-              ₹{stats?.productDiscountAmount?.toFixed(2)}
-            </p>
-          </div>
-          <div className="p-3 bg-red-50 rounded-lg border border-red-100">
-            <p className="text-xs text-gray-600 mb-1">Coupon Discount</p>
-            <p className="text-xl font-bold text-red-600">
-              ₹{stats?.couponDiscount?.toFixed(2)}
-            </p>
-          </div>
+      <div className="bg-white rounded-lg shadow-sm p-6">
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="text-lg font-bold text-gray-800">
+            Recent Delivered Orders
+          </h3>
+          <span className="text-xs text-gray-500 bg-gray-100 px-3 py-1 rounded-full">
+            Latest 5 Orders
+          </span>
+        </div>
+
+        <div className="overflow-x-auto rounded-lg border border-gray-200">
+
+          <table className="w-full">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left py-4 px-6 text-xs font-bold text-gray-600 uppercase tracking-wider">Order ID</th>
+                <th className="text-left py-4 px-6 text-xs font-bold text-gray-600 uppercase tracking-wider">Customer</th>
+                <th className="text-left py-4 px-6 text-xs font-bold text-gray-600 uppercase tracking-wider">Amount</th>
+                <th className="text-left py-4 px-6 text-xs font-bold text-gray-600 uppercase tracking-wider">Date</th>
+                <th className="text-center py-4 px-6 text-xs font-bold text-gray-600 uppercase tracking-wider">Status</th>
+              </tr>
+            </thead>
+
+            <tbody className="bg-white divide-y divide-gray-200">
+
+              {orders?.map((order) => (
+
+                <tr key={order._id} className="hover:bg-gray-50 transition-colors">
+                  <td className="py-4 px-6">
+                    <span className="text-sm font-semibold text-gray-900">{order.orderId}</span>
+                  </td>
+                  <td className="py-4 px-6">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-gray-400 to-gray-600 flex items-center justify-center text-white font-semibold text-xs">
+                        {order?.user_id?.name.split(' ').map(n => n[0]).join('')}
+                      </div>
+                      <span className="text-sm font-medium text-gray-800">{order?.user_id?.name}</span>
+                    </div>
+                  </td>
+                  <td className="py-4 px-6">
+                    <span className="text-sm font-bold text-green-600">₹{order?.total_amount?.toFixed(2)}</span>
+                  </td>
+                  <td className="py-4 px-6">
+                    <span className="text-sm text-gray-600">
+                    {new Date(order?.createdAt).toLocaleDateString("en-IN", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
+                    </span>
+                  </td>
+                  <td className="py-4 px-6 text-center">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-green-700 bg-green-50 border border-green-200 rounded-lg">
+                      <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                      </svg>
+                      {order.status}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+
+          </table>
         </div>
       </div>
     </div>

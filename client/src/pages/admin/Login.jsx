@@ -5,10 +5,11 @@ import { verifyAdmin } from "../../Services/admin.api";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import { FaExclamationCircle, FaExclamationTriangle } from "react-icons/fa";
+import ErrorMessage from "../../components/admin/ErrorMessage";
 
 export default function Login() {
 
-    const { register, handleSubmit, reset, formState } = useForm();
+    const { register, handleSubmit, reset, formState:{errors} } = useForm();
     const token = localStorage.getItem("adminToken");
     const nav = useNavigate();
 
@@ -74,7 +75,7 @@ export default function Login() {
                             className="w-full border border-gray-300 px-3 py-2 text-sm outline-none"
                             {...register("email", { required: "field is required", pattern: { value: /^\S+@\S+$/i, message: "Invalid mail" } })}
                         />
-                        <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.email?.message ? `${formState.errors.email?.message}` : null}</p>
+                        <ErrorMessage elem={errors.email}/>
                     </div>
 
                     <div>
@@ -88,7 +89,7 @@ export default function Login() {
                                 className="w-full border border-gray-300 px-3 py-2 text-sm outline-none"
                                 {...register("password", { required: "field is required" })}
                             />
-                            <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.password?.message ? `${formState.errors.password?.message}` : null}</p>
+                            <ErrorMessage elem={errors.password}/>
                             <button
                                 type="button"
                                 className="absolute right-3 top-2 text-gray-500 hover:text-gray-700"

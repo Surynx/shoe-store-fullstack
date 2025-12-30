@@ -162,7 +162,7 @@ const OrderDetailPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-10">
       <div className="max-w-5xl mx-auto">
-        {/* Header */}
+        
         <div className="mb-4 mt-6">
           <button
             onClick={() => window.history.back()}
@@ -267,7 +267,7 @@ const OrderDetailPage = () => {
               </div>
             </div>
 
-            {/* Order Items */}
+            
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h2 className="text-base font-semibold text-gray-900 mb-3">
                 Order Items
@@ -509,7 +509,7 @@ const OrderDetailPage = () => {
               </div>
             </div>
 
-            {/* Payment Information */}
+            
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="flex items-center gap-1.5 mb-3">
                 <CreditCard className="w-4 h-4 text-gray-600" />

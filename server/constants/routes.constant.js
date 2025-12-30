@@ -49,12 +49,15 @@ const ROUTES= {
             GET:"/coupon",
             CHNAGE_STATUS:"/coupon/:id"
         },
-        DASHBOARD:{
-            FETCH:"/dashboard",
+        SALES:{
+            FETCH:"/sales",
             SALES_OVERVIEW:"/sales-report",
             SALES_OVERVIEW_CUSTOM:"/sales-report-custom",
             DOWNLOAD_EXCEL_REPORT:"/sales-report/excel",
             DOWNLOAD_PDF_REPORT:"/sales-report/pdf"
+        },
+        DASHBOARD:{
+            FETCH:"/dashboard"
         }
     },
     USER:{

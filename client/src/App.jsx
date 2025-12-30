@@ -2,7 +2,7 @@ import { Route, Routes } from "react-router-dom"
 import Login from "./pages/admin/Login"
 import Layout from "./pages/admin/Layout"
 import UserManagment from "./pages/admin/UserManagment"
-import Dashboard from "./components/admin/Dashboard"
+import Dashboard from "./pages/admin/Dashboard"
 import AdminProtected from "./components/admin/adminProtected"
 import UserLayout from "./pages/user/userLayout"
 import Home from "./pages/user/Home"
@@ -40,6 +40,7 @@ import Wallet from "./pages/user/MyWallet"
 import AddWalletAmount from "./pages/user/AddWalletAmount"
 import AuthRedirect from "./components/user/AuthRedirect"
 import PaymentFailed from "./pages/user/PaymentFailed"
+import SalesPage from "./pages/admin/SalesReport"
 
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
             <Route path="/admin" element={<AdminProtected><Layout/></AdminProtected>}>
               <Route index element={<Dashboard/>}/>
               <Route path="users" element={<UserManagment/>}/>
+              <Route path="sales" element={<SalesPage/>}/>
               <Route path="category" element={<CategoryManagment/>}/>
               <Route path="category/add" element={<AddCategory/>}/>
               <Route path="category/edit/:id" element={<AddCategory/>}/>

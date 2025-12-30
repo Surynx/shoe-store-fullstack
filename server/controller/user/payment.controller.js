@@ -34,7 +34,7 @@ const createCheckoutOrder = async (req, res) => {
 
             const variant = await Variant.findById(item.variant_id);
 
-            if (variant.stock <= 0) {
+            if (variant.stock < item.quantity) {
                 out_of_stock = true;
             }
         }
@@ -68,6 +68,10 @@ const verifyCheckoutPayment = async (req, res) => {
 
     try {
 
+        const email = req.email;
+
+        const user = await User.findOne({ email });
+
         const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
 
         const orderDoc = await Order.findOne({ razorpay_order_id });
@@ -79,7 +83,7 @@ const verifyCheckoutPayment = async (req, res) => {
 
         if (orderDoc.payment_status === "paid") {
 
-            return res.status(STATUS.SUCCESS.OK).json({ success: true,message: "Payment already verified",orderId: orderDoc.orderId});
+            return res.status(STATUS.SUCCESS.OK).json({ success: true, message: "Payment already verified", orderId: orderDoc.orderId });
         }
 
 
@@ -101,9 +105,28 @@ const verifyCheckoutPayment = async (req, res) => {
 
         await orderDoc.save();
 
-        if(req.body.source == "checkout"){
+        const orderCount = await Order.countDocuments({ user_id: user._id, payment_status: "paid" });
 
-            await Cart.updateOne({ user_id:orderDoc.user_id }, { $set: { items: [] } });   
+        if (orderCount == 1 && user.referred_by) {
+
+            let referrer = await User.findOne({ _id: user.referred_by });
+
+            await Coupon.create({
+                code: `REF-${referrer.referral_code}`,
+                type: "flat",
+                value: 200,
+                min_purchase: 1000,
+                usageLimit: 1,
+                start_date: new Date(),
+                end_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                status: true,
+                createdFor: referrer._id
+            });
+        }
+
+        if (req.body.source == "checkout") {
+
+            await Cart.updateOne({ user_id: orderDoc.user_id }, { $set: { items: [] } });
         }
 
         const coupon_id = orderDoc.coupon_id;
@@ -143,7 +166,7 @@ const markPaymentFailed = async (req, res) => {
 
         await orderDoc.save();
 
-        return res.status(STATUS.SUCCESS.OK).json({ success: true, orderId: orderDoc.orderId, id:orderDoc._id, total:orderDoc.total_amount });
+        return res.status(STATUS.SUCCESS.OK).json({ success: true, orderId: orderDoc.orderId, id: orderDoc._id, total: orderDoc.total_amount });
 
     } catch (error) {
 
@@ -160,14 +183,14 @@ const createPaymentRetryOrder = async (req, res) => {
         const order = await Order.findById(id);
 
         const items = order.items;
-        
+
         let out_of_stock = false;
 
         for (let item of items) {
 
             const variant = await Variant.findById(item.variant_id);
 
-            if (variant.stock <= 0) {
+            if (variant.stock < item.quantity) {
                 out_of_stock = true;
             }
         }
@@ -177,22 +200,22 @@ const createPaymentRetryOrder = async (req, res) => {
             return res.status(STATUS.ERROR.BAD_REQUEST).json({ success: false, message: "Payment retry is unavailable because one or more items in this order are out of stock. Please review your order." });
         }
 
-        if(order.coupon_id) {
+        if (order.coupon_id) {
 
             const coupon = await Coupon.findOne({
-                _id:order.coupon_id,
-                min_purchase:{$lte:order.total_amount},
-                start_date:{$lte: new Date()},
-                end_date:{$gte: new Date()},
-                status:true,
-                $expr:{ $lt: ["usageCount","usageLimit"] },
-                $or:[
-                    {createdFor:order.user_id},
-                    {createdFor:null}
+                _id: order.coupon_id,
+                min_purchase: { $lte: order.total_amount },
+                start_date: { $lte: new Date() },
+                end_date: { $gte: new Date() },
+                status: true,
+                $expr: { $lt: ["usageCount", "usageLimit"] },
+                $or: [
+                    { createdFor: order.user_id },
+                    { createdFor: null }
                 ]
             });
 
-            if(!coupon) {
+            if (!coupon) {
 
                 return res.status(STATUS.ERROR.BAD_REQUEST).send({ success: false, message: "The coupon applied to this order is no longer valid. Please place a new order to continue." });
             }

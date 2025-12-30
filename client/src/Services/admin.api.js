@@ -1,249 +1,259 @@
-import { data } from "react-router-dom";
 import api from "./config/Api";
 
+export const verifyAdmin = async (data) => {
 
-const verifyAdmin=async(data)=>{
-    const res = await api.post("/admin/verify",data);
+    const res = await api.post("/admin/verify", data);
     return res;
 }
 
-const getAllusers= async (search,page)=>{
-    const res=await api.get("/admin/users",{
-        params:{
-            search:search,
-            page:page
+export const getAllusers = async (search, page) => {
+
+    const res = await api.get("/admin/users", {
+        params: {
+            search: search,
+            page: page
         }
     });
     return res;
 }
 
-const blockUser= async(data)=> {
-    const res= await api.patch('/admin/block-user',data);
+export const blockUser = async (data) => {
+
+    const res = await api.patch('/admin/block-user', data);
     return res;
 }
 
-const addCategory= async(data)=> {
-    const res= await api.post('/admin/category/add',data);
+export const addCategory = async (data) => {
+
+    const res = await api.post('/admin/category/add', data);
     return res;
 }
 
-const getAllCategory= async(search,page)=> {
-    const res= await api.get("/admin/category",{
-        params:{
-            search:search,
-            page:page
+export const getAllCategory = async (search, page) => {
+
+    const res = await api.get("/admin/category", {
+        params: {
+            search: search,
+            page: page
         }
     });
     return res;
 }
 
-const editCategory= async(id,data)=> {
-    const res= await api.patch("/admin/category/edit",{id,data});
+export const editCategory = async (id, data) => {
+
+    const res = await api.patch("/admin/category/edit", { id, data });
     return res;
 }
 
-const addBrand= async(data)=> {
-    const res= await api.post("/admin/brand/add",data);
+export const addBrand = async (data) => {
+
+    const res = await api.post("/admin/brand/add", data);
     return res;
 }
 
-const getAllbrand= async(search,page)=> {
-    const res= await api.get("/admin/brand",{
-        params:{
-            search:search,
-            page:page
+export const getAllbrand = async (search, page) => {
+
+    const res = await api.get("/admin/brand", {
+        params: {
+            search: search,
+            page: page
         }
     });
     return res;
 }
 
-const editBrand= async(formData,id)=> {
+export const editBrand = async (formData, id) => {
 
-    const res=await api.patch(`/admin/brand/edit/${id}`,formData);
+    const res = await api.patch(`/admin/brand/edit/${id}`, formData);
     return res;
 }
 
-const addProduct= async(formData)=> {
-    let res=await api.post("/admin/product/add",formData);
+export const addProduct = async (formData) => {
+
+    let res = await api.post("/admin/product/add", formData);
     return res;
 }
 
-const getAllProduct= async(search,page)=> {
-    const res= await api.get("/admin/product",{
-        params:{
-            search:search,
-            page:page
+export const getAllProduct = async (search, page) => {
+
+    const res = await api.get("/admin/product", {
+        params: {
+            search: search,
+            page: page
         }
     });
     return res;
 }
 
-const editProduct= async(formData,id)=> {
+export const editProduct = async (formData, id) => {
 
-    const res= await api.put(`/admin/product/edit/${id}`,formData);
+    const res = await api.put(`/admin/product/edit/${id}`, formData);
     return res;
 }
 
-const addVariant= async(data,id)=> {
-    const res= await api.post(`/admin/variant/add/${id}`,data);
+export const addVariant = async (data, id) => {
+
+    const res = await api.post(`/admin/variant/add/${id}`, data);
     return res;
 }
 
-const getAllVariant= async(id)=> {
-    const res= await api.get(`/admin/variant/${id}`);
+export const getAllVariant = async (id) => {
+
+    const res = await api.get(`/admin/variant/${id}`);
     return res;
 }
 
-const removeVariant= async(id)=> {
-    const res= await api.delete(`/admin/variant/remove/${id}`);
+export const removeVariant = async (id) => {
+
+    const res = await api.delete(`/admin/variant/remove/${id}`);
     return res;
 }
 
-const updateVariant= async(data,id)=> {
-    const res= await api.patch(`/admin/variant/edit/${id}`,data);
+export const updateVariant = async (data, id) => {
+
+    const res = await api.patch(`/admin/variant/edit/${id}`, data);
     return res;
 }
 
-const getAllOrders= async(search,page)=> {
+export const getAllOrders = async (search, page) => {
 
-    const res= await api.get("/admin/orders",{
-        params:{
-            search:search,
-            page:page
+    const res = await api.get("/admin/orders", {
+        params: {
+            search: search,
+            page: page
         }
     });
     return res;
 }
 
-const getOrderDetailsForAdmin= async(id)=> {
+export const getOrderDetailsForAdmin = async (id) => {
 
-    const res= await api.get(`/admin/order/${id}`);
+    const res = await api.get(`/admin/order/${id}`);
     return res;
 }
 
-const changeOrderStatus= async(data,id)=> {
+export const changeOrderStatus = async (data, id) => {
 
-    const res= await api.patch(`/admin/order/status/${id}`,data);
+    const res = await api.patch(`/admin/order/status/${id}`, data);
     return res;
 }
 
-const approveReturn= async(orderId, itemId)=> {
+export const approveReturn = async (orderId, itemId) => {
 
-    const res= await api.patch(`/admin/item/return/approve/${orderId}/${itemId}`);
+    const res = await api.patch(`/admin/item/return/approve/${orderId}/${itemId}`);
     return res;
 }
 
-const completeReturn= async(orderId, itemId)=> {
+export const completeReturn = async (orderId, itemId) => {
 
-    const res= await api.patch(`/admin/item/return/complete/${orderId}/${itemId}`);
+    const res = await api.patch(`/admin/item/return/complete/${orderId}/${itemId}`);
     return res;
 }
 
-const rejectReturn= async(orderId, itemId)=> {
+export const rejectReturn = async (orderId, itemId) => {
 
-    const res= await api.patch(`/admin/item/return/reject/${orderId}/${itemId}`);
+    const res = await api.patch(`/admin/item/return/reject/${orderId}/${itemId}`);
     return res;
 }
 
-const addOfferForCategory= async (data,id) => {
-    
-    const res= await api.post(`/admin/category/offer/${id}`,data);
+export const addOfferForCategory = async (data, id) => {
+
+    const res = await api.post(`/admin/category/offer/${id}`, data);
     return res;
 }
 
-const getAllOfferOfCategory= async(id)=> {
+export const getAllOfferOfCategory = async (id) => {
 
-    const res= await api.get(`/admin/category/offers/${id}`);
+    const res = await api.get(`/admin/category/offers/${id}`);
     return res;
 }
 
-const  deleteOffer= async(id)=> {
+export const deleteOffer = async (id) => {
 
-    const res= await api.delete(`/admin/category/offer/${id}`);
+    const res = await api.delete(`/admin/category/offer/${id}`);
     return res;
 }
 
-const addOfferForProduct= async (data,id) => {
-    
-    const res= await api.post(`/admin/product/offer/${id}`,data);
+export const addOfferForProduct = async (data, id) => {
+
+    const res = await api.post(`/admin/product/offer/${id}`, data);
     return res;
 }
 
-const getAllOfferOfProduct= async(id)=> {
+export const getAllOfferOfProduct = async (id) => {
 
-    const res= await api.get(`/admin/product/offers/${id}`);
+    const res = await api.get(`/admin/product/offers/${id}`);
     return res;
 }
 
-const addNewCoupon= async(data)=> {
+export const addNewCoupon = async (data) => {
 
-    const res= await api.post(`/admin/coupon`,data);
+    const res = await api.post(`/admin/coupon`, data);
     return res;
 }
 
-const getAllCoupon= async(search,page)=> {
+export const getAllCoupon = async (search, page) => {
 
-    const res= await api.get("/admin/coupon",{
-        params:{
-            search:search,
-            page:page
+    const res = await api.get("/admin/coupon", {
+        params: {
+            search: search,
+            page: page
         }
     });
     return res;
 }
 
 
-const changeCouponStatus= async(id,data)=> {
+export const changeCouponStatus = async (id, data) => {
 
-    const res= await api.patch(`/admin/coupon/${id}`,data);
+    const res = await api.patch(`/admin/coupon/${id}`, data);
     return res;
 }
 
-const getDashboardInfo= async () => {
+export const getSalesPageInfo = async () => {
 
-    const res= await api.get("/admin/dashboard");
+    const res = await api.get("/admin/sales");
     return res;
 }
 
-const getSalesOverview= async (range) => {
-    
-    const res= await api.get("/admin/sales-report",{
-        params:{range}
+export const getSalesOverview = async (range) => {
+
+    const res = await api.get("/admin/sales-report", {
+        params: { range }
     });
     return res
 }
 
-const getCustomSalesOverview = async (customStartDate,customEndDate) => {
-    
-    const res= await api.get("/admin/sales-report-custom",{
-        params:{ start:customStartDate,end:customEndDate }
+export const getCustomSalesOverview = async (customStartDate, customEndDate) => {
+
+    const res = await api.get("/admin/sales-report-custom", {
+        params: { start: customStartDate, end: customEndDate }
     });
     return res
 }
 
-const downloadExcelReport= async (range,start=null,end=null) => {
-    
-    const res= await api.get("/admin/sales-report/excel",{
-        params:{range,start,end},
-        responseType:"blob"
+export const downloadExcelReport = async (range, start = null, end = null) => {
+
+    const res = await api.get("/admin/sales-report/excel", {
+        params: { range, start, end },
+        responseType: "blob"
     });
     return res;
 }
 
-const downloadPdfReport= async (range,start=null,end=null) => {
-    
-    const res= await api.get("/admin/sales-report/pdf",{
-        params:{range,start,end},
-        responseType:"blob"
+export const downloadPdfReport = async (range, start = null, end = null) => {
+
+    const res = await api.get("/admin/sales-report/pdf", {
+        params: { range, start, end },
+        responseType: "blob"
     });
     return res;
 }
 
-export { 
-    verifyAdmin,getAllusers,blockUser,addCategory,getAllCategory,editCategory,addBrand,getAllbrand,editBrand,addProduct,
-    getAllProduct,editProduct,addVariant,getAllVariant,removeVariant,updateVariant,getAllOrders,getOrderDetailsForAdmin,changeOrderStatus,
-    approveReturn,completeReturn,rejectReturn,addOfferForCategory,getAllOfferOfCategory,deleteOffer,addOfferForProduct,
-    getAllOfferOfProduct,addNewCoupon,getAllCoupon,changeCouponStatus,getDashboardInfo,getSalesOverview,getCustomSalesOverview,
-    downloadExcelReport,downloadPdfReport
+export const getDashboardInfo = async () => {
 
+    const res = await api.get("/admin/dashboard");
+    return res;
 }
+

@@ -1,284 +1,280 @@
-import { data } from "react-router-dom";
 import api from "./config/Api";
 
-const registerApi=async (data) => {
+export const registerApi=async (data) => {
+
     const res = await api.post("/user/register",data);
     return res;
     
 }
 
-const verifyEmail=async (data)=> {
+export const verifyEmail=async (data)=> {
+
     const res = await api.post("/user/verify",data);
     return res;
 }
 
-const verifyUser=async (data)=> {
+export const verifyUser=async (data)=> {
+
     const res= await api.patch("/user/verifyuser",data);
     console.log(res.data);
 }
 
-const userLogin=async (data)=> {
+export const userLogin=async (data)=> {
+    
     const res=await api.post("/user/login",data);
     return res;
 }
 
-const resetPassword=async (data)=> {
+export const resetPassword=async (data)=> {
 
     const res= await api.patch("/user/resetpassword",data);
     return res;
 }
 
-const getAllCategoryForUser= async()=> {
+export const getAllCategoryForUser= async()=> {
 
     const res= await api.get("/user/category");
     return res;
 }
 
-const getAllBrandForUser= async()=> {
+export const getAllBrandForUser= async()=> {
 
     const res= await api.get("/user/brand");
     return res;
 }
 
-const getAllLatestProducts= async()=>{
+export const getAllLatestProducts= async()=>{
 
     const res=await api.get("/user/latest/product");
     return res;
 }
 
-const getShopProductList= async(filterValue)=> {
+export const getShopProductList= async(filterValue)=> {
 
     const res= await api.post("/user/shop/product",filterValue);
     return res;
 }
 
-const getProductData= async(id)=> {
+export const getProductData= async(id)=> {
 
     const res= await api.get(`/user/product/${id}`);
     return res;
 }
 
-const getUserInfo= async()=> {
+export const getUserInfo= async()=> {
 
     const res= await api.get("/user/account/profile");
     return res;
 }
 
-const editUserInfo= async(data)=> {
+export const editUserInfo= async(data)=> {
     const res= await api.patch("/user/account/profile/edit",data);
     return res;
 }
 
-const sentOtpToPhone= async(data)=> {
+export const sentOtpToPhone= async(data)=> {
     
     console.log(data);
     const res= await api.post("/user/account/phone/otp",data);
     return res;
 }
 
-const verifyPhone=async(data)=> {
+export const verifyPhone=async(data)=> {
 
     const res= await api.patch("/user/account/phone/verify",data);
     return res;
 }
 
-const sendOtpToEmail= async(data)=> {
+export const sendOtpToEmail= async(data)=> {
     
     const res= await api.post("/user/account/email/otp",data);
     return res;
 }
 
-const verifyEmailOtp= async(data)=> {
+export const verifyEmailOtp= async(data)=> {
 
     const res= await api.patch("/user/account/email/verify",data);
     return res;
 }
 
-const addNewAddress= async(data)=> {
+export const addNewAddress= async(data)=> {
 
     const res= await api.post("/user/address/add",data);
     return res;
 }
 
-const getAllAddress= async(data)=> {
+export const getAllAddress= async(data)=> {
 
     const res= await api.get("/user/address");
     return res;
 }
 
-const deleteAddress= async(id)=> {
+export const deleteAddress= async(id)=> {
 
     const res= await api.delete(`/user/address/${id}`);
     return res;
 }
 
-const updateAddress= async(data,id)=> {
+export const updateAddress= async(data,id)=> {
 
     const res= await api.put(`/user/address/${id}`,data);
     return res;
 }
 
-const changePassword= async(data)=> {
+export const changePassword= async(data)=> {
 
    const res= await api.patch("/user/account/changepassword",data);
    return res; 
 }
 
-const addToCart= async(data)=> {
+export const addToCart= async(data)=> {
 
     const res= await api.post("/user/cart/add",data);
     return res;
 }
 
-const fetchCartInfo= async()=> {
+export const fetchCartInfo= async()=> {
 
     const res= await api.get("/user/cart");
     return res;
 }
 
-const removeProductFromCart= async(id)=> {
+export const removeProductFromCart= async(id)=> {
 
     const res= await api.patch(`/user/cart/remove/${id}`);
     return res;
 }
 
-const increaseQty= async(id)=> {
+export const increaseQty= async(id)=> {
 
     const res= await api.patch(`/user/cart/increase/${id}`);
     return res;
 }
 
-const decreaseQty= async(id)=> {
+export const decreaseQty= async(id)=> {
 
     const res= await api.patch(`/user/cart/decrease/${id}`);
     return res;
 }
 
-const getCartCount= async()=> {
+export const getCartCount= async()=> {
 
     const res= await api.get("/user/cart/count");
     return res;
 }
 
-const validateCartItems= async()=> {
+export const validateCartItems= async()=> {
 
     const res= await api.get("/user/cart/validate");
     return res;
 }
 
-const getCheckoutInfo= async()=> {
+export const getCheckoutInfo= async()=> {
 
     const res= await api.get("/user/checkout");
     return res;
 }
 
-const placeNewOrder= async(data)=> {
+export const placeNewOrder= async(data)=> {
 
     const res= await api.post("/user/order",data);
     return res;
 }
 
-const getOrderDetails= async(id)=> {
+export const getOrderDetails= async(id)=> {
 
     const res= await api.get(`/user/order/${id}`);
     return res;
 }
 
-const getAllOrders= async()=> {
+export const getAllOrders= async()=> {
 
     const res= await api.get("/user/order");
     return res;
 }
 
-const cancelOrder= async({order_id})=> {
+export const cancelOrder= async({order_id})=> {
     
     const res= await api.patch(`/user/order/cancel/${order_id}`);
     return res;
 }
 
-const cancelSingleItem= async({order_id,item_id})=> {
+export const cancelSingleItem= async({order_id,item_id})=> {
     
     const res= await api.patch(`/user/order/item/cancel/${order_id}/${item_id}`);
     return res;
 }
 
-const handleReturnItem= async({order_id,item_id},reason)=> {
+export const handleReturnItem= async({order_id,item_id},reason)=> {
 
     const res= await api.patch(`/user/order/item/return/${order_id}/${item_id}`,reason);
     return res;
 }
 
-const addToFavourite= async(data)=> {
+export const addToFavourite= async(data)=> {
 
     const res= await api.post("/user/wishlist/add",data);
     return res;
 }
 
-const fetchWishListInfo= async () => {
+export const fetchWishListInfo= async () => {
     
     const res= await api.get("/user/wishlist");
     return res;
 }
 
-const removeItemFromWishlist= async(id) => {
+export const removeItemFromWishlist= async(id) => {
 
     const res= await api.patch(`/user/wishlist/item/${id}`);
     return res;
 }
 
-const validateCoupon= async (data) => {
+export const validateCoupon= async (data) => {
 
     const res= await api.post("/user/coupon",data);
     return res;
 }
 
-const createRazorpayOrder= async (data) => {
+export const createRazorpayOrder= async (data) => {
     
     const res= await api.post("/user/wallet/create-order",data);
     return res;
 }
 
-const verifyPayment= async (response) => {
+export const verifyPayment= async (response) => {
 
     const res= await api.post("/user/wallet/addmoney",response);
     return res;
 }
 
-const getWalletInfo= async () => {
+export const getWalletInfo= async () => {
     
     const res= await api.get("/user/wallet");
     return res;
 }
 
-const createCheckoutOrder= async (data) => {
+export const createCheckoutOrder= async (data) => {
     
     const res= await api.post("/user/payment/create-order",data);
     return res;
 }
 
-const verifyCheckoutPayment= async (data) => {
+export const verifyCheckoutPayment= async (data) => {
     
     const res= await api.post("/user/payment/verify",data);
     return res;
 }
 
-const markPaymentFailed = async (data) => {
+export const markPaymentFailed = async (data) => {
     
     const res= await api.post("/user/payment/failed",data);
     return res;
 }
 
-const createPaymentRetryOrder = async (id) => {
+export const createPaymentRetryOrder = async (id) => {
     
     const res= await api.post(`/user/payment/retry/${id}`);
     return res;
 }
 
-export { 
-    registerApi,verifyEmail,verifyUser,userLogin,resetPassword,getAllLatestProducts,getShopProductList,getAllCategoryForUser,
-    getAllBrandForUser,getProductData,getUserInfo,editUserInfo,sentOtpToPhone,verifyPhone,sendOtpToEmail,verifyEmailOtp,addNewAddress,
-    getAllAddress,deleteAddress,updateAddress,changePassword,addToCart,fetchCartInfo,removeProductFromCart,increaseQty,decreaseQty,getCartCount,
-    getCheckoutInfo,placeNewOrder,validateCartItems,getOrderDetails ,getAllOrders,cancelOrder,cancelSingleItem,handleReturnItem,addToFavourite,
-    fetchWishListInfo,removeItemFromWishlist,validateCoupon,createRazorpayOrder,verifyPayment,getWalletInfo,createCheckoutOrder,
-    verifyCheckoutPayment,markPaymentFailed ,createPaymentRetryOrder
-}
+ 
