@@ -1,10 +1,6 @@
 import { Edit, Wallet, Users, Lock, Mail, LoaderPinwheel } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import ErrorMessage from "../admin/ErrorMessage";
-import { changePassword } from "../../Services/user.api";
-import toast from "react-hot-toast";
 import ReferralModal from "./modal/Referal";
 
 export default function UserInfo() {
@@ -21,10 +17,6 @@ export default function UserInfo() {
 
   const [ openModal,setOpenModal ]= useState(false);
 
-  const { register, handleSubmit, reset,formState: { errors }, watch} = useForm();
-
-  const newPassword = watch("newPassword");
-
   useEffect(() => {
     if (data) {
 
@@ -34,28 +26,8 @@ export default function UserInfo() {
     }
   }, [data]);
 
-
-  const handlePasswordReset = async (data) => {
-    
-    try {
-
-      const res = await changePassword(data);
-
-      if (res?.data?.success) {
-
-        toast.success(res.data.message);
-        localStorage.removeItem("userEmail");
-        nav("/login", { replace: true });
-
-      }
-    } catch (err) {
-
-      toast.error(err.response.data.message);
-    }
-  };
-
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mt-5">
       <div className="bg-white p-6 rounded-lg shadow-sm border flex justify-between relative">
         <div>
           <h2 className="text-xl font-semibold mb-4">Personal Information</h2>
@@ -138,78 +110,6 @@ export default function UserInfo() {
           </div>
           <p className="text-blue-600 text-sm cursor-pointer" onClick={()=>setOpenModal(true)}>See details →</p>
         </div>
-      </div>
-
-      <div className="bg-white p-6 rounded-lg shadow-sm border">
-        <div className="flex items-center gap-2 mb-4">
-          <Lock className="w-5 h-5 text-gray-600" />
-          <h2 className="text-xl font-semibold">Change Password</h2>
-        </div>
-        <form className="space-y-4 max-w-md">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Current Password
-            </label>
-            <input
-              type="password"
-              {...register("currentPassword", {
-                required: "Current password is required",
-              })}
-              className="w-full px-3 py-1 border focus:outline-none"
-              placeholder="Enter current password"
-            />
-            {errors.currentPassword && (
-              <ErrorMessage elem={errors.currentPassword} />
-            )}
-          </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              New Password
-            </label>
-            <input
-              type="password"
-              {...register("newPassword", {
-                required: "New password is required",
-                minLength: {
-                  value: 6,
-                  message: "Password must be at least 6 characters",
-                },
-              })}
-              className="w-full px-3 py-1 border focus:outline-none"
-              placeholder="Enter new password"
-            />
-            {errors.newPassword && <ErrorMessage elem={errors.newPassword} />}
-          </div>
-
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Confirm New Password
-            </label>
-            <input
-              type="password"
-              {...register("confirmPassword", {
-                required: "Please confirm your password",
-                validate: (value) =>
-                  value === newPassword || "Passwords do not match",
-              })}
-              className="w-full px-3 py-1 border focus:outline-none"
-              placeholder="Re-enter new password"
-            />
-            {errors.confirmPassword && (
-              <ErrorMessage elem={errors.confirmPassword} />
-            )}
-          </div>
-
-          <button
-            type="button"
-            onClick={handleSubmit(handlePasswordReset)}
-            className="px-3 py-2 bg-blue-700 text-white text-sm hover:bg-blue-700 transition-colors cursor-pointer"
-          >
-            Update Password
-          </button>
-        </form>
       </div>
       <ReferralModal isOpen={openModal} onClose={()=>setOpenModal(false)} referralCode={user?.referral_code} totalReferrals={totalReferral}/>
     </div>

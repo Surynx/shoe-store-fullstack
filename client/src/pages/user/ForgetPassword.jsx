@@ -37,7 +37,7 @@ function ForgetPassword() {
               id="email"
               type="email"
               placeholder="Enter your email"
-              className="w-full border border-gray-300 px-4 py-2 focus:outline-none"
+              className="w-full border border-gray-300 px-4 py-2 focus:outline-none rounded-md"
               {...register("email", {
                 required: "Email is required",
                 pattern: {
@@ -51,7 +51,7 @@ function ForgetPassword() {
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 font-medium hover:bg-gray-800 transition cursor-pointer"
+            className="w-full bg-black text-white py-2 font-medium hover:bg-gray-800 transition cursor-pointer rounded-md"
           >
             Verify Mail
           </button>

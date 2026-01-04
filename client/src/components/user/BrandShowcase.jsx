@@ -13,7 +13,7 @@ function BrandShowcase() {
   }
 
   return (
-    <section className="bg-gray-100 w-full py-16 flex items-center">
+    <section className="bg-gray-100 w-full py-12 flex items-center">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-14">
           <h2 className="text-4xl font-serif font-semibold text-gray-900">

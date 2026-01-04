@@ -50,7 +50,7 @@ export default function Signup() {
             Don't Have an Account?
           </h2>
           <p className="mb-8">Please signup to create account</p>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-3">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Full Name
@@ -64,7 +64,7 @@ export default function Signup() {
                   },
                 })}
                 placeholder="Enter your full name"
-                className="w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black"
+                className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black rounded-md"
               />
               <ErrorMessage elem={errors?.name} />
             </div>
@@ -82,7 +82,7 @@ export default function Signup() {
                   },
                 })}
                 placeholder="Enter your email"
-                className="w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black"
+                className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black rounded-md"
               />
               <ErrorMessage elem={errors?.email} />
             </div>
@@ -101,7 +101,7 @@ export default function Signup() {
                 })}
                 type="password"
                 placeholder="Enter your password"
-                className="w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black"
+                className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black rounded-md"
               />
               <ErrorMessage elem={errors.password} />
             </div>
@@ -120,14 +120,14 @@ export default function Signup() {
                 })}
                 type="password"
                 placeholder="Confirm your password"
-                className="w-full border border-gray-300 px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black"
+                className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black rounded-md"
               />
               <ErrorMessage elem={errors?.confirmPassword} />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-black text-white py-2 hover:bg-gray-900 transition-colors cursor-pointer"
+              className="w-full bg-black text-white py-2 hover:bg-gray-900 transition-colors cursor-pointer rounded-md mt-6"
             >
               Sign Up
             </button>

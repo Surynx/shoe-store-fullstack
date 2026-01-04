@@ -1,36 +1,112 @@
-import { Truck, Headphones, RotateCcw } from "lucide-react";
+import { Truck, Headphones, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
+import { useState, useEffect } from "react";
 import LatestProducts from "../../components/user/LatestProducts";
 import BrandShowcase from "../../components/user/BrandShowcase";
 import { useNavigate } from "react-router-dom";
 
 export default function HomePage() {
+  const nav = useNavigate();
+  const [currentSlide, setCurrentSlide] = useState(0);
+  
+  const banners = [
+    {
+      image: "src/assets/Banner.png",
+      title: "KICKS THAT CAN'T MISS",
+      subtitle: "Gift the perfect sneakers for their every move."
+    },
+    {
+      image: "src/assets/Banner1.jpeg",
+      title: "STEP INTO STYLE",
+      subtitle: "Discover the latest trends in footwear."
+    },
+    {
+      image: "src/assets/Banner2.png",
+      title: "UNLEASH YOUR POTENTIAL",
+      subtitle: "Performance meets design in every stride."
+    }
+  ];
 
-  const nav=useNavigate();
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % banners.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const nextSlide = () => {
+    setCurrentSlide((prev) => (prev + 1) % banners.length);
+  };
+
+  const prevSlide = () => {
+    setCurrentSlide((prev) => (prev - 1 + banners.length) % banners.length);
+  };
+
+  const goToSlide = (index) => {
+    setCurrentSlide(index);
+  };
 
   return (
     <div className="w-full">
-      <section className="w-full h-[90vh] relative overflow-hidden">
-        <img
-          src="src/assets/Banner.jpeg"
-          alt="Banner"
-          className="w-full h-full object-cover"
-        />
-        <div
-          className="absolute bottom-0 w-full text-center px-4 py-10
-                  bg-gradient-to-t from-black/80 to-transparent text-white"
+      <section className="w-full h-[90vh] relative overflow-hidden group">
+        <div className="relative w-full h-full">
+          {banners.map((banner, index) => (
+            <div
+              key={index}
+              className={`absolute inset-0 transition-opacity duration-1000 ease-in-out ${
+                index === currentSlide ? "opacity-100" : "opacity-0"
+              }`}
+            >
+              <img
+                src={banner.image}
+                alt={`Banner ${index + 1}`}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          ))}
+          
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
+          
+          <div className="absolute inset-0 flex flex-col items-center justify-end pb-20 px-4 text-white">
+            <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-3 text-center">
+              {banners[currentSlide].title}
+            </h1>
+            <p className="text-sm md:text-base font-bold text-gray-200 mb-6 text-center">
+              {banners[currentSlide].subtitle}
+            </p>
+            <button 
+              className="px-8 py-3 bg-black text-white rounded-full text-base font-semibold hover:bg-gray-800 transition-all duration-300 hover:scale-105"
+              onClick={() => nav("/shop")}
+            >
+              Shop
+            </button>
+          </div>
+        </div>
+
+        <button
+          onClick={prevSlide}
+          className="absolute left-6 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-300 z-20 opacity-0 group-hover:opacity-100 hover:scale-110"
         >
-          <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight">
-            KICKS THAT CAN’T MISS
-          </h1>
+          <ChevronLeft className="w-8 h-8" strokeWidth={3} />
+        </button>
+        <button
+          onClick={nextSlide}
+          className="absolute right-6 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white p-3 rounded-full transition-all duration-300 z-20 opacity-0 group-hover:opacity-100 hover:scale-110"
+        >
+          <ChevronRight className="w-8 h-8" strokeWidth={3} />
+        </button>
 
-          <p className="mt-2 text-xs font-bold text-gray-200">
-            Gift the perfect sneakers for their every move.
-          </p>
-
-          <button className="mt-4 px-4 py-1 bg-black text-white rounded-full text-md font-semibold hover:bg-gray-900 transition cursor-pointer"
-          onClick={()=>nav("/shop")}>
-            Shop
-          </button>
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex gap-3 z-20">
+          {banners.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => goToSlide(index)}
+              className={`h-3 rounded-full transition-all duration-300 ${
+                index === currentSlide
+                  ? "bg-white w-10"
+                  : "bg-white/60 hover:bg-white/80 w-3"
+              }`}
+            />
+          ))}
         </div>
       </section>
 
@@ -42,11 +118,10 @@ export default function HomePage() {
         <BrandShowcase/>
       </section>
 
-      <section className="p-20 mt-2 text-center">
-          <h2 className="text-2xl font-serif text-black mb-4 text-center">
-            Our Sevices
-          </h2>
-
+      <section className="px-20 py-15 text-center">
+        <h2 className="text-2xl font-serif text-black mb-8 text-center">
+          Our Sevices
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="p-2">
             <Truck className="mx-auto mb-4 w-10 h-10 text-black" />

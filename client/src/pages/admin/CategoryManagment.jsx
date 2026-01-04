@@ -1,4 +1,3 @@
-import { FaPlus } from "react-icons/fa";
 import SearchBox from "../../components/admin/SearchBox";
 import CategoryTable from "../../components/admin/Tables/CategoryTable";
 import { useNavigate } from "react-router-dom";
@@ -7,6 +6,7 @@ import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getAllCategory } from "../../Services/admin.api";
 import useDebounce from "../../hooks/useDebounce";
+import { FaPlus } from "react-icons/fa";
 
 function CategoryManagment() {
 

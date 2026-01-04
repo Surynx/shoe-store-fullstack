@@ -71,7 +71,7 @@ export default function UserLogin() {
               })}
               type="text"
               placeholder="Enter your email"
-              className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black"
+              className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black rounded-md"
             />
              <ErrorMessage elem={errors.email} />
           </div>
@@ -90,7 +90,7 @@ export default function UserLogin() {
               })}
               type="password"
               placeholder="Enter your password"
-              className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black"
+              className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black rounded-md"
             />
              <ErrorMessage elem={errors.password} />
             <p className="text-right text-xs text-gray-500 mt-2 cursor-pointer hover:text-gray-600 font-bold focus:" onClick={()=>nav("/forgotpassword")}>
@@ -100,7 +100,7 @@ export default function UserLogin() {
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 hover:bg-gray-900 transition-colors cursor-pointer"
+            className="w-full bg-black text-white py-2 hover:bg-gray-900 transition-colors cursor-pointer rounded-md"
           >
             Login
           </button>
@@ -114,7 +114,7 @@ export default function UserLogin() {
         </div>
 
 
-        <button onClick={handleGoogleAuth} className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 hover:bg-gray-100 transition cursor-pointer">
+        <button onClick={handleGoogleAuth} className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 hover:bg-gray-100 transition cursor-pointer rounded-lg">
           <FcGoogle className="text-xl" />
           Continue with Google
         </button>

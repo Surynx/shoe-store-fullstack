@@ -32,6 +32,10 @@ const userSchema=new mongoose.Schema({
         type:Boolean,
         default:false
     },
+    google_id:{
+        type:String,
+        default:null
+    },
     referral_code:{
         type:String,
         unique:true

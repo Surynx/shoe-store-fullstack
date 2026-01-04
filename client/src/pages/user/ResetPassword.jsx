@@ -56,7 +56,7 @@ function ResetPassword() {
                             id="newPassword"
                             type="password"
                             placeholder="Enter new password"
-                            className="w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+                            className="w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black rounded-md"
                             {...register("newpassword",{
                                 required: "Field is required", pattern: {value:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
                                    
@@ -77,7 +77,7 @@ function ResetPassword() {
                             id="confirmPassword"
                             type="password"
                             placeholder="Confirm new password"
-                            className="w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
+                            className="w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black rounded-md"
                             {...register("confirmpassword",{
                                 required: "Field is required", pattern: {value:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
                                    
@@ -89,7 +89,7 @@ function ResetPassword() {
 
                     <button
                         type="submit"
-                        className="w-full bg-black text-white py-2 font-medium hover:bg-gray-800 transition cursor-pointer"
+                        className="w-full bg-black text-white py-2 font-medium hover:bg-gray-800 transition cursor-pointer rounded-md"
                     >
                         Reset Password
                     </button>

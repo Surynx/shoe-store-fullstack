@@ -1,4 +1,4 @@
-import { findCouponDiscount, findProductDiscount } from "../../computation/dashboard.computation.js";
+import { findCouponDiscount, findProductDiscount } from "../../computation/sales.computation.js";
 import STATUS from "../../constants/status.constant.js";
 import Admin from "../../models/admin.model.js";
 import Order from "../../models/order.model.js";

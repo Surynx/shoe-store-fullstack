@@ -22,6 +22,7 @@ passport.use(
                 const referral_code= generateReferralCode();
                 
                 user = await User.create({
+                    google_id:profile.id,
                     name:profile.displayName,
                     email:profile.emails[0].value,
                     profile_picture:profile.photos[0].value,
@@ -35,6 +36,7 @@ passport.use(
                 await User.updateOne({email:user.email},{
                     name:profile.displayName,
                     isVerified:true,
+                    google_id:profile.id
                 });
             }
 
