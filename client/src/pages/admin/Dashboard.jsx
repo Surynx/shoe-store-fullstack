@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 
 function Dashboard() {
 
-  const {data} = useQuery({
+  const { data,isLoading } = useQuery({
     queryKey:"dashboard-info",
     queryFn:getDashboardInfo
   });
@@ -35,6 +35,16 @@ function Dashboard() {
   };
   return colors[status] || "bg-gray-50 text-gray-700 border-gray-200";
 };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen space-x-2">
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-.2s]"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-.4s]"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full min-h-screen bg-white p-5">

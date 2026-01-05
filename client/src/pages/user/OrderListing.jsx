@@ -51,11 +51,16 @@ const OrderListingPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
 
   const [cancelTarget, setCancelTarget] = useState(null);
+
   const [showCancelModal, setShowCancelModal] = useState(false);
 
   const [returnTarget, setReturnTarget] = useState(null);
+
   const [showReturnModal, setShowReturnModal] = useState(false);
+
   const [returnReason, setReturnReason] = useState("");
+
+  const [customReturnReason, setCustomReturnReason] = useState("");
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -68,7 +73,7 @@ const OrderListingPage = () => {
       case "cancelled":
         return "bg-red-100 text-red-800";
       case "returned":
-        return "bg-gray-100 text-gray-800";
+        return "bg-orange-100 text-orange-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
@@ -85,7 +90,7 @@ const OrderListingPage = () => {
       case "cancelled":
         return <XCircle className="w-4 h-4" />;
       case "returned":
-        return <AlertCircle className="w-4 h-4" />;
+        return <RotateCcw className="w-4 h-4" />;
       default:
         return <Package className="w-4 h-4" />;
     }
@@ -124,14 +129,23 @@ const OrderListingPage = () => {
   const handleReturnOrder = (order_id, item_id) => {
     setReturnTarget({ order_id, item_id });
     setReturnReason("");
+    setCustomReturnReason("");
     setShowReturnModal(true);
   };
 
   const confirmReturn = async () => {
     if (!returnReason.trim()) {
-      toast.error("Should provide a Reason to return a product!");
+      toast.error("Select a Return Reason From DropDown!");
       return;
     }
+
+    if (returnReason == "Other" && !customReturnReason) {
+      toast.error("Custom message should not be empty!");
+      return;
+    }
+
+    const reason = returnReason == "Other" ? customReturnReason : returnReason;
+    console.log(reason)
 
     try {
       const res = await handleReturnItem(returnTarget, { returnReason });
@@ -177,20 +191,17 @@ const OrderListingPage = () => {
               });
 
               if (res && res.data.success) {
-                
                 const orderId = res.data.orderId;
                 nav(`/order/success/${orderId}`, { state: total_amount });
               }
             } catch (error) {
-              
               console.log(error);
               toast.error(error.response.data.message);
             }
           },
           modal: {
             ondismiss: async () => {
-
-            toast.error("Payment cancelled. You can try again.");
+              toast.error("Payment cancelled. You can try again.");
             },
           },
 
@@ -205,8 +216,6 @@ const OrderListingPage = () => {
         razorpay.on("payment.failed", async (response) => {
           try {
             razorpay.close();
-
-            console.log(response);
 
             const res = await markPaymentFailed({
               razorpay_order_id: order.id,
@@ -234,14 +243,12 @@ const OrderListingPage = () => {
         razorpay.open();
       }
     } catch (error) {
-      
       console.log(error);
       toast.error(error.response.data.message);
     }
   };
 
   const filteredOrders = orders.filter(
-
     (order) =>
       order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
       order.items.some((item) =>
@@ -437,15 +444,6 @@ const OrderListingPage = () => {
                   Details
                 </button>
 
-                {/* {order.status === "delivered" && (
-                  <button
-                    onClick={() => handleReturnOrder(order)}
-                    className="px-3 py-1.5 text-xs bg-orange-50 text-orange-700 rounded-lg"
-                  >
-                    Return
-                  </button>
-                )} */}
-
                 {(order.status === "pending" || order.status === "confirmed") &&
                   order.payment_status !== "failed" && (
                     <button
@@ -500,36 +498,111 @@ const OrderListingPage = () => {
 
       {/* Return Modal */}
       {showReturnModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white w-full max-w-md p-5 relative">
-            <button
-              onClick={() => setShowReturnModal(false)}
-              className="absolute right-3 top-3 text-gray-500 hover:text-black cursor-pointer"
-            >
-              <X className="w-4 h-4" />
-            </button>
-
-            <h3 className="text-base font-semibold mb-2">Return Product</h3>
-
-            <textarea
-              value={returnReason}
-              onChange={(e) => setReturnReason(e.target.value)}
-              placeholder="Reason *"
-              className="w-full border p-2 rounded-sm text-sm"
-              rows="3"
-            />
-
-            <div className="flex gap-2 mt-3">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+          <div className="bg-white w-full max-w-md rounded-xl shadow-2xl relative transform animate-in zoom-in-95 duration-200">
+            {/* Header */}
+            <div className="border-b px-6 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center">
+                  <Package className="w-5 h-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    Return Product
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    Please provide a reason for your return
+                  </p>
+                </div>
+              </div>
               <button
                 onClick={() => setShowReturnModal(false)}
-                className="flex-1 bg-gray-100 p-2 rounded-sm text-xs cursor-pointer"
+                className="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded-full"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Return Reason <span className="text-red-500">*</span>
+                </label>
+                <select
+                  value={returnReason}
+                  onChange={(e) => {
+                    setReturnReason(e.target.value);
+                    if (e.target.value !== "Other") setCustomReturnReason("");
+                  }}
+                  className="w-full border border-gray-300 p-2 rounded-lg text-sm outline-none transition-all bg-gray-50 hover:bg-white"
+                >
+                  <option value="">Select a reason</option>
+                  <option value="Defective or damaged product">
+                    Defective or damaged product
+                  </option>
+                  <option value="Wrong item received">
+                    Wrong item received
+                  </option>
+                  <option value="Item not as described">
+                    Item not as described
+                  </option>
+                  <option value="No longer needed">No longer needed</option>
+                  <option value="Found better price elsewhere">
+                    Found better price elsewhere
+                  </option>
+                  <option value="Quality not satisfactory">
+                    Quality not satisfactory
+                  </option>
+                  <option value="Size or fit issue">Size or fit issue</option>
+                  <option value="Other">Other (please specify)</option>
+                </select>
+              </div>
+
+              {returnReason === "Other" && (
+                <div className="animate-in slide-in-from-top-2 duration-200">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Additional Details <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                  
+                    value={customReturnReason}
+                    onChange={(e) => setCustomReturnReason(e.target.value)}
+                    placeholder="Please describe your reason for return..."
+                    className="w-full border border-gray-300 p-3 rounded-lg text-sm outline-none transition-all resize-none"
+                    rows="4"
+                  />
+                </div>
+              )}
+
+              {/* Info Box */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 flex gap-3">
+                <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                <div className="text-xs text-blue-800">
+                  <p className="font-medium mb-1">Return Policy</p>
+                  <p className="text-blue-700">
+                    Returns are accepted within 30 days of delivery. Items must
+                    be unused and in original packaging.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Footer */}
+            <div className="border-t px-6 py-4 bg-gray-50 rounded-b-xl flex gap-3">
+              <button
+                onClick={() => {
+                  setShowReturnModal(false);
+                  setReturnReason("");
+                  setCustomReturnReason("");
+                }}
+                className="flex-1 bg-white border border-gray-300 text-gray-700 py-2 rounded-md text-xs font-medium hover:bg-gray-50 transition-colors"
               >
                 Cancel
               </button>
-
               <button
                 onClick={confirmReturn}
-                className="flex-1 bg-red-600 text-white p-2 rounded-sm text-xs cursor-pointer"
+                className="flex-1 bg-red-600 text-white py-2 rounded-md text-xs font-medium hover:bg-red-700 transition-colors shadow-sm cursor-pointer"
               >
                 Submit Return
               </button>

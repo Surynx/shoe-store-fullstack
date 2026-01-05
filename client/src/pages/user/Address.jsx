@@ -65,7 +65,12 @@ export default function Address() {
             >
               <div className="flex flex-col md:flex-row md:items-start gap-4">
                 <div className="flex-1">
-                  <div className="mb-3">
+                  <div className="mb-3 flex items-center gap-2">
+                    {address.isDefault && (
+                      <span className="inline-block px-3 py-1 rounded-md text-xs font-semibold bg-green-100 text-green-700">
+                        Default
+                      </span>
+                    )}
                     <span className={`inline-block px-3 py-1 rounded-md text-xs font-semibold ${
                       address.type === 'Home' 
                         ? 'bg-blue-100 text-blue-700' 

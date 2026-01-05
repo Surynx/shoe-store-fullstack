@@ -11,6 +11,7 @@ import {
   XCircle,
   Clock,
   AlertCircle,
+  RotateCcw,
 } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -70,7 +71,15 @@ const OrderDetailPage = () => {
       label: "Delivered",
       color: "bg-green-100 text-green-800",
     },
-    { value: "canceled", label: "Canceled", color: "bg-red-100 text-red-800" },
+    { value: "canceled",
+      label: "Canceled",
+      color: "bg-red-100 text-red-800" 
+    },
+    {
+    value: "returned",
+    label: "Returned",
+    color: "bg-orange-100 text-orange-800",
+  }
   ];
 
   const statusFlow = [
@@ -78,7 +87,7 @@ const OrderDetailPage = () => {
     "confirmed",
     "shipped",
     "out_for_delivery",
-    "delivered",
+    "delivered"
   ];
 
   const currentStatusIndex = statusFlow.indexOf(orderData.status);
@@ -87,7 +96,7 @@ const OrderDetailPage = () => {
     pending: "bg-yellow-100 text-yellow-800",
     paid: "bg-green-100 text-green-800",
     failed: "bg-red-100 text-red-800",
-    refunded: "bg-gray-100 text-gray-800",
+    refunded: "bg-orange-100 text-orange-800",
   };
 
   const handleStatusChange = async (data) => {
@@ -115,6 +124,8 @@ const OrderDetailPage = () => {
         return <CheckCircle className="w-5 h-5" />;
       case "canceled":
         return <XCircle className="w-5 h-5" />;
+      case "returned":
+        return <RotateCcw className="w-5 h-5" />;
       default:
         return <Package className="w-5 h-5" />;
     }
@@ -179,7 +190,7 @@ const OrderDetailPage = () => {
                 Order ID: {orderData.orderId}
               </p>
             </div>
-            {orderData.status !== "canceled" &&
+            {orderData.status !== "canceled" || orderData.status !== "returned" &&
               orderData.payment_status !== "failed" && (
                 <form onSubmit={handleSubmit(handleStatusChange)}>
                   <div className="flex items-center gap-2">

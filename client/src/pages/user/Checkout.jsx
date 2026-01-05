@@ -19,16 +19,11 @@ import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../components/user/modal/ConfirmOrder";
 
 export default function CheckoutPage() {
-
   useEffect(() => {
     const validateCart = async () => {
-
       try {
-
         const res = await validateCartItems();
-
       } catch (err) {
-
         console.error(err);
         toast.error(err.response.data.message);
         nav("/cart", { replace: true });
@@ -70,8 +65,12 @@ export default function CheckoutPage() {
   const coupons = data?.data?.coupon || [];
 
   useEffect(() => {
-    if (addresses.length > 0 && !selectedAddress) {
-      setSelectedAddress(addresses[0]._id);
+    
+    if (addresses.length > 0) {
+
+      const defaultAddress = addresses.find((address) => address.isDefault);
+
+      setSelectedAddress(defaultAddress?._id || addresses[0]._id);
     }
   }, [addresses]);
 
@@ -118,7 +117,6 @@ export default function CheckoutPage() {
   const total = subtotal - discount - couponDiscount + shipping_charge + tax;
 
   const handleEditAddress = (addressId) => {
-
     setIsEditing(true);
     setShowAddressForm(true);
     setEditAddress_id(addressId);
@@ -166,7 +164,6 @@ export default function CheckoutPage() {
 
   const handleApplyCoupon = async (data) => {
     try {
-
       const res = await validateCoupon(data);
 
       if (res?.data?.success) {
@@ -176,7 +173,8 @@ export default function CheckoutPage() {
 
         setAppliedCoupon(coupon);
 
-        const discount_value = coupon.type == "flat" ? coupon.value : (total * coupon.value) / 100;
+        const discount_value =
+          coupon.type == "flat" ? coupon.value : (total * coupon.value) / 100;
 
         setCouponDiscount(discount_value);
       }
@@ -186,7 +184,6 @@ export default function CheckoutPage() {
   };
 
   const handleRemoveCoupon = () => {
-
     setCouponCode("");
     setAppliedCoupon(null);
     setCouponDiscount(0);
@@ -194,7 +191,6 @@ export default function CheckoutPage() {
   };
 
   const handlePlaceOrder = async () => {
-
     try {
       setOpenModal(false);
 
@@ -241,7 +237,6 @@ export default function CheckoutPage() {
             },
             modal: {
               ondismiss: async () => {
-
                 toast.error("Payment cancelled. You can try again.");
 
                 try {
@@ -254,7 +249,10 @@ export default function CheckoutPage() {
                     const id = res.data.id;
                     const total = res.data.total;
 
-                    sessionStorage.setItem("payment_failed_data", JSON.stringify({ total, orderId }));
+                    sessionStorage.setItem(
+                      "payment_failed_data",
+                      JSON.stringify({ total, orderId })
+                    );
 
                     nav(`/payment/failed/${id}`);
                   }
@@ -283,18 +281,19 @@ export default function CheckoutPage() {
               });
 
               if (res && res.data.success) {
-
                 const orderId = res.data.orderId;
                 const id = res.data.id;
                 const total = res.data.total;
 
-                sessionStorage.setItem("payment_failed_data", JSON.stringify({ total, orderId }));
+                sessionStorage.setItem(
+                  "payment_failed_data",
+                  JSON.stringify({ total, orderId })
+                );
 
                 setTimeout(() => {
                   window.location.replace(`/payment/failed/${id}`);
                 }, 500);
               }
-
             } catch (error) {
               console.log(error);
             }
@@ -392,6 +391,11 @@ export default function CheckoutPage() {
                             <span className="text-sm font-semibold text-gray-900">
                               {address.type}
                             </span>
+                            {address.isDefault && (
+                              <span className="bg-gray-900 text-white text-[10px] font-semibold px-2 py-0.5 rounded">
+                                DEFAULT
+                              </span>
+                            )}
                           </div>
                           <p className="text-sm font-medium text-gray-800 mb-0.5">
                             {address.name}

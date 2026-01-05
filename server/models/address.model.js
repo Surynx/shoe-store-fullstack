@@ -57,6 +57,11 @@ const addressSchema = new mongoose.Schema(
       required: true,
       min: 6000000000,
       max: 9999999999, 
+    },
+
+    isDefault:{
+      type:Boolean,
+      default:false
     }
   },
   { timestamps: true }

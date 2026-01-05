@@ -5,6 +5,7 @@ import ErrorMessage from '../admin/ErrorMessage';
 import { addNewAddress, updateAddress } from '../../Services/user.api';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function AddressForm() {
 
@@ -32,6 +33,7 @@ export default function AddressForm() {
     if(id) {
 
       res= await updateAddress(data,id);
+
     }else {
 
       res=await addNewAddress(data);
@@ -64,7 +66,7 @@ export default function AddressForm() {
 
       <div className="bg-white rounded-md p-6 border">
         <h2 className="text-xl font-semibold text-gray-800 mb-6">
-          {'Add New Address'}
+          {id ? 'Edit Address' : 'Add New Address'}
         </h2>
 
         <form className="space-y-3" onSubmit={handleSubmit(submit)}>
@@ -189,6 +191,18 @@ export default function AddressForm() {
             </div>
           </div>
 
+          <div className="flex items-center gap-2 pt-2">
+            <input
+              type="checkbox"
+              id="isDefault"
+              {...register("isDefault")}
+              className="w-4 h-4 text-gray-700 border-gray-300 focus:ring-gray-700 cursor-pointer"
+            />
+            <label htmlFor="isDefault" className="text-sm font-medium text-gray-700 cursor-pointer">
+              Set as default address
+            </label>
+          </div>
+
           <div className="flex gap-3 pt-4">
             <button
               type="button"
@@ -202,7 +216,7 @@ export default function AddressForm() {
               type="submit"
               className="flex-1 px-3 py-2 border text-white bg-gray-700 hover:bg-gray-800 transition-colors font-medium cursor-pointer"
             >
-              {"Add Address"}
+              {id ? "Update Address" : "Add Address"}
             </button>
           </div>
         </form>

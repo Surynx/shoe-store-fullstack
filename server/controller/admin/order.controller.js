@@ -197,7 +197,7 @@ const completeReturn = async (req, res) => {
 
         if( orderDoc.payment_status == "paid" && orderDoc.payment_method != "cod"){
 
-            await Order.updateOne({_id:order_id},{ $set:{payment_status:"refunded"} });
+            await Order.updateOne({_id:order_id},{ $set:{payment_status:"refunded",status:"returned"} });
         }
     }
     

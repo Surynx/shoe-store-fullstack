@@ -6,7 +6,7 @@ const addNewAddress= async (req,res) => {
     
     try{
 
-    const {  name,type,line1,line2,city,state,pin_code,phone }= req.body;
+    const {  name,type,line1,line2,city,state,pin_code,phone,isDefault }= req.body;
     const email=req.email;
 
     const user = await User.findOne({ email });
@@ -26,6 +26,14 @@ const addNewAddress= async (req,res) => {
       pin_code,
       phone,
     });
+
+    if(isDefault) {
+
+      await Address.updateMany({user_id:user._id},{isDefault:false});
+
+      newAddress.isDefault = true;
+      await newAddress.save();
+    }
 
     return res.status(STATUS.SUCCESS.CREATED).json({ success:true,message:"Address Added Successfully" });
 
@@ -85,8 +93,19 @@ const editAddress= async (req,res) => {
    
     try{
 
+    const email= req.email;
+
+    const user= await User.findOne({email});
+
     const {id}= req.params;
-    const {  name,type,line1,line2,city,state,pin_code,phone }= req.body;
+
+    const {  name,type,line1,line2,city,state,pin_code,phone,isDefault }= req.body;
+
+    if(isDefault) {
+
+      await Address.updateMany({user_id:user._id},{isDefault:false});
+
+    }
 
     const updated = await Address.findOneAndUpdate({ _id: id },{
         name,
@@ -97,6 +116,7 @@ const editAddress= async (req,res) => {
         state,
         pin_code,
         phone,
+        isDefault
       });
 
     if (!updated) {

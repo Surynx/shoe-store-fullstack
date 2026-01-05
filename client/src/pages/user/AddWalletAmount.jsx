@@ -48,8 +48,9 @@ export default function AddMoneyPage() {
               const res= await verifyPayment(response);
 
               if(res && res.data.success) {
+                
                 toast.success(res.data.message);
-                QueryClient.invalidateQueries("wallet-info");
+                nav("/account/wallet");
               }
 
             }catch(error) {
