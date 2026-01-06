@@ -11,7 +11,7 @@ const findRefundAmount= (orderDoc,item,coupon) => {
 
         }, 0);
 
-        let coupon_discount = coupon.type == "percentage" ? (orderItemTotal * coupon.value) / 100 : coupon.value;
+        let coupon_discount = orderDoc.coupon_share;
 
         coupon_discount = Math.min(coupon_discount, orderItemTotal);
 

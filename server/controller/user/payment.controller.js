@@ -133,7 +133,7 @@ const verifyCheckoutPayment = async (req, res) => {
 
         if (coupon_id) {
 
-            await Coupon.updateOne({ _id: coupon_id }, { $inc: { usageCount: 1 } });
+            await Coupon.updateOne({ _id: coupon_id }, { $inc: { usageCount: 1 },$push: {applied_by: user._id} });
         }
 
         for (let item of orderDoc.items) {

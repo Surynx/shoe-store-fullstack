@@ -89,7 +89,7 @@ const placeNewOrder = async (req, res) => {
 
     if (coupon) {
 
-        await Coupon.updateOne({ code: coupon.code },{ $inc: { usageCount: 1 }} );
+        await Coupon.updateOne({ code: coupon.code },{ $inc: { usageCount: 1 },$push: {applied_by: user._id} } );
     }
 
     for (let item of result.newOrder.items) {
@@ -123,11 +123,25 @@ const fetchAllOrders = async (req, res) => {
     try {
 
         const email = req.email;
+
         const user = await User.findOne({ email });
 
-        const orderDocs = await Order.find({ user_id: user._id }).populate("items.product_id").populate("items.variant_id").sort({ createdAt: -1 });
+        const { search = '',page = 1} = req.query;
 
-        return res.status(STATUS.SUCCESS.OK).send({ orderDocs });
+        const query= search ? { user_id:user._id, orderId:{$regex:search,$options:"i"} } : {user_id:user._id};
+
+        const limit=4;
+
+        const skip= (Number(page)-1)*limit || 0;
+
+        const total_doc= await Order.countDocuments(query);
+
+        const orderDocs = await Order.find(query).populate("items.product_id").populate("items.variant_id")
+        .sort({ createdAt: -1 })
+        .skip(skip)
+        .limit(limit);
+
+        return res.status(STATUS.SUCCESS.OK).send({ orderDocs,total_doc,limit });
 
     } catch (error) {
         console.log("Error in fetchAllOrders", error);

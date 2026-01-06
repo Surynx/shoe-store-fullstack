@@ -12,6 +12,8 @@ const findBestOffer= (offers,price)=> {
 
        } else if( offer.type == "flat" ) {
 
+        if( price <= offer.value) return;
+
         amount= offer.value;
        }
 

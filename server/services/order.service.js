@@ -115,7 +115,9 @@ const createOrderService = async (address_id, payment_method, coupon, user, cart
     if (coupon) {
 
         newOrder.coupon_id = coupon._id;
-        // newOrder.coupon_share = discount_coupon
+        newOrder.coupon_code = coupon.code;
+        newOrder.coupon_share = discount_coupon;
+
         await newOrder.save();
     }
 

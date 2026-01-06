@@ -47,6 +47,7 @@ const getCheckoutData = async (req, res) => {
 
         const coupon = await Coupon.find({
             min_purchase: { $lte: total_amount },
+            applied_by:{ $ne:user._id },
             start_date: { $lte: new Date() },
             end_date: { $gte: new Date() },
             status: true,

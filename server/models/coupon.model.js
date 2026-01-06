@@ -46,7 +46,12 @@ const couponSchema= new mongoose.Schema({
     createdFor: {
         type: mongoose.Schema.ObjectId,
         default:null
-    }
+    },
+    applied_by:[{
+        type:mongoose.Schema.ObjectId,
+        ref:"users"
+    }]
+    
 },{timestamps:true});
 
 const Coupon= mongoose.model("coupons",couponSchema);

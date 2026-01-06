@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowLeft,
   Package,
@@ -24,11 +24,14 @@ import {
 import { useParams } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { findSubtotal } from "../../math/subtotal.math";
 
 const OrderDetailPage = () => {
   const { id } = useParams();
 
   const QueryClient = useQueryClient();
+
+  const [subtotal, setSubtotal] = useState(0);
 
   const { data } = useQuery({
     queryKey: ["order-details-admin", id],
@@ -40,9 +43,13 @@ const OrderDetailPage = () => {
   const orderData = data?.data?.orderDoc || [];
 
   useEffect(() => {
+    if (!orderData || !orderData.items) return;
+
     reset({
       status: orderData.status,
     });
+
+    setSubtotal(findSubtotal(orderData));
   }, [orderData]);
 
   const statusOptions = [
@@ -71,15 +78,12 @@ const OrderDetailPage = () => {
       label: "Delivered",
       color: "bg-green-100 text-green-800",
     },
-    { value: "canceled",
-      label: "Canceled",
-      color: "bg-red-100 text-red-800" 
-    },
+    { value: "canceled", label: "Canceled", color: "bg-red-100 text-red-800" },
     {
-    value: "returned",
-    label: "Returned",
-    color: "bg-orange-100 text-orange-800",
-  }
+      value: "returned",
+      label: "Returned",
+      color: "bg-orange-100 text-orange-800",
+    },
   ];
 
   const statusFlow = [
@@ -87,7 +91,7 @@ const OrderDetailPage = () => {
     "confirmed",
     "shipped",
     "out_for_delivery",
-    "delivered"
+    "delivered",
   ];
 
   const currentStatusIndex = statusFlow.indexOf(orderData.status);
@@ -173,7 +177,6 @@ const OrderDetailPage = () => {
   return (
     <div className="min-h-screen bg-gray-50 p-10">
       <div className="max-w-5xl mx-auto">
-        
         <div className="mb-4 mt-6">
           <button
             onClick={() => window.history.back()}
@@ -183,61 +186,40 @@ const OrderDetailPage = () => {
             <span className="font-medium">Back to Orders</span>
           </button>
 
-          <div className="flex justify-between items-start mt-8">
+          <div className="flex justify-between items-center mt-8">
             <div>
               <h1 className="text-xl font-bold text-gray-900">Order Details</h1>
               <p className="text-gray-600 mt-0.5 text-sm">
                 Order ID: {orderData.orderId}
               </p>
             </div>
-            {orderData.status !== "canceled" || orderData.status !== "returned" &&
-              orderData.payment_status !== "failed" && (
-                <form onSubmit={handleSubmit(handleStatusChange)}>
-                  <div className="flex items-center gap-2">
-                    <select
-                      {...register("status")}
-                      defaultValue={orderData.status}
-                      className="px-3 py-1.5 cursor-pointer text-sm font-bold border border-gray-300 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    >
-                      {statusFlow.map((status, index) => (
-                        <option
-                          key={status}
-                          value={status}
-                          disabled={index < currentStatusIndex}
-                        >
-                          {status.replaceAll("_", " ").toUpperCase()}
-                        </option>
-                      ))}
-                    </select>
 
-                    <button
-                      type="submit"
-                      className="px-3 py-1 text-white text-sm bg-gray-600 transition-colors cursor-pointer"
-                    >
-                      Update
-                    </button>
-                  </div>
-                </form>
-              )}
-
-              {orderData.payment_status === "failed" &&  (
-                <div className="flex items-center justify-center p-4">
+            {orderData.payment_status === "failed" && (
+              <div className="flex items-center justify-center p-4">
                 <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-2.5 rounded-lg">
                   <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
                   <p className="text-sm font-medium">Razorpay payment failed</p>
                 </div>
-                </div>
-              )}
+              </div>
+            )}
 
-              {orderData.status === "canceled" &&  (
-                <div className="flex items-center justify-center p-4">
+            {orderData.status === "canceled" && (
+              <div className="flex items-center justify-center p-4">
                 <div className="inline-flex items-center gap-2 bg-red-50 border border-red-200 text-red-800 px-4 py-2.5 rounded-lg">
                   <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
                   <p className="text-sm font-medium">Order Cancelled</p>
                 </div>
+              </div>
+            )}
+
+            {orderData.status === "returned" && (
+              <div className="flex items-center justify-center p-4">
+                <div className="inline-flex items-center gap-2 border border-orange-200 bg-orange-100 text-orange-800 px-4 py-2.5 rounded-lg">
+                  <RotateCcw className="w-5 h-5 text-red-600 flex-shrink-0" />
+                  <p className="text-sm font-medium">Order Returned</p>
                 </div>
-              )}
-              
+              </div>
+            )}
           </div>
         </div>
 
@@ -278,7 +260,6 @@ const OrderDetailPage = () => {
               </div>
             </div>
 
-            
             <div className="bg-white rounded-lg shadow-sm p-4">
               <h2 className="text-base font-semibold text-gray-900 mb-3">
                 Order Items
@@ -473,6 +454,46 @@ const OrderDetailPage = () => {
           </div>
 
           <div className="space-y-4">
+            {orderData.status !== "canceled" &&
+              orderData.status !== "returned" &&
+              orderData.payment_status !== "failed" && (
+                <form onSubmit={handleSubmit(handleStatusChange)}>
+                  <div className="w-full bg-gray-50 border border-gray-200 rounded-md px-3 py-2">
+                    {/* Label */}
+                    <label className="block text-[11px] font-medium text-gray-500 mb-1">
+                      Order Status
+                    </label>
+
+                    {/* Select */}
+                    <select
+                      {...register("status")}
+                      defaultValue={orderData.status}
+                      className="w-full px-2 py-1 text-[13px] font-semibold border-2 border-gray-800 rounded bg-white text-gray-800 cursor-pointer"
+                    >
+                      {statusFlow.map((status, index) => (
+                        <option
+                          key={status}
+                          value={status}
+                          disabled={index < currentStatusIndex}
+                          className={
+                            index < currentStatusIndex ? "text-gray-400" : ""
+                          }
+                        >
+                          {status.replaceAll("_", " ").toUpperCase()}
+                        </option>
+                      ))}
+                    </select>
+
+                    {/* Button */}
+                    <button
+                      type="submit"
+                      className="mt-2 w-full px-2 py-1 text-[13px] font-semibold text-white bg-gray-700 rounded cursor-pointer transition-all"
+                    >
+                      Update Status
+                    </button>
+                  </div>
+                </form>
+              )}
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="flex items-center gap-1.5 mb-3">
                 <User className="w-4 h-4 text-gray-600" />
@@ -520,7 +541,6 @@ const OrderDetailPage = () => {
               </div>
             </div>
 
-            
             <div className="bg-white rounded-lg shadow-sm p-4">
               <div className="flex items-center gap-1.5 mb-3">
                 <CreditCard className="w-4 h-4 text-gray-600" />
@@ -556,21 +576,19 @@ const OrderDetailPage = () => {
               </div>
             </div>
 
-            {orderData.coupon_id && (
+            {orderData?.coupon_id && (
               <div className="mb-2 p-2 rounded-md bg-green-50 border border-green-200">
                 <div className="flex justify-between items-center text-xs">
                   <span className="font-semibold text-green-700">
                     Coupon Applied
                   </span>
                   <span className="font-bold text-green-800">
-                    {orderData.coupon_id.code}
+                    {orderData.coupon_code}
                   </span>
                 </div>
 
                 <div className="mt-1 text-[11px] text-green-700">
-                  {orderData.coupon_id.type === "percentage"
-                    ? `${orderData.coupon_id.value}% off`
-                    : `₹${orderData.coupon_id.value} off`}
+                  You saved ₹{orderData.coupon_share.toFixed()}
                 </div>
               </div>
             )}
@@ -582,21 +600,18 @@ const OrderDetailPage = () => {
               <div className="space-y-1.5 text-xs">
                 <div className="flex justify-between">
                   <span className="text-gray-600">Subtotal</span>
-                  <span className="text-gray-900">
-                    ₹
-                    {orderData.total_amount -
-                      orderData.tax -
-                      orderData.delivery_charge +
-                      orderData.discount}
-                  </span>
+                  <span className="text-gray-900">₹ {subtotal || 0}</span>
                 </div>
                 {orderData.discount > 0 && (
-                  <div className="flex justify-between text-green-600">
-                    <span>
-                      Discount{" "}
-                      {orderData.coupon_id && `(${orderData.coupon_id.code})`}
-                    </span>
+                  <div className="flex justify-between text-red-600">
+                    <span>Discount </span>
                     <span>-₹{orderData.discount.toFixed()}</span>
+                  </div>
+                )}
+                {orderData?.coupon_id && (
+                  <div className="flex justify-between text-green-600">
+                    <span>Coupon ({orderData.coupon_code})</span>
+                    <span>-₹{orderData.coupon_share}</span>
                   </div>
                 )}
                 <div className="flex justify-between">

@@ -10,7 +10,7 @@ import ProductReview from "../../components/user/ProductReview";
 import OfferBanner from "../../components/user/OfferBanner";
 import { useState } from "react";
 import { useEffect } from "react";
-import { findBestOffer } from "../../math/offerMath";
+import { findBestOffer } from "../../math/offer.math.js";
 
 export default function Product() {
 

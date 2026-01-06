@@ -1,3 +1,4 @@
+import { Search } from "lucide-react";
 import api from "./config/Api";
 
 export const registerApi=async (data) => {
@@ -187,9 +188,14 @@ export const getOrderDetails= async(id)=> {
     return res;
 }
 
-export const getAllOrders= async()=> {
+export const getAllOrders= async( search,page )=> {
 
-    const res= await api.get("/user/order");
+    const res= await api.get("/user/order",{
+        params:{
+            search: search,
+            page: page
+        }
+    });
     return res;
 }
 

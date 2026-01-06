@@ -28,7 +28,7 @@ const getDashboardInfo = async (req,res) => {
 
     const return_request = await findReturnRequest(totalSuccessfullOrders);
 
-    const recent_orders = await Order.find().populate("user_id").limit(5);
+    const recent_orders = await Order.find().populate("user_id").sort({createdAt:-1}).limit(5);
 
     res.status(STATUS.SUCCESS.OK).json({ adminEmail:admin.email,stats,top_products,top_brands,top_brands,return_request,recent_orders });
 }

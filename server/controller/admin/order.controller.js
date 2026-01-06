@@ -47,7 +47,7 @@ const getDetailsOfOrder = async (req, res) => {
 
     const { id } = req.params;
 
-    const orderDoc = await Order.findOne({ _id: id }).populate("items.product_id").populate("items.variant_id").populate("address_id").populate("user_id").populate("coupon_id");
+    const orderDoc = await Order.findOne({ _id: id }).populate("items.product_id").populate("items.variant_id").populate("address_id").populate("user_id");
 
     if (!orderDoc) {
 
@@ -195,7 +195,7 @@ const completeReturn = async (req, res) => {
 
     if (all_item_completed) {
 
-        if( orderDoc.payment_status == "paid" && orderDoc.payment_method != "cod"){
+        if( orderDoc.payment_status == "paid" ){
 
             await Order.updateOne({_id:order_id},{ $set:{payment_status:"refunded",status:"returned"} });
         }

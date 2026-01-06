@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Search,
   Package,
@@ -27,12 +27,28 @@ import {
 } from "../../Services/user.api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import Pagination from "../../components/admin/Pagination";
+import SearchBox from "../../components/admin/SearchBox";
+import useDebounce from "../../hooks/useDebounce";
 
 const OrderListingPage = () => {
+
+
+  const [search, setSearch] = useState("");
+
+  const [page,setPage]= useState(1);
+
+  const debounce = useDebounce(search)
+
   const { data } = useQuery({
-    queryKey: ["orderListing"],
-    queryFn: getAllOrders,
+    queryKey: ["orderListing",debounce,page],
+    queryFn: ()=> getAllOrders(debounce,page),
   });
+
+  const limit= data?.data?.limit;
+  const total= data?.data?.total_doc;
+
+  const totalPages = Math.ceil(total / limit);
 
   const nav = useNavigate();
 
@@ -47,8 +63,6 @@ const OrderListingPage = () => {
   }, [orderDocs]);
 
   const [orders, setOrders] = useState(orderDocs);
-
-  const [searchQuery, setSearchQuery] = useState("");
 
   const [cancelTarget, setCancelTarget] = useState(null);
 
@@ -145,7 +159,6 @@ const OrderListingPage = () => {
     }
 
     const reason = returnReason == "Other" ? customReturnReason : returnReason;
-    console.log(reason)
 
     try {
       const res = await handleReturnItem(returnTarget, { returnReason });
@@ -248,14 +261,6 @@ const OrderListingPage = () => {
     }
   };
 
-  const filteredOrders = orders.filter(
-    (order) =>
-      order.orderId.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      order.items.some((item) =>
-        item.product_id.name.toLowerCase().includes(searchQuery.toLowerCase())
-      )
-  );
-
   return (
     <div className="space-y-5">
       <div>
@@ -263,18 +268,9 @@ const OrderListingPage = () => {
         <p className="text-sm text-gray-500">Track and manage your orders</p>
       </div>
       <div>
-        <div className="relative">
-          <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-          <input
-            type="text"
-            placeholder="Search by order ID or product name..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full pl-10 pr-3 py-2 text-sm border border-gray-300 rounded-lg outline-none"
-          />
-        </div>
+        <SearchBox search={search} setSearch={setSearch}/>
       </div>
-      {filteredOrders.length === 0 && (
+      {orderDocs.length === 0 && (
         <div className="text-center py-12">
           <Package className="w-12 h-12 text-gray-300 mx-auto mb-3" />
           <h3 className="text-base font-semibold text-gray-900">
@@ -285,7 +281,7 @@ const OrderListingPage = () => {
       )}
 
       <div className="space-y-3">
-        {filteredOrders.map((order) => (
+        {orderDocs.map((order) => (
           <div
             key={order._id}
             className="bg-white rounded-md border border-gray-500 p-4"
@@ -459,6 +455,8 @@ const OrderListingPage = () => {
         ))}
       </div>
 
+      <Pagination page={page} setPage={setPage} totalPages={totalPages}/>
+
       {showCancelModal && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4">
           <div className="relative bg-white w-full max-w-md p-5 rounded-md shadow-md">
@@ -495,12 +493,13 @@ const OrderListingPage = () => {
           </div>
         </div>
       )}
+   
 
-      {/* Return Modal */}
+      
       {showReturnModal && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 animate-in fade-in duration-200">
+        <div className="fixed inset-0 bg-black/60 flex items-center justify-center p-4">
           <div className="bg-white w-full max-w-md rounded-xl shadow-2xl relative transform animate-in zoom-in-95 duration-200">
-            {/* Header */}
+       
             <div className="border-b px-6 py-4 flex items-center justify-between">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 bg-red-50 rounded-full flex items-center justify-center">

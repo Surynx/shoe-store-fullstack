@@ -78,7 +78,7 @@ const OrderDetail = () => {
   if (!order) return <div className="text-center py-12">Loading...</div>;
 
   const subtotal = order?.items?.reduce(
-    (sum, item) => sum + item.salesPrice * item.quantity,
+    (sum, item) => sum + item.original_price * item.quantity,
     0
   );
 
@@ -402,6 +402,22 @@ const OrderDetail = () => {
                   </span>
                 </div>
               </div>
+              {order?.coupon_id && (
+              <div className="mt-4 p-2 rounded-md bg-green-50 border border-green-200">
+                <div className="flex justify-between items-center text-xs">
+                  <span className="font-semibold text-green-700">
+                    Coupon Applied
+                  </span>
+                  <span className="font-bold text-green-800">
+                    {order.coupon_code}
+                  </span>
+                </div>
+
+                <div className="mt-1 text-[11px] text-green-700">
+                  You saved ₹{order.coupon_share.toFixed()}
+                </div>
+              </div>
+            )}
             </div>
 
             <div className="bg-white border rounded-sm p-6">
@@ -462,12 +478,7 @@ const OrderDetail = () => {
                   </span>
                   <span className="text-gray-900 font-medium">
                     ₹
-                    {(
-                      order.total_amount -
-                      order.tax -
-                      order.delivery_charge +
-                      order.discount
-                    ).toLocaleString("en-IN")}
+                    {(subtotal)?.toLocaleString("en-IN")}
                   </span>
                 </div>
 
@@ -484,6 +495,13 @@ const OrderDetail = () => {
                     <span className="text-green-600 font-medium">
                       -₹{order?.discount?.toLocaleString("en-IN")}
                     </span>
+                  </div>
+                )}
+
+                {order?.coupon_id && (
+                  <div className="flex justify-between text-green-600 text-sm">
+                    <span className="text-gray-600">Coupon ({order.coupon_code})</span>
+                    <span>-₹{order.coupon_share}</span>
                   </div>
                 )}
 

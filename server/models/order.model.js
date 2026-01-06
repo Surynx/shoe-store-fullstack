@@ -111,6 +111,12 @@ const orderSchema = new mongoose.Schema(
       ref: "coupons",
       default: null,
     },
+    coupon_code: {
+      type:String
+    },
+    coupon_share: {
+      type:Number
+    },
     cancelledAt: {
       type:Date
     }
