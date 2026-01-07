@@ -20,7 +20,7 @@ const getCheckoutData = async (req, res) => {
             return res.status(STATUS.ERROR.NOT_FOUND).json({ success: false, message: "User not found" });
         }
 
-        const addressDocs = await Address.find({ user_id: user._id });
+        const addressDocs = await Address.find({ user_id: user._id }).sort({ isDefault:-1,createdAt:-1 });
 
         const cartDoc = await Cart.findOne({ user_id: user._id }).populate("items.product_id").populate("items.variant_id");
 

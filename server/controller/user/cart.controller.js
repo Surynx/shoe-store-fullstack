@@ -146,7 +146,7 @@ const countCartItems= async(req,res)=> {
     
     const cartDoc= await Cart.findOne({user_id:user._id});
 
-    return res.status(STATUS.SUCCESS.OK).send({count:cartDoc?.items?.length});
+    return res.status(STATUS.SUCCESS.OK).send({count:cartDoc?.items?.length,username:user.name});
 }
 
 const validateCartItems= async(req,res)=> {

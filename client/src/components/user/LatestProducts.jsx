@@ -50,12 +50,6 @@ export default function Latestproducts() {
                     className="w-full h-full object-cover"
                   />
                 </div>
-                
-                {/* <button
-                  className="absolute top-3 right-3 p-2 bg-white rounded-full hover:opacity-80 transition-opacity"
-                >
-                  <Heart size={18}/>
-                </button> */}
               </div>
 
               <div className="flex flex-col px-1">

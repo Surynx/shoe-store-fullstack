@@ -55,7 +55,7 @@ const fetchAddress= async(req,res)=> {
       return res.status(STATUS.ERROR.NOT_FOUND).json({ success:false,message: "User not found" });
     }
 
-    const docs= await Address.find({user_id:user._id});
+    const docs= await Address.find({user_id:user._id}).sort({isDefault:-1,createdAt:-1});
 
     if(docs) {
 
