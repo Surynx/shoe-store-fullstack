@@ -2,9 +2,9 @@ import { FaPlus } from "react-icons/fa";
 import AddBannerModal from "../../components/admin/modal/Banner";
 import { useState } from "react";
 import BannerList from "../../components/admin/BannerList";
-import { QueryClient, useQuery } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import { getAllBanners } from "../../Services/admin.api";
-import SearchBox from "../../components/admin/SearchBox";
+
 
 function BannerManagment() {
 

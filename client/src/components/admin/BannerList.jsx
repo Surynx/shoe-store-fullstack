@@ -3,9 +3,9 @@ import toast from "react-hot-toast";
 import { FaEdit, FaTrash, FaImage } from "react-icons/fa";
 import { deleteBanner } from "../../Services/admin.api";
 import { useQueryClient } from "@tanstack/react-query";
-import { Trash } from "lucide-react";
 
-function BannerList({ banners, onEdit }) {
+
+function BannerList({ banners }) {
 
   const [deleteConfirm, setDeleteConfirm] = useState(null);
 
