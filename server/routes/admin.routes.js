@@ -12,6 +12,7 @@ import { addNewOfferForCategory, addNewOfferForProduct, getAllOfferOfCategory, g
 import { addNewCoupon, changeCouponStatus, getAllCoupon } from "../controller/admin/coupon.controller.js";
 import { getExcelSalesReport, getPdfSalesReport, getSalesOverview, getSalesOverviewCustom, getSalesPageInfo } from "../controller/admin/sales.controller.js";
 import { getDashboardInfo } from "../controller/admin/dashboard.controller.js";
+import { addBanner, fetchBannerList, removeBanner } from "../controller/admin/banner.controller.js";
 
 const route=express.Router();
 
@@ -88,5 +89,11 @@ route.get(ROUTES.ADMIN.SALES.DOWNLOAD_EXCEL_REPORT,isAdmin,getExcelSalesReport);
 route.get(ROUTES.ADMIN.SALES.DOWNLOAD_PDF_REPORT,isAdmin,getPdfSalesReport);
 
 route.get(ROUTES.ADMIN.DASHBOARD.FETCH,isAdmin,getDashboardInfo);
+
+route.post(ROUTES.ADMIN.BANNER.ADD,isAdmin,upload.single("image"),addBanner);
+
+route.get(ROUTES.ADMIN.BANNER.FETCH,isAdmin,fetchBannerList);
+
+route.delete(ROUTES.ADMIN.BANNER.REMOVE,isAdmin,removeBanner);
 
 export default route;

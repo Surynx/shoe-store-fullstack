@@ -9,7 +9,9 @@ export default function Navbar() {
   const nav = useNavigate();
 
   const [userName, setUserName] = useState(null);
+
   const [showDropdown, setShowDropdown] = useState(false);
+  
   const dropdownRef = useRef(null);
 
   const isLoggedIn = !!localStorage.getItem("userToken");
@@ -51,7 +53,7 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="w-full bg-white">
+    <nav className="w-full bg-white border-b border-gray-300">
       
       <div className="bg-gray-200 text-center py-1 px-4">
         <div className="max-w-7xl mx-auto overflow-hidden">
@@ -79,7 +81,7 @@ export default function Navbar() {
       </div>
 
       {/* User Greeting Bar */}
-      <div className="bg-white border-b border-gray-200 py-0.5">
+      <div className="bg-white border-b border-gray-300 py-0.5">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-end gap-3">
             {isLoggedIn ? (
@@ -166,7 +168,7 @@ export default function Navbar() {
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-12">
             {/* Logo */}
-            <Link to="/" className="flex-shrink-0">
+            <Link to="/" className="">
               <svg
                 className="h-7 w-auto"
                 viewBox="0 0 120 40"

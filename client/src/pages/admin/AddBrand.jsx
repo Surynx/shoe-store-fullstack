@@ -43,6 +43,7 @@ function AddBrand() {
 
   //edit / add logic
   const submit = async (data) => {
+
     const formData = new FormData();
     formData.append("name", data.name);
     formData.append("logo", data.logo[0]);
@@ -52,8 +53,10 @@ function AddBrand() {
       let res;
       setLoading(true);
       if (id) {
+
         res = await editBrand(formData, id);
       } else {
+        
         res = await addBrand(formData);
       }
 

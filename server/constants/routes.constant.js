@@ -58,6 +58,11 @@ const ROUTES= {
         },
         DASHBOARD:{
             FETCH:"/dashboard"
+        },
+        BANNER:{
+            ADD:"/banner",
+            FETCH:"/banner",
+            REMOVE:"/banner/:id"
         }
     },
     USER:{
@@ -136,6 +141,9 @@ const ROUTES= {
             VERIFY_PAYMENT:"/payment/verify",
             FAILED_PAYMENT:"/payment/failed",
             RETRY_PAYMENT:"/payment/retry/:id"
+        },
+        BANNER:{
+            FETCH:"/banner"
         }
     }
 }

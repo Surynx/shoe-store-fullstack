@@ -15,6 +15,7 @@ import { addProductToWishlist, fetchWishlistInfo, removeItemFromWishlist } from 
 import { createWalletOrder, fetchWalletInfo, verifyWalletPayment } from "../controller/user/wallet.controller.js";
 import { createCheckoutOrder, createPaymentRetryOrder, markPaymentFailed, verifyCheckoutPayment } from "../controller/user/payment.controller.js";
 import { validateCoupon } from "../controller/user/coupon.controller.js";
+import { getDisplayBanner } from "../controller/user/banner.controller.js";
 
 const route=express.Router();
 
@@ -118,5 +119,7 @@ route.post(ROUTES.USER.PAYMENT.VERIFY_PAYMENT,isUser,verifyCheckoutPayment);
 route.post(ROUTES.USER.PAYMENT.FAILED_PAYMENT,isUser,markPaymentFailed);
 
 route.post(ROUTES.USER.PAYMENT.RETRY_PAYMENT,isUser,createPaymentRetryOrder);
+
+route.get(ROUTES.USER.BANNER.FETCH,getDisplayBanner);
 
 export default route;

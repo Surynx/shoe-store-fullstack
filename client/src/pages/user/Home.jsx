@@ -3,35 +3,34 @@ import { useState, useEffect } from "react";
 import LatestProducts from "../../components/user/LatestProducts";
 import BrandShowcase from "../../components/user/BrandShowcase";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { getDisplayBanner } from "../../Services/user.api";
+import Loading from "../../components/user/Loading";
 
 export default function HomePage() {
+
   const nav = useNavigate();
+
   const [currentSlide, setCurrentSlide] = useState(0);
+
+  const { data,isLoading } = useQuery({
+
+    queryKey:["display-banner"],
+    queryFn:getDisplayBanner
+
+  });
   
-  const banners = [
-    {
-      image: "src/assets/Banner.png",
-      title: "KICKS THAT CAN'T MISS",
-      subtitle: "Gift the perfect sneakers for their every move."
-    },
-    {
-      image: "src/assets/Banner1.jpeg",
-      title: "STEP INTO STYLE",
-      subtitle: "Discover the latest trends in footwear."
-    },
-    {
-      image: "src/assets/Banner2.png",
-      title: "UNLEASH YOUR POTENTIAL",
-      subtitle: "Performance meets design in every stride."
-    }
-  ];
+  const banners = data?.data?.bannerDocs || [];
 
   useEffect(() => {
+
     const timer = setInterval(() => {
       setCurrentSlide((prev) => (prev + 1) % banners.length);
     }, 5000);
+
     return () => clearInterval(timer);
-  }, []);
+
+  }, [data]);
 
   const nextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % banners.length);
@@ -45,9 +44,13 @@ export default function HomePage() {
     setCurrentSlide(index);
   };
 
+  if (isLoading) {
+    return <Loading />;
+  }
+
   return (
     <div className="w-full">
-      <section className="w-full h-[90vh] relative overflow-hidden group">
+      <section className="w-full h-[86vh] relative overflow-hidden group">
         <div className="relative w-full h-full">
           {banners.map((banner, index) => (
             <div
@@ -57,7 +60,7 @@ export default function HomePage() {
               }`}
             >
               <img
-                src={banner.image}
+                src={banner?.image}
                 alt={`Banner ${index + 1}`}
                 className="w-full h-full object-cover"
               />
@@ -68,10 +71,10 @@ export default function HomePage() {
           
           <div className="absolute inset-0 flex flex-col items-center justify-end pb-20 px-4 text-white">
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight mb-3 text-center">
-              {banners[currentSlide].title}
+              {banners[currentSlide]?.title}
             </h1>
             <p className="text-sm md:text-base font-bold text-gray-200 mb-6 text-center">
-              {banners[currentSlide].subtitle}
+              {banners[currentSlide]?.sub_title}
             </p>
             <button 
               className="px-8 py-3 bg-black text-white rounded-full text-base font-semibold hover:bg-gray-800 transition-all duration-300 hover:scale-105"

@@ -257,3 +257,20 @@ export const getDashboardInfo = async () => {
     return res;
 }
 
+export const addNewBanner = async (data) => {
+    
+    const res = await api.post("/admin/banner",data);
+    return res;
+}
+
+export const getAllBanners = async () => {
+    
+    const res = await api.get("/admin/banner");
+    return res;
+}
+
+export const  deleteBanner = async (id) => {
+    
+    const res = await api.delete(`/admin/banner/${id}`);
+    return res;
+}

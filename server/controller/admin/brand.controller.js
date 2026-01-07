@@ -6,7 +6,9 @@ import Product from "../../models/product.model.js";
 const addBrand= async(req,res)=>{
 
     try{
+        
     const {name,status} = req.body;
+
     const {path} = req.file;
 
     let doc= await Brand.findOne({name:{$regex:name,$options:"i"}});

@@ -1,4 +1,4 @@
-import {  Folder, Gift, Home, LogOut, Package, ShoppingCart, TagIcon, User } from 'lucide-react'
+import { Folder, Gift, Home, Image, LogOut, Package, ShoppingCart, TagIcon, User } from 'lucide-react'
 import { NavLink, useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast';
 import { GiProgression } from 'react-icons/gi';
@@ -21,8 +21,10 @@ function Sidebar() {
         name:"Product", icon:<Package color='black' size={20}/>,path:"/admin/product"
     },{
         name:"Orders", icon:<ShoppingCart color='black' size={20}/>,path:"/admin/orders"
-    },{
+    },,{
         name:"Coupon", icon:<Gift color='black' size={20}/> , path:"/admin/coupon"
+    },{
+        name:"Banner", icon:<Image color='black' size={20}/> , path:"/admin/banner"
     }]
 
     const logout=()=>{

@@ -73,6 +73,7 @@ export default function EditProfile() {
   }, [data]);
 
   const handleAvatar = (file) => {
+    
     if (file) {
       setAvatar(file);
       const url = URL.createObjectURL(file);

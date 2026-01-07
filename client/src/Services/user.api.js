@@ -279,8 +279,13 @@ export const markPaymentFailed = async (data) => {
 
 export const createPaymentRetryOrder = async (id) => {
     
-    const res= await api.post(`/user/payment/retry/${id}`);
+    const res = await api.post(`/user/payment/retry/${id}`);
     return res;
 }
 
+export const getDisplayBanner = async () => {
+    
+    const res = await api.get("/user/banner");
+    return res;
+}
  

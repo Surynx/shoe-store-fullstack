@@ -43,6 +43,7 @@ import PaymentFailed from "./pages/user/PaymentFailed"
 import SalesPage from "./pages/admin/SalesReport"
 import ContactPage from "./pages/user/Contact"
 import NotFound from "./pages/user/PageNotFound"
+import BannerManagment from "./pages/admin/BannerManagmanet"
 
 
 function App() {
@@ -72,6 +73,7 @@ function App() {
               <Route path="orders" element={<OrderManagement/>}/>
               <Route path="order/detail/:id" element={<OrderDetailPage/>}/>
               <Route path="coupon" element={<CouponManagment/>}/>
+              <Route path="banner" element={<BannerManagment/>}/>
             </Route>
 
           {/* User Route */}
