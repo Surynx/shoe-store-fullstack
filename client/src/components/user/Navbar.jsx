@@ -4,6 +4,7 @@ import { getCartCount } from "../../Services/user.api";
 import { useQuery } from "@tanstack/react-query";
 
 export default function Navbar() {
+
   const nav = useNavigate();
 
   const { data } = useQuery({
@@ -15,69 +16,176 @@ export default function Navbar() {
   const count = data?.data?.count || 0;
 
   return (
-    <header className="">
-      <div className="bg-gray-900 text-white text-xs text-center py-2">
-        <span className="ml-2 text-gray-300 animate-pulse">
-          SIGN UP TO GET A 15% DISCOUNT NEWSLETTER
-        </span>
-      </div>
-      <nav className="flex items-center justify-between px-8 py-3 bg-white shadow-sm text-md">
-        <Link to="/" className=" text-2xl font-bold">
-          COMET
-        </Link>
-
-        <div className="flex gap-8 text-gray-700 ml-45 ">
-          <NavLink to="/" className="hover:text-black" end>
-            Home
-          </NavLink>
-          <NavLink to="/about" className="hover:text-black">
-            About
-          </NavLink>
-          <NavLink to="/shop" className="hover:text-black">
-            Shop
-          </NavLink>
-          <NavLink to="/contact" className="hover:text-black">
-            Contact
-          </NavLink>
-        </div>
-
-        <div className="flex items-center gap-4 text-gray-700">
-          <div className="relative w-36">
-            <Search className="absolute left-2 top-1/2 -translate-y-1/2 text-gray-500 w-3 h-3" />
-            <input
-              type="text"
-              placeholder="Search..."
-              className="w-full pl-8 pr-3 py-1 text-sm rounded-full border border-gray-300 outline-none"
-            />
-          </div>
-          <Heart className="cursor-pointer hover:text-black" size={23}
-            onClick={() =>
-              localStorage.getItem("userToken")
-                ? nav("/wishlist")
-                : nav("/login")
-            } 
-          />
-          <User size={23}
-            className="cursor-pointer hover:text-black"
-            onClick={() =>
-              localStorage.getItem("userToken")
-                ? nav("/account/profile")
-                : nav("/login")
-            }
-          />
-          <div className="relative">
-          <ShoppingBag size={23}
-            className="cursor-pointer hover:text-black"
-            onClick={() => nav("/cart")}
-          />
-          {count > 0 && (
-            <span className="absolute -top-1 -right-1 bg-gray-700 text-white text-xs px-1.5  rounded-full">
-              {(localStorage.getItem("userToken")) ? count : null}
+    <nav className="w-full bg-white">
+      {/* Top Announcement Bar */}
+      <div className="bg-gray-200 text-center py-1.5 px-4">
+        <div className="max-w-7xl mx-auto overflow-hidden">
+          <div className="animate-marquee whitespace-nowrap inline-block">
+            <span className="mx-6 text-[10px] font-medium">
+              Welcome to Commet — Smart Shopping Starts Here🔥
             </span>
-          )}
+            <span className="mx-6 text-[10px] font-medium">
+              Flat 15% OFF for New Users — Join Commet Today
+            </span>
+            <span className="mx-6 text-[10px] font-medium">
+              Fast • Secure • Smart Shopping — Only on Commet🔥
+            </span>
+            <span className="mx-6 text-[10px] font-medium">
+              Trending Products at Unbeatable Prices
+            </span>
+            <span className="mx-6 text-[10px] font-medium">
+              Limited Time Deals — Grab Them Now on Commet🔥
+            </span>
+            <span className="mx-6 text-[10px] font-medium">
+              Shop More. Save More. Experience Commet
+            </span>
           </div>
         </div>
-      </nav>
-    </header>
+      </div>
+
+      {/* Main Navbar */}
+      <div className="border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex items-center justify-between h-14">
+            {/* Logo */}
+            <Link to="/" className="flex-shrink-0">
+              <svg
+                className="h-7 w-auto"
+                viewBox="0 0 120 40"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <text
+                  x="10"
+                  y="28"
+                  fontFamily="Arial Black, sans-serif"
+                  fontSize="20"
+                  fontWeight="900"
+                  fill="#000"
+                >
+                  COMET
+                </text>
+              </svg>
+            </Link>
+
+            {/* Center Navigation Links */}
+            <div className="hidden lg:flex items-center space-x-6 absolute left-1/2 transform -translate-x-1/2">
+              <NavLink
+                to="/"
+                className={({ isActive }) =>
+                  `text-sm font-medium pb-5 pt-5 border-b-2 transition-colors ${
+                    isActive
+                      ? "border-black text-black"
+                      : "border-transparent text-gray-700 hover:text-black"
+                  }`
+                }
+              >
+                Home
+              </NavLink>
+              
+              <NavLink
+                to="/shop"
+                className={({ isActive }) =>
+                  `text-sm font-medium pb-5 pt-5 border-b-2 transition-colors ${
+                    isActive
+                      ? "border-black text-black"
+                      : "border-transparent text-gray-700 hover:text-black"
+                  }`
+                }
+              >
+                Collections
+              </NavLink>
+              <NavLink
+                to="/contact"
+                className={({ isActive }) =>
+                  `text-sm font-medium pb-5 pt-5 border-b-2 transition-colors ${
+                    isActive
+                      ? "border-black text-black"
+                      : "border-transparent text-gray-700 hover:text-black"
+                  }`
+                }
+              >
+                Support
+              </NavLink>
+            </div>
+
+            {/* Right Side Actions */}
+            <div className="flex items-center space-x-2">
+              {/* Search Input */}
+              <div className="hidden md:flex items-center bg-gray-100 rounded-full px-3 py-1.5 hover:bg-gray-200 transition-colors">
+                <Search className="w-4 h-4 text-gray-600 mr-2" />
+                <input
+                  type="text"
+                  placeholder="Search"
+                  className="bg-transparent outline-none text-xs w-28 lg:w-32 placeholder-gray-500"
+                />
+              </div>
+
+              {/* Mobile Search Button */}
+              <button
+                className="md:hidden p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="Search"
+              >
+                <Search className="w-4 h-4" />
+              </button>
+
+              {/* Wishlist Button */}
+              <button
+                onClick={() =>
+                  localStorage.getItem("userToken")
+                    ? nav("/wishlist")
+                    : nav("/login")
+                }
+                className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="Wishlist"
+              >
+                <Heart className="w-5 h-5" />
+              </button>
+
+              {/* Account Button */}
+              <button
+                onClick={() =>
+                  localStorage.getItem("userToken")
+                    ? nav("/account/profile")
+                    : nav("/login")
+                }
+                className="p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="Account"
+              >
+                <User className="w-5 h-5" />
+              </button>
+
+              {/* Cart Button */}
+              <button
+                onClick={() => nav("/cart")}
+                className="relative p-1.5 hover:bg-gray-100 rounded-full transition-colors"
+                aria-label="Cart"
+              >
+                <ShoppingBag className="w-5 h-5" />
+                {count > 0 && localStorage.getItem("userToken") && (
+                  <span className="absolute -top-0.5 -right-0.5 bg-black text-white text-[10px] font-semibold rounded-full h-4 w-4 flex items-center justify-center">
+                    {count > 9 ? "9+" : count}
+                  </span>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <style jsx>{`
+        @keyframes marquee {
+          0% {
+            transform: translateX(0);
+          }
+          100% {
+            transform: translateX(-50%);
+          }
+        }
+        .animate-marquee {
+          animation: marquee 30s linear infinite;
+        }
+      `}</style>
+    </nav>
   );
 }

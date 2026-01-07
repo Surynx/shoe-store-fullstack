@@ -5,7 +5,6 @@ import ErrorMessage from '../admin/ErrorMessage';
 import { addNewAddress, updateAddress } from '../../Services/user.api';
 import toast from 'react-hot-toast';
 import { useEffect } from 'react';
-import { useQueryClient } from '@tanstack/react-query';
 
 export default function AddressForm() {
 

@@ -33,4 +33,24 @@
   background: white;
 }
 
+.marquee {
+  display: inline-flex;
+  white-space: nowrap;
+  animation: marquee 40s linear infinite;
+}
+
+.marquee span {
+  margin-right: 40px;
+  color: #d1d5db; /* gray-300 */
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
 

@@ -41,6 +41,8 @@ import AddWalletAmount from "./pages/user/AddWalletAmount"
 import AuthRedirect from "./components/user/AuthRedirect"
 import PaymentFailed from "./pages/user/PaymentFailed"
 import SalesPage from "./pages/admin/SalesReport"
+import ContactPage from "./pages/user/Contact"
+import NotFound from "./pages/user/PageNotFound"
 
 
 function App() {
@@ -76,6 +78,7 @@ function App() {
           
           <Route path="/" element={<UserLayout/>}>
             <Route index element={<Home/>}/>
+            <Route path="contact" element={<ContactPage/>}/>
             <Route path="login" element={<AuthRedirect><UserLogin/></AuthRedirect>}/>
             <Route path="signup" element={<AuthRedirect><Signup/></AuthRedirect>}/>
             <Route path="verify" element={<AuthRedirect><Verify/></AuthRedirect>}/>
@@ -100,6 +103,7 @@ function App() {
               <Route path="wallet" element={<Wallet/>}/>
               <Route path="wallet/addmoney" element={<AddWalletAmount/>}/>
             </Route>
+            <Route path="*" element={<NotFound/>}/>
           </Route>
           <Route path="auth/google/success/:id" element={<AuthSuccess/>}/>
         </Routes> 

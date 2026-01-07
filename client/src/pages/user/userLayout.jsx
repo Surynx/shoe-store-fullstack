@@ -17,7 +17,7 @@ function UserLayout() {
         </div>
         <div
           className={
-            pathname == "/" || pathname == "/shop" || pathname == "/cart" || pathname == "/wishlist"  ? "mt-0 mb-0" : "mt-15 mb-8"
+            pathname == "/" || pathname == "/shop" || pathname == "/cart" || pathname == "/wishlist"  ? "mt-0 mb-0" : "mt-12 mb-8"
           }
         >
           <Outlet/>

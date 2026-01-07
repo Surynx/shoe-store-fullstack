@@ -478,7 +478,7 @@ export default function EditProfile() {
                   <button
                     type="button"
                     onClick={handleSubmit(handlePasswordReset)}
-                    className="px-4 py-1.5 bg-blue-600 text-white text-xs font-medium rounded-md hover:bg-blue-700 transition-colors"
+                    className="px-4 py-1.5 bg-gray-700 text-white text-xs font-medium rounded-md hover:bg-gray-800 transition-colors"
                   >
                     Update Password
                   </button>

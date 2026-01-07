@@ -70,6 +70,11 @@ const createOrderService = async (address_id, payment_method, coupon, user, cart
 
     total_amount = total_amount + tax + delivery_charge;
 
+    if( payment_method == "cod" && total_amount > 1000) {
+
+        return { success: false, error: "COD is available only for orders up to ₹1000. Please select a prepaid payment method to continue."}
+    } 
+
     if (payment_method === "wallet") {
 
         const wallet = await Wallet.findOne({ user_id: user._id });
