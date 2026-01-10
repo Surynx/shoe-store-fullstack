@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { Plus, Edit2, Trash2, MapPin, Pen, Edit } from 'lucide-react';
+import { Plus, Trash2, MapPin, Edit } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { deleteAddress, getAllAddress } from '../../Services/user.api';

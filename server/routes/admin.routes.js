@@ -12,7 +12,7 @@ import { addNewOfferForCategory, addNewOfferForProduct, getAllOfferOfCategory, g
 import { addNewCoupon, changeCouponStatus, getAllCoupon } from "../controller/admin/coupon.controller.js";
 import { getExcelSalesReport, getPdfSalesReport, getSalesOverview, getSalesOverviewCustom, getSalesPageInfo } from "../controller/admin/sales.controller.js";
 import { getDashboardInfo } from "../controller/admin/dashboard.controller.js";
-import { addBanner, fetchBannerList, removeBanner } from "../controller/admin/banner.controller.js";
+import { addBanner, changeBannerPosition, fetchBannerList, removeBanner } from "../controller/admin/banner.controller.js";
 
 const route=express.Router();
 
@@ -95,5 +95,7 @@ route.post(ROUTES.ADMIN.BANNER.ADD,isAdmin,upload.single("image"),addBanner);
 route.get(ROUTES.ADMIN.BANNER.FETCH,isAdmin,fetchBannerList);
 
 route.delete(ROUTES.ADMIN.BANNER.REMOVE,isAdmin,removeBanner);
+
+route.patch(ROUTES.ADMIN.BANNER.EDIT,isAdmin,changeBannerPosition);
 
 export default route;

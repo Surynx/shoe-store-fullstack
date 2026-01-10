@@ -28,9 +28,9 @@ function Shop() {
   });
 
   return (
-     <div className="max-w-7xl mx-auto mt-10 px-4 sm:px-6 lg:px-8 mb-10">
-      <h2 className="text-4xl font-serif text-center">Shop the Essentials</h2>
-      <p className="text-center text-sm font-mono mt-2">
+     <div className="max-w-7xl mx-auto mt-15 px-4 sm:px-6 lg:px-8 mb-10">
+      <h2 className="text-4xl font-sans text-center">Shop the Essentials</h2>
+      <p className="text-center text-xs font-bold mt-2">
         Discover curated styles crafted to elevate your everyday look.
       </p>
       <SearchBox text={text} setText={setText}/>

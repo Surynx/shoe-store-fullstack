@@ -26,9 +26,10 @@ const storage= new CloudinaryStorage({
 
 const filter = (req,file,cb)=>{
 
-    //validation
     const regex=/jpeg|jpg|png|svg|webp/
+
     const ext= path.extname(file.originalname).toLowerCase();
+
     const valid= regex.test(ext);
 
     (valid) ? cb(null,valid) : cb(new Error("Requires Image file"),valid);

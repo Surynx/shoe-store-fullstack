@@ -56,7 +56,15 @@ const register = async (req, res) => {
 const generateOtpForEmail = async (req, res) => {
 
     try {
+
         const { email } = req.body;
+
+        const user = await User.findOne({email});
+
+        if( user.google_id ) {
+
+            return res.status(STATUS.ERROR.BAD_REQUEST).json({message: "This account uses Google Sign-In. Please log in using Google."});
+        }
 
         const exist = await Otp.findOne({ email });
 

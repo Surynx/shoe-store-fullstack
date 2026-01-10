@@ -59,7 +59,7 @@ export default function Signup() {
                 {...register("name", {
                   required: "field is required",
                   pattern: {
-                    value: /^[A-Za-z&\-'. ]{2,50}$/,
+                    value: /^(?=.*[A-Za-z])[A-Za-z&\-'. ]{2,50}$/,
                     message: "Invalid Name",
                   },
                 })}

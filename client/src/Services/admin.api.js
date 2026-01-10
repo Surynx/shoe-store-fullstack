@@ -274,3 +274,9 @@ export const  deleteBanner = async (id) => {
     const res = await api.delete(`/admin/banner/${id}`);
     return res;
 }
+
+export const editBannerPosition = async (id,position) => {
+    
+    const res = await api.patch(`/admin/banner/${id}`,position);
+    return res;
+}

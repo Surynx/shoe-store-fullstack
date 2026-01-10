@@ -2,7 +2,6 @@ import { Loader, Lock, UploadCloud } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate, useOutletContext } from "react-router-dom";
-
 import {
   editUserInfo,
   sendOtpToEmail,
@@ -15,6 +14,7 @@ import toast from "react-hot-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { changePassword } from "../../Services/user.api";
 import ErrorMessage from "../../components/admin/ErrorMessage";
+import { validateFile } from "../../utils/user/fileValidate";
 
 export default function EditProfile() {
 
@@ -73,15 +73,26 @@ export default function EditProfile() {
   }, [data]);
 
   const handleAvatar = (file) => {
+
+    const valid = validateFile(file);
+
+    if( !valid ) {
+
+      return toast.error("Invalid File Format!");
+    }
     
     if (file) {
+      
       setAvatar(file);
+
       const url = URL.createObjectURL(file);
+
       setPreview(url);
     }
   };
 
   const handleProfileSubmit = async (data) => {
+
     setLoading(true);
 
     const formData = new FormData();
@@ -95,6 +106,7 @@ export default function EditProfile() {
     setLoading(false);
 
     if (res) {
+
       toast.success(res.data.message);
       QueryClient.invalidateQueries("userInfo");
     }

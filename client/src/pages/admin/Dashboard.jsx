@@ -2,12 +2,14 @@ import { Package,Users,ShoppingBag,DollarSign,TrendingUp,AlertCircle,ChevronRigh
 import { useQuery } from "@tanstack/react-query";
 import { getDashboardInfo } from "../../Services/admin.api";
 import { useNavigate } from "react-router-dom";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 
 function Dashboard() {
 
   const { data,isLoading } = useQuery({
     queryKey:"dashboard-info",
     queryFn:getDashboardInfo
+
   });
 
   const nav = useNavigate();
@@ -24,17 +26,48 @@ function Dashboard() {
 
   const recentOrders = data?.data?.recent_orders || [];
 
+  const orders = data?.data?.orders || [];
+
   const getStatusColor = (status) => {
+
   const colors = {
+
     pending: "bg-yellow-50 text-yellow-700 border-yellow-200",
     confirmed: "bg-blue-50 text-blue-700 border-blue-200",
     shipped: "bg-purple-50 text-purple-700 border-purple-200",
     out_for_delivery: "bg-indigo-50 text-indigo-700 border-indigo-200",
     delivered: "bg-green-50 text-green-700 border-green-200",
     canceled: "bg-red-50 text-red-700 border-red-200",
+
   };
-  return colors[status] || "bg-gray-50 text-gray-700 border-gray-200";
-};
+
+    return colors[status] || "bg-gray-50 text-gray-700 border-gray-200";
+
+  };
+
+   const orderStatusData = orders.reduce((acc, order) => {
+
+    const status = order.status;
+
+    const existing = acc.find(item => item.name === status);
+
+    if (existing) {
+      existing.value += 1;
+    } else {
+      acc.push({ name: status, value: 1 });
+    }
+    return acc;
+  }, []);
+
+  const COLORS = {
+
+    pending: '#eab308',
+    confirmed: '#3b82f6',
+    shipped: '#a855f7',
+    out_for_delivery: '#6366f1',
+    delivered: '#22c55e',
+    canceled: '#ef4444',
+  };
 
   if (isLoading) {
     return (
@@ -60,7 +93,7 @@ function Dashboard() {
 
    
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-5">
-        {/* Total Revenue */}
+       
         <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl p-5 hover:shadow-md transition-all">
           <div className="flex items-center justify-between mb-3">
             <div className="bg-green-500 p-2 rounded-lg">
@@ -77,7 +110,7 @@ function Dashboard() {
           <p className="text-green-600 text-xs mt-2">Performance improving over time</p>
         </div>
 
-        {/* Total Orders */}
+       
         <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl p-5 hover:shadow-md transition-all">
           <div className="flex items-center justify-between mb-3">
             <div className="bg-blue-500 p-2 rounded-lg">
@@ -94,7 +127,7 @@ function Dashboard() {
           <p className="text-blue-600 text-xs mt-2">Orders placed by customers</p>
         </div>
 
-        {/* Active Users */}
+        
         <div className="bg-gradient-to-br from-purple-50 to-purple-100 border border-purple-200 rounded-xl p-5 hover:shadow-md transition-all">
           <div className="flex items-center justify-between mb-3">
             <div className="bg-purple-500 p-2 rounded-lg">
@@ -128,9 +161,92 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Top Products and Brands */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        {/* Top Products */}
+
+        <div className="bg-white border border-gray-200 rounded-lg p-5 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+            <ShoppingBag className="w-5 h-5 mr-2 text-blue-600" />
+            Order Status Distribution
+          </h3>
+          {orderStatusData.length > 0 ? (
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={orderStatusData}
+                  cx="50%"
+                  cy="50%"
+                  labelLine={false}
+                  
+                  outerRadius={90}
+                  fill="#8884d8"
+                  dataKey="value"
+                >
+                  {orderStatusData.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={COLORS[entry.name] || '#94a3b8'} />
+                  ))}
+                </Pie>
+                <Tooltip />
+                <Legend />
+              </PieChart>
+            </ResponsiveContainer>
+          ) : (
+            <div className="h-72 flex items-center justify-center">
+              <p className="text-gray-500 text-sm">No order data available</p>
+            </div>
+          )}
+        </div>
+
+        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
+          <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
+            <TrendingUp className="w-4 h-4 mr-2 text-purple-600" />
+            Top Brands
+          </h3>
+          <div className="space-y-2">
+            {topBrands.length > 0 ? (
+              topBrands.map((brand, index) => (
+                <div
+                  key={brand._id}
+                  className="flex items-center justify-between p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
+                >
+                  <div className="flex items-center space-x-3">
+                    <div className="bg-purple-100 text-purple-600 w-6 h-6 rounded-full flex items-center justify-center font-semibold text-xs flex-shrink-0">
+                      {index + 1}
+                    </div>
+                    {brand.logo && (
+                      <img 
+                        src={brand.logo} 
+                        alt={brand.name}
+                        className="w-10 h-10 rounded object-contain flex-shrink-0 bg-white border border-gray-200"
+                      />
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <p className="text-gray-900 font-medium text-xs truncate">
+                        {brand.name}
+                      </p>
+                      <p className="text-gray-500 text-xs">
+                        Brand ranking #{index + 1}
+                      </p>
+                    </div>
+                  </div>
+                  <span
+                    className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ml-2 ${
+                      brand.status
+                        ? "bg-green-100 text-green-700 border border-green-200"
+                        : "bg-red-100 text-red-700 border border-red-200"
+                    }`}
+                  >
+                    {brand.status ? "Active" : "Inactive"}
+                  </span>
+                </div>
+              ))
+            ) : (
+              <div className="p-6 text-center">
+                <p className="text-gray-500 text-sm">No brands data available</p>
+              </div>
+            )}
+          </div>
+        </div>
+
         <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
           <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
             <Package className="w-4 h-4 mr-2 text-blue-600" />
@@ -188,61 +304,7 @@ function Dashboard() {
           </div>
         </div>
 
-        {/* Top Brands */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
-          <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
-            <TrendingUp className="w-4 h-4 mr-2 text-purple-600" />
-            Top Brands
-          </h3>
-          <div className="space-y-2">
-            {topBrands.length > 0 ? (
-              topBrands.map((brand, index) => (
-                <div
-                  key={brand._id}
-                  className="flex items-center justify-between p-2 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors"
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="bg-purple-100 text-purple-600 w-6 h-6 rounded-full flex items-center justify-center font-semibold text-xs flex-shrink-0">
-                      {index + 1}
-                    </div>
-                    {brand.logo && (
-                      <img 
-                        src={brand.logo} 
-                        alt={brand.name}
-                        className="w-10 h-10 rounded object-contain flex-shrink-0 bg-white border border-gray-200"
-                      />
-                    )}
-                    <div className="min-w-0 flex-1">
-                      <p className="text-gray-900 font-medium text-xs truncate">
-                        {brand.name}
-                      </p>
-                      <p className="text-gray-500 text-xs">
-                        Brand ranking #{index + 1}
-                      </p>
-                    </div>
-                  </div>
-                  <span
-                    className={`px-2 py-1 rounded-full text-xs font-medium whitespace-nowrap ml-2 ${
-                      brand.status
-                        ? "bg-green-100 text-green-700 border border-green-200"
-                        : "bg-red-100 text-red-700 border border-red-200"
-                    }`}
-                  >
-                    {brand.status ? "Active" : "Inactive"}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <div className="p-6 text-center">
-                <p className="text-gray-500 text-sm">No brands data available</p>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Return Requests Alert */}
-      <div className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-xl p-5 mb-5">
+         <div className="bg-gradient-to-r from-red-50 to-red-100 border border-red-200 rounded-xl p-5">
         <h3 className="text-lg font-semibold text-gray-900 mb-3 flex items-center">
           <AlertCircle className="w-5 h-5 mr-2 text-red-600" />
           Order Return Requests
@@ -292,8 +354,8 @@ function Dashboard() {
           </div>
         )}
       </div>
+      </div>
 
-      {/* Recent Orders Table */}
       <div className="bg-white border border-gray-200 rounded-lg p-4 shadow-sm">
         <h3 className="text-base font-semibold text-gray-900 mb-3 flex items-center">
           <ShoppingBag className="w-4 h-4 mr-2 text-green-600" />

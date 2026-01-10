@@ -283,9 +283,9 @@ export const createPaymentRetryOrder = async (id) => {
     return res;
 }
 
-export const getDisplayBanner = async () => {
+export const getHomeInfo = async () => {
     
-    const res = await api.get("/user/banner");
+    const res = await api.get("/user/home");
     return res;
 }
  

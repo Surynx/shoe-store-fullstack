@@ -5,12 +5,16 @@ import { toast } from "react-toastify";
 import { addBrand, editBrand } from "../../Services/admin.api";
 import { useEffect, useState } from "react";
 import ErrorMessage from "../../components/admin/ErrorMessage";
+import { validateFile } from "../../utils/user/fileValidate";
 
 function AddBrand() {
+
   const { id } = useParams();
+
   const { state } = useLocation();
 
   const { register, handleSubmit, reset, watch,formState:{errors} } = useForm();
+
   const [loading, setLoading] = useState(false);
 
   let logoFile = watch("logo");
@@ -21,13 +25,27 @@ function AddBrand() {
 
   //preview logic
   useEffect(() => {
+
     if (logoFile && logoFile[0]) {
+
+      const valid = validateFile(logoFile[0]);
+
+      if( !valid ) {
+
+        toast.error("Invalid File Format!");
+
+      }
+      else 
+      {
       const fileReader = new FileReader();
       fileReader.onloadend = () => setPreview(fileReader.result);
       fileReader.readAsDataURL(logoFile[0]);
+      }
+
     } else {
       setPreview(null);
     }
+
   }, [logoFile]);
 
   //brand data fetch

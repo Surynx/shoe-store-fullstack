@@ -25,6 +25,7 @@ import {
   getSalesOverview,
   getSalesPageInfo,
 } from "../../Services/admin.api";
+import toast from "react-hot-toast";
 
 
 const Dashboard = () => {
@@ -82,6 +83,11 @@ const Dashboard = () => {
 
   const handleCoustomeDateFilter = async () => {
 
+    if(new Date(customStartDate) > new Date(customEndDate)) {
+
+      return toast.error("Invalid End Date!");
+    }
+
     const res = await getCustomSalesOverview(customStartDate, customEndDate);
 
     if (res) {
@@ -95,9 +101,15 @@ const Dashboard = () => {
 
     if(dateFilter == "custom") {
 
+    if(new Date(customStartDate) > new Date(customEndDate)) {
+
+      return toast.error("Invalid End Date!");
+    }
+
       res = await downloadExcelReport(dateFilter,customStartDate,customEndDate);
 
     }else {
+
       res = await downloadExcelReport(dateFilter);
     }
 
@@ -118,14 +130,21 @@ const Dashboard = () => {
     let res;
 
     if(dateFilter == "custom") {
+    
+      if(new Date(customStartDate) > new Date(customEndDate)) {
+
+        return toast.error("Invalid End Date!");
+      }
 
       res = await downloadPdfReport(dateFilter,customStartDate,customEndDate);
 
     }else {
+
       res = await downloadPdfReport(dateFilter);
     }
 
     if (res) {
+
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
       link.href = url;
@@ -133,6 +152,7 @@ const Dashboard = () => {
       document.body.appendChild(link);
       link.click();
       link.remove();
+      
     }
   };
 

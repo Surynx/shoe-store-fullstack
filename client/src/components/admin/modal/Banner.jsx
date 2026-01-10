@@ -5,6 +5,7 @@ import { addNewBanner } from '../../../Services/admin.api';
 import { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';
+import { validateFile } from '../../../utils/user/fileValidate';
 
 export default function AddBannerModal({ isOpen, onClose }) {
 
@@ -35,6 +36,14 @@ export default function AddBannerModal({ isOpen, onClose }) {
     const file = e.target.files[0];
 
     if (!file) return;
+
+    const valid = validateFile(file);
+
+    if( !valid ) {
+
+      return toast.error("Invalid File Format!");
+
+    }
 
     if (!file.type.startsWith("image/")) {
       alert("Only image files are allowed");

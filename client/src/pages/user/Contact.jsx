@@ -23,7 +23,7 @@ function ContactPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl md:text-4xl font-serif text-gray-900 mb-3">CONTACT US</h1>
+          <h1 className="text-3xl md:text-4xl font-sans text-gray-900 mb-3">CONTACT US</h1>
           <p className="text-sm font-sans text-gray-600 max-w-2xl mx-auto">
             Please contact us at the marketer's address for any customer complaints or inquiries. We're here to help!
           </p>

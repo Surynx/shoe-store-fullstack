@@ -30,7 +30,9 @@ const getDashboardInfo = async (req,res) => {
 
     const recent_orders = await Order.find().populate("user_id").sort({createdAt:-1}).limit(5);
 
-    res.status(STATUS.SUCCESS.OK).json({ adminEmail:admin.email,stats,top_products,top_brands,top_brands,return_request,recent_orders });
+    const orders = await Order.find({});
+
+    res.status(STATUS.SUCCESS.OK).json({ adminEmail:admin.email,stats,top_products,top_brands,top_brands,return_request,recent_orders,orders });
 }
 
 export { getDashboardInfo }

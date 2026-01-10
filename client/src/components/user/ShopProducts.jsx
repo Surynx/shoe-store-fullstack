@@ -32,7 +32,7 @@ function ShopProducts({ data, isLoading }) {
                 <img
                   src={product.productImages[0]}
                   alt={product.name}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
               </div>
             </div>

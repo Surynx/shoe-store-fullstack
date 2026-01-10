@@ -8,6 +8,7 @@ import { Cropper } from "react-cropper";
 import "cropperjs/dist/cropper.css";
 import { toast } from "react-toastify";
 import ErrorMessage from "../../components/admin/ErrorMessage";
+import { validateFile } from "../../utils/user/fileValidate";
 
 function AddProduct() {
 
@@ -82,6 +83,14 @@ function AddProduct() {
       return;
     }
 
+    const valid = validateFile(file);
+
+    if( !valid ) {
+
+      return toast.error("Invalid File Format!");
+
+    }
+
     const reader = new FileReader();
 
     reader.onload = () => {
@@ -93,6 +102,7 @@ function AddProduct() {
   };
 
   const saveCropImage = () => {
+
     const cropper = cropperRef.current.cropper;
     const cropperCanvas = cropper.getCroppedCanvas({
       width: 600,

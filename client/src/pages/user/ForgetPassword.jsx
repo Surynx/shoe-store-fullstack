@@ -8,12 +8,20 @@ function ForgetPassword() {
   const nav = useNavigate();
 
   const submit = async (data) => {
+
     localStorage.setItem("verifyEmail", data.email);
     localStorage.setItem("userEmail", data.email);
     localStorage.setItem("flow", "forgot");
+
+    try{
     await generateOtp({ email: data.email });
 
     nav("/verify", { replace: true });
+
+    }catch(error) {
+
+      window.alert(error.response.data.message);
+    }
   };
 
   return (

@@ -1,4 +1,3 @@
-import { LucideFileExclamationPoint, User } from "lucide-react"
 import { useForm } from "react-hook-form"
 import toast, { Toaster } from "react-hot-toast";
 import { verifyAdmin } from "../../Services/admin.api";
@@ -72,7 +71,7 @@ export default function Login() {
                         <input
                             type="email"
                             placeholder="Enter you Mail"
-                            className="w-full border border-gray-300 px-3 py-2 text-sm outline-none"
+                            className="w-full border border-gray-300 px-3 py-2 text-sm outline-none rounded-lg"
                             {...register("email", { required: "field is required", pattern: { value: /^\S+@\S+$/i, message: "Invalid mail" } })}
                         />
                         <ErrorMessage elem={errors.email}/>
@@ -86,7 +85,7 @@ export default function Login() {
                             <input
                                 type="password"
                                 placeholder="Enter your password"
-                                className="w-full border border-gray-300 px-3 py-2 text-sm outline-none"
+                                className="w-full border border-gray-300 px-3 py-2 text-sm outline-none rounded-lg"
                                 {...register("password", { required: "field is required" })}
                             />
                             <ErrorMessage elem={errors.password}/>
@@ -99,7 +98,7 @@ export default function Login() {
 
                     <button
                         type="submit"
-                        className="cursor-pointer w-full bg-black text-white py-2 text-sm font-medium hover:bg-gray-900 transition"
+                        className="cursor-pointer w-full bg-black text-white py-2 text-sm font-medium hover:bg-gray-900 transition rounded-lg"
                     >
                         Login
                     </button>

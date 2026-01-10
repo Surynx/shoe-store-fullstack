@@ -1,5 +1,4 @@
 import { useQuery } from "@tanstack/react-query";
-import { Heart } from "lucide-react";
 import { getAllLatestProducts } from "../../Services/user.api";
 import { useNavigate } from "react-router-dom";
 import Loading from "./Loading";
@@ -27,10 +26,10 @@ export default function Latestproducts() {
   return (
     <div className="bg-white min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-20">
-        <h2 className="text-4xl font-serif text-black mb-2 text-center">
+        <h2 className="text-4xl font-sans font-semibold text-black mb-2 text-center">
           Latest Products
         </h2>
-        <p className="text-center text-sm font-sans mb-10">
+        <p className="text-center text-xs font-sans mb-10">
           Discover our latest arrivals, freshly added and handpicked just for you.
         </p>
         
@@ -47,7 +46,7 @@ export default function Latestproducts() {
                   <img
                     src={product.productImages[0]}
                     alt={product.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 </div>
               </div>

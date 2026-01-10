@@ -55,7 +55,8 @@ export default function Product() {
   }
 
   return (
-    <div className="bg-white text-black px-30">
+    <>
+    <div className="bg-white text-black px-20">
       <Breadcrumb location={pathname} product={productDoc} />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 grid lg:grid-cols-2 gap-10">
         <div>
@@ -69,8 +70,8 @@ export default function Product() {
           bestOffer= {bestOffer}
         />
       </div>
-      <ProductReview />
-      <RelatedProducts data={data} />
     </div>
+    <RelatedProducts data={data} />
+    </>
   );
 }

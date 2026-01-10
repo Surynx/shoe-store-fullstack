@@ -62,7 +62,8 @@ const ROUTES= {
         BANNER:{
             ADD:"/banner",
             FETCH:"/banner",
-            REMOVE:"/banner/:id"
+            REMOVE:"/banner/:id",
+            EDIT:"/banner/:id"
         }
     },
     USER:{
@@ -142,8 +143,8 @@ const ROUTES= {
             FAILED_PAYMENT:"/payment/failed",
             RETRY_PAYMENT:"/payment/retry/:id"
         },
-        BANNER:{
-            FETCH:"/banner"
+        HOME:{
+            FETCH:"/home"
         }
     }
 }

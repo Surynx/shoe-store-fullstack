@@ -4,8 +4,7 @@ const bannerSchema = new mongoose.Schema({
     position:{
         type:Number,
         required:true,
-        enum:[1,2,3,4,5],
-        unique:true
+        enum:[1,2,3,4,5]
     },
     image:{
         type:String,

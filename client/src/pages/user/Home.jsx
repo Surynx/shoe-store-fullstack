@@ -1,10 +1,10 @@
-import { Truck, Headphones, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
+import { Truck, Headphones, RotateCcw, ChevronLeft, ChevronRight, User, UserPen } from "lucide-react";
 import { useState, useEffect } from "react";
 import LatestProducts from "../../components/user/LatestProducts";
 import BrandShowcase from "../../components/user/BrandShowcase";
 import { useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { getDisplayBanner } from "../../Services/user.api";
+import { getHomeInfo } from "../../Services/user.api";
 import Loading from "../../components/user/Loading";
 
 export default function HomePage() {
@@ -15,12 +15,16 @@ export default function HomePage() {
 
   const { data,isLoading } = useQuery({
 
-    queryKey:["display-banner"],
-    queryFn:getDisplayBanner
+    queryKey:["home-info"],
+    queryFn:getHomeInfo
 
   });
   
   const banners = data?.data?.bannerDocs || [];
+
+  const userCount = data?.data?.userCount || 0;
+  const productCount = data?.data?.productCount || 0;
+  const brandCount = data?.data?.brandCount || 0;
 
   useEffect(() => {
 
@@ -121,28 +125,82 @@ export default function HomePage() {
         <BrandShowcase/>
       </section>
 
-      <section className="px-20 py-15 text-center">
-        <h2 className="text-2xl font-serif text-black mb-8 text-center">
-          Our Sevices
-        </h2>
+      <section className="px-6 md:px-20 py-16 mt-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center mb-12">
+            <div>
+              <h2 className="text-2xl md:text-3xl font-bold text-black mb-3">
+                Quality You Can Trust
+              </h2>
+              <p className="text-gray-700 mb-4 leading-relaxed text-xs font-sans">
+                We carefully curate every product in our collection to ensure you receive only the finest quality. 
+                Our commitment to excellence means you can shop with confidence, knowing that each item has been 
+                selected with care and attention to detail.
+              </p>
+              <button 
+                onClick={() => nav("/contact")}
+                className="px-4 py-1 border-2 font-sans transition-all duration-300 cursor-pointer"
+              >
+                Keep in Touch
+              </button>
+            </div>
+            <div className="relative h-64 rounded-xl overflow-hidden shadow-lg">
+              <img 
+                src="src/assets/shoes.png"
+                alt="Quality products" 
+                className="w-full h-full object-cover"
+              />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-6 md:px-10 py-4 bg-black text-white mt-8 mb-8">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 text-center">
+            <div>
+              <h3 className="text-3xl font-bold mb-2">{userCount}+</h3>
+              <p className="text-gray-300 text-sm">Active Customers</p>
+            </div>
+            <div>
+              <h3 className="text-3xl font-bold mb-2">{productCount}+</h3>
+              <p className="text-gray-300 text-sm">Products Available</p>
+            </div>
+            <div>
+              <h3 className="text-3xl font-bold mb-2">{brandCount}+</h3>
+              <p className="text-gray-300 text-sm">Premium Brands</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="px-25 py-15 text-center mb-5">
+         <div className="text-center mb-10">
+          <h2 className="text-3xl font-sans font-semibold text-gray-900">
+            Our Sevices
+          </h2>
+          <p className="mt-2 text-xs font-sans text-gray-500">
+            Fast, secure, and reliable shopping made easy.
+          </p>
+        </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           <div className="p-2">
-            <Truck className="mx-auto mb-4 w-10 h-10 text-black" />
-            <h3 className="text-xl font-semibold mb-2">Fast Delivery</h3>
+            <Truck className="mx-auto mb-4 w-8 h-8 text-black" />
+            <h3 className="text-sm font-semibold mb-2">Fast Delivery</h3>
             <p className="text-gray-600 text-xs font-bold">
               Get your orders delivered quickly and safely to your doorstep.
             </p>
           </div>
           <div className="p-2">
-            <Headphones className="mx-auto mb-4 w-10 h-10 text-black" />
-            <h3 className="text-xl font-semibold mb-2">24/7 Support</h3>
+            <Headphones className="mx-auto mb-4 w-8 h-8 text-black" />
+            <h3 className="text-sm font-semibold mb-2">24/7 Support</h3>
             <p className="text-gray-600 text-xs font-bold">
               We provide round-the-clock support to assist you anytime.
             </p>
           </div>
           <div className="p-2">
-            <RotateCcw className="mx-auto mb-4 w-10 h-10 text-black" />
-            <h3 className="text-xl font-semibold mb-2">Easy Returns</h3>
+            <RotateCcw className="mx-auto mb-4 w-8 h-8 text-black" />
+            <h3 className="text-sm font-semibold mb-2">Easy Returns</h3>
             <p className="text-gray-600 text-xs font-bold">
               Hassle-free return policy for a smooth shopping experience.
             </p>

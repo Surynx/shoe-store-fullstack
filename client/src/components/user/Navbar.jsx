@@ -18,10 +18,10 @@ export default function Navbar() {
 
   const { data } = useQuery({
 
-    queryKey: ["cart-count"],
+    queryKey: ["navbar-info"],
     queryFn: getCartCount,
     refetchInterval: 3000,
-
+    enabled: Boolean(localStorage.getItem("userToken"))
   });
 
   useEffect(() => {
@@ -80,7 +80,7 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* User Greeting Bar */}
+      
       <div className="bg-white border-b border-gray-300 py-0.5">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-end gap-3">
@@ -98,7 +98,7 @@ export default function Navbar() {
                 <User className="w-4 h-4 text-gray-700" />
                 </button>
 
-                {/* Dropdown Menu */}
+                
                 {showDropdown && (
                   <div className="absolute top-full right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-1 z-50">
                     <button
@@ -163,11 +163,11 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Main Navbar */}
+
       <div className="border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4">
           <div className="flex items-center justify-between h-12">
-            {/* Logo */}
+          
             <Link to="/" className="">
               <svg
                 className="h-7 w-auto"
@@ -193,10 +193,10 @@ export default function Navbar() {
               <NavLink
                 to="/"
                 className={({ isActive }) =>
-                  `text-sm font-medium pb-5 pt-5 border-b-2 transition-colors ${
+                  `text-sm font-medium py-5 transition-colors${
                     isActive
-                      ? "border-black text-black"
-                      : "border-transparent text-gray-700 hover:text-black"
+                      ? "text-black"
+                      : "text-gray-700 hover:text-black"
                   }`
                 }
               >
@@ -206,10 +206,10 @@ export default function Navbar() {
               <NavLink
                 to="/shop"
                 className={({ isActive }) =>
-                  `text-sm font-medium pb-5 pt-5 border-b-2 transition-colors ${
+                  `text-sm font-medium py-5 transition-colors${
                     isActive
-                      ? "border-black text-black"
-                      : "border-transparent text-gray-700 hover:text-black"
+                      ? "text-black"
+                      : "text-gray-700 hover:text-black"
                   }`
                 }
               >
@@ -218,10 +218,10 @@ export default function Navbar() {
               <NavLink
                 to="/contact"
                 className={({ isActive }) =>
-                  `text-sm font-medium pb-5 pt-5 border-b-2 transition-colors ${
+                  `text-sm font-medium py-5 transition-colors${
                     isActive
-                      ? "border-black text-black"
-                      : "border-transparent text-gray-700 hover:text-black"
+                      ? "text-black"
+                      : "text-gray-700 hover:text-black"
                   }`
                 }
               >

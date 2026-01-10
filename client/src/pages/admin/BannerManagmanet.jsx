@@ -1,7 +1,7 @@
 import { FaPlus } from "react-icons/fa";
 import AddBannerModal from "../../components/admin/modal/Banner";
 import { useState } from "react";
-import BannerList from "../../components/admin/BannerList";
+import BannerList from "../../components/admin/Tables/BannerTable";
 import { useQuery } from "@tanstack/react-query";
 import { getAllBanners } from "../../Services/admin.api";
 
