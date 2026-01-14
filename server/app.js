@@ -35,15 +35,10 @@ app.get("/",(req,res)=>{
 app.use("/admin",adminRoute);
 app.use("/user",userRoute);
 
-//connect db
+
 connectDb();
 
-//port
 const port = process.env.PORT;
-
-// trigger deployment 1
-//trigger deployment 2
-//trigger deployment 3
 
 app.listen(port,()=>console.log(`server is running at ${port}...✅`));
 
