@@ -57,9 +57,22 @@ jobs:
             docker rm real-backend || true
 
             echo "Starting new container..."
-            docker run -d \
-              -p 8080:8080 \
-              --name real-backend \
+            docker run -d -p 8080:8080 --name real-backend \
+              -e PORT="$PORT" \
+              -e ATLAS_URL="$ATLAS_URL" \
+              -e JWT_KEY_ADMIN="$JWT_KEY_ADMIN" \
+              -e JWT_KEY_USER="$JWT_KEY_USER" \
+              -e GOOGLE_CLIENT_ID="$GOOGLE_CLIENT_ID" \
+              -e GOOGLE_CLIENT_SECRET="$GOOGLE_CLIENT_SECRET" \
+              -e CLOUDINARY_CLOUD_NAME="$CLOUDINARY_CLOUD_NAME" \
+              -e CLOUDINARY_API_KEY="$CLOUDINARY_API_KEY" \
+              -e CLOUDINARY_API_SECRET="$CLOUDINARY_API_SECRET" \
+              -e CLIENT_URL="$CLIENT_URL" \
+              -e SERVER_URL="$SERVER_URL" \
+              -e EMAIL_USER="$EMAIL_USER" \
+              -e EMAIL_PASS="$EMAIL_PASS" \
+              -e RAZORPAY_KEY_ID="$RAZORPAY_KEY_ID" \
+              -e RAZORPAY_KEY_SECRET="$RAZORPAY_KEY_SECRET" \
               real-backend
 
-            echo "Deployment successful 🎉"
+            echo "Deployment successful"
