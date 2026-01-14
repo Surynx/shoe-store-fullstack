@@ -23,23 +23,26 @@ jobs:
           source: "server"
           target: "/home/ubuntu/backend"
 
-      - name: Build & Run Docker container on EC2
+      - name: Build and run Docker container on EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            set -e
+
             cd /home/ubuntu/backend/server
 
+            echo "Building Docker image..."
             docker build -t real-backend .
 
+            echo "Stopping old container if exists..."
             docker stop real-backend || true
             docker rm real-backend || true
 
-            docker run -d \
-              -p 8080:8080 \
-              --name real-backend \
+            echo "Running new container..."
+            docker run -d -p 8080:8080 --name real-backend \
               -e PORT=${{ secrets.PORT }} \
               -e ATLAS_URL=${{ secrets.ATLAS_URL }} \
               -e JWT_KEY_ADMIN=${{ secrets.JWT_KEY_ADMIN }} \
@@ -56,3 +59,5 @@ jobs:
               -e RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }} \
               -e RAZORPAY_KEY_SECRET=${{ secrets.RAZORPAY_KEY_SECRET }} \
               real-backend
+
+            echo "Deployment completed successfully"
