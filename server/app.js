@@ -38,6 +38,8 @@ app.use("/user",userRoute);
 //connect db
 connectDb();
 
+//port
 const port = process.env.PORT;
+
 app.listen(port,()=>console.log(`server is running at ${port}...✅`));
 
