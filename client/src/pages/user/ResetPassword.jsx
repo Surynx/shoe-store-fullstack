@@ -1,12 +1,13 @@
 import React from 'react'
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { resetPassword } from '../../API/userApi';
+import { resetPassword } from '../../Services/user.api';
 import toast from 'react-hot-toast';
+import ErrorMessage from '../../components/admin/ErrorMessage';
 
 function ResetPassword() {
 
-    const { handleSubmit,reset,register,formState } = useForm();
+    const { handleSubmit,reset,register,formState:{errors} } = useForm();
     const nav = useNavigate();
 
     const submit = async(data)=>{
@@ -20,7 +21,8 @@ function ResetPassword() {
 
             toast.success("Reset Successfully!");
             localStorage.removeItem("userEmail");
-            nav("/login");
+            
+            nav("/login",{replace:true});
 
             }catch(err) {
                 toast.error(err.response.data.message);
@@ -35,10 +37,10 @@ function ResetPassword() {
 
 
     return (
-        <div className="flex items-center justify-center bg-gray-50">
-            <div className="bg-white w-full max-w-md p-8 rounded-xl shadow-sm border border-gray-200 text-center">
-                <h2 className="text-2xl font-bold mb-2">Reset Password</h2>
-                <p className="text-gray-600 text-sm mb-6">
+        <div className="flex items-center justify-center">
+            <div className="bg-white w-full max-w-md p-8 text-sm font-sans text-left">
+                <h2 className="text-2xl font-bold mb-2">Reset Password ?</h2>
+                <p className="text-gray-600 text-sm mb-8">
                     Enter your new password below
                 </p>
 
@@ -54,10 +56,14 @@ function ResetPassword() {
                             id="newPassword"
                             type="password"
                             placeholder="Enter new password"
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
-                            {...register("newpassword",{required:"filed is required"})}
+                            className="w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black rounded-md"
+                            {...register("newpassword",{
+                                required: "Field is required", pattern: {value:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
+                                   
+                                    message: "Not Strong One..!"
+                                }})}
                         />
-                        <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.newpassword?.message ? `${formState.errors.newpassword?.message}` : null}</p>
+                        <ErrorMessage elem={errors?.newpassword}/>
                     </div>
 
                     <div className="text-left">
@@ -71,23 +77,27 @@ function ResetPassword() {
                             id="confirmPassword"
                             type="password"
                             placeholder="Confirm new password"
-                            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black"
-                            {...register("confirmpassword",{required:"field is required"})}
+                            className="w-full border border-gray-300 px-4 py-2 focus:outline-none focus:ring-2 focus:ring-black rounded-md"
+                            {...register("confirmpassword",{
+                                required: "Field is required", pattern: {value:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
+                                   
+                                    message: "Not Strong One..!"
+                                }})}
                         />
-                        <p className="text-[11px] text-red-400 ml-2.5">{formState.errors.confirmpassword?.message ? `${formState.errors.confirmpassword?.message}` : null}</p>
+                        <ErrorMessage elem={errors?.confirmpassword}/>
                     </div>
 
                     <button
                         type="submit"
-                        className="w-full bg-black text-white py-2 rounded-lg font-medium hover:bg-gray-800 transition cursor-pointer"
+                        className="w-full bg-black text-white py-2 font-medium hover:bg-gray-800 transition cursor-pointer rounded-md"
                     >
                         Reset Password
                     </button>
                 </form>
 
-                <p className="text-sm text-gray-600 mt-6">
+                <p className="text-sm text-gray-600 mt-6 text-center">
                     Remember your password?{" "}
-                    <a href="/login" className="font-semibold text-black hover:underline" onClick={()=>nav("/login")}>
+                    <a href="/login" className="font-semibold text-black hover:underline" onClick={()=>nav("/login",{replace:true})}>
                         Login
                     </a>
                 </p>

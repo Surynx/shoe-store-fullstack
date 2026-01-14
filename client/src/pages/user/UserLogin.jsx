@@ -1,14 +1,14 @@
-import React from 'react'
 import { useForm } from "react-hook-form";
 import { FcGoogle } from "react-icons/fc";
 import { useNavigate } from 'react-router-dom';
-import { userLogin } from '../../API/userApi';
+import { userLogin } from '../../Services/user.api';
 import toast from 'react-hot-toast';
-import { generateOtp } from '../../API/OtpApi';
+import { generateOtp } from '../../Services/otp.api';
+import ErrorMessage from "../../components/admin/ErrorMessage";
 
 export default function UserLogin() {
 
-  const { register, handleSubmit, reset } = useForm();
+  const { register, handleSubmit, formState:{errors} } = useForm();
   const nav = useNavigate();
 
   const onSubmit =  async(data) => {
@@ -18,8 +18,11 @@ export default function UserLogin() {
       let res=await userLogin(data);
 
       if(res.data.success) {
-        toast.success(res.data.message);
-        nav("/");
+
+        localStorage.setItem("userToken",res.data.token);
+        toast("Welcome to comet website!");
+        nav("/",{replace:true});
+
       }
 
     }catch(err) {
@@ -41,44 +44,63 @@ export default function UserLogin() {
     }
   }
 
-  return (
-    <div className="flex justify-center items-center bg-gray-50 px-4">
-      <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold text-center mb-8">Login</h2>
+  const handleGoogleAuth= async()=>{
 
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+     window.location.href = `${import.meta.env.VITE_BASE_URL}/user/auth/google`;
+
+  }
+
+  return (
+    <div className="flex justify-center items-center px-4">
+      <div className="bg-white p-8 text-sm w-2xl max-w-sm">
+        <h2 className="text-2xl font-sans text-left mb-3">Welcome to Comet</h2>
+        <p className="mb-8">Please login to continue</p>
+
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
+          <div className="">
+            <label className="block text-sm font-bold text-gray-700 mb-1">
               Email
             </label>
             <input
-              {...register("email")}
-              type="email"
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^\S+@\S+\.\S+$/,
+                  message: "Enter a valid email address"
+                }
+              })}
+              type="text"
               placeholder="Enter your email"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black"
-              required
+              className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black rounded-md"
             />
+             <ErrorMessage elem={errors.email} />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">
+            <label className="block text-sm font-bold text-gray-700 mb-1">
               Password
             </label>
             <input
-              {...register("password")}
+              {...register("password", {
+                required: "Password is required",
+                minLength: {
+                  value: 6,
+                  message: "Password must be at least 6 characters"
+                }
+              })}
               type="password"
               placeholder="Enter your password"
-              className="w-full border border-gray-300 rounded-md px-3 py-2 focus:outline-none focus:ring-1 focus:ring-black"
-              required
+              className="w-full border border-gray-300 px-3 py-1.5 focus:outline-none focus:ring-1 focus:ring-black rounded-md"
             />
-            <p className="text-right text-xs text-gray-500 mt-2 cursor-pointer hover:underline" onClick={()=>nav("/forgotpassword")}>
+             <ErrorMessage elem={errors.password} />
+            <p className="text-right text-xs text-gray-500 mt-2 cursor-pointer hover:text-gray-600 font-bold focus:" onClick={()=>nav("/forgotpassword")}>
               Forgot Password?
             </p>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-black text-white py-2 rounded-md hover:bg-gray-900 transition-colors cursor-pointer"
+            className="w-full bg-black text-white py-2 hover:bg-gray-900 transition-colors cursor-pointer rounded-md"
           >
             Login
           </button>
@@ -92,7 +114,7 @@ export default function UserLogin() {
         </div>
 
 
-        <button className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 rounded-md hover:bg-gray-100 transition">
+        <button onClick={handleGoogleAuth} className="w-full flex items-center justify-center gap-2 border border-gray-300 py-2 hover:bg-gray-100 transition cursor-pointer rounded-lg">
           <FcGoogle className="text-xl" />
           Continue with Google
         </button>
