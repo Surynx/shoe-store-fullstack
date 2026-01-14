@@ -19,7 +19,7 @@ app.use("/uploads",express.static("uploads"));
 app.use("/sound",express.static("sound"));
 
 app.use(cors({
-    origin:process.env.Client_Url,
+    origin:process.env.CLIENT_URL,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
     allowedHeaders: ["Content-Type", "Authorization"]
 }));

@@ -45,7 +45,7 @@ const verifyAdmin = async (req, res) => {
         let valid = await compare(password, admin.password);
 
         let payload = { admin_email: admin.email }
-        const token = jwt.sign(payload, process.env.Jwt_Key_Admin);
+        const token = jwt.sign(payload, process.env.JWT_KEY_ADMIN);
 
         if (valid) {
             res.status(STATUS.SUCCESS.OK).send({ success: true, token });

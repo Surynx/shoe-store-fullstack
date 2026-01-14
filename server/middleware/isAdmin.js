@@ -9,7 +9,7 @@ export const isAdmin= async(req,res,next)=>{
 
         let token= req.headers.authorization.split(" ")[1];
         
-        let decode= jwt.verify(token,process.env.Jwt_Key_Admin);
+        let decode= jwt.verify(token,process.env.JWT_KEY_ADMIN);
 
         const email=decode.admin_email;
 

@@ -7,7 +7,7 @@ export const isUser= async(req,res,next)=> {
         if(req?.headers?.authorization?.startsWith("Bearer")) {
 
             let token= req.headers.authorization.split(" ")[1];
-            let decode= jwt.verify(token,process.env.Jwt_Key_User);
+            let decode= jwt.verify(token,process.env.JWT_KEY_USER);
 
             const userMail= decode.email
             req.email= userMail;

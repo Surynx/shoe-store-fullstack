@@ -151,7 +151,7 @@ const userLogin = async (req, res) => {
         if (doc.isVerified) {
 
             const payload = { email: doc.email };
-            const token = jwt.sign(payload, process.env.Jwt_Key_User);
+            const token = jwt.sign(payload, process.env.JWT_KEY_USER);
 
             return res.status(STATUS.SUCCESS.OK).send({ success: true, message: "Login Success", token });
 
@@ -186,15 +186,15 @@ const googleAuth = async (req, res) => {
     const user = req.user;
 
     if (user.isBlock) {
-        return res.redirect(`${process.env.Client_LocalHost}/login`);
+        return res.redirect(`${process.env.CLIENT_URL}/login`);
     }
 
     if (user) {
 
         const payload = { email: user.email };
-        const token = await jwt.sign(payload, process.env.Jwt_Key_User);
+        const token = await jwt.sign(payload, process.env.JWT_KEY_USER);
 
-        return res.redirect(`${process.env.Client_LocalHost}/auth/google/success/${token}`);
+        return res.redirect(`${process.env.CLIENT_URL}/auth/google/success/${token}`);
     }
 }
 
