@@ -160,7 +160,7 @@ const handleCancelOrder = async (req, res) => {
 
         if (orderDoc.status == "canceled") {
 
-            return res.status(STATUS.SUCCESS.OK).send({ success: true, message: "Order already canceled" });
+            return res.status(STATUS.ERROR.BAD_REQUEST).send({ success: true, message: "Order already canceled" });
         }
 
         if (orderDoc.status == "shipped" || orderDoc.status == "out_for_delivery" || orderDoc.status == "delivered") {
@@ -236,7 +236,7 @@ const handleCancelItem = async (req, res) => {
 
     if (orderDoc.status == "canceled") {
 
-        return res.status(STATUS.SUCCESS.OK).send({ success: true, message: "Order already canceled" });
+        return res.status(STATUS.ERROR.BAD_REQUEST).send({ success: true, message: "Order already canceled" });
     }
 
     if (orderDoc.status == "shipped" || orderDoc.status == "out_for_delivery" || orderDoc.status == "delivered") {

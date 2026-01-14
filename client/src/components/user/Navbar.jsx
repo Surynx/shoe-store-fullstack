@@ -3,6 +3,8 @@ import { Search, Heart, User, ShoppingBag, LogOut, Settings, Package } from "luc
 import { getCartCount } from "../../Services/user.api";
 import { useQuery } from "@tanstack/react-query";
 import { useState, useEffect, useRef } from "react";
+import toast from "react-hot-toast";
+import NavbarSearch from "./NavbarSearch";
 
 export default function Navbar() {
 
@@ -50,13 +52,14 @@ export default function Navbar() {
     localStorage.removeItem("userToken");
     setShowDropdown(false);
     nav("/login");
+    toast("You have successfully logged out of your account.");
   };
 
   return (
     <nav className="w-full bg-white border-b border-gray-300">
       
       <div className="bg-gray-200 text-center py-1 px-4">
-        <div className="max-w-7xl mx-auto overflow-hidden">
+        <div className="w-full mx-auto overflow-hidden">
           <div className="animate-marquee whitespace-nowrap inline-block">
             <span className="mx-6 text-[10px] font-medium">
               Welcome to Commet — Smart Shopping Starts Here🔥
@@ -232,15 +235,7 @@ export default function Navbar() {
     
             <div className="flex items-center space-x-2">
           
-              <div className="hidden md:flex items-center bg-gray-100 rounded-full px-3 py-1.5 hover:bg-gray-200 transition-colors">
-                <Search className="w-4 h-4 text-gray-600 mr-2" />
-                <input
-                  type="text"
-                  placeholder="Search"
-                  className="bg-transparent outline-none text-xs w-28 lg:w-32 placeholder-gray-500"
-                />
-              </div>
-
+              <NavbarSearch/>
             
               <button
                 className="md:hidden p-1.5 hover:bg-gray-100 rounded-full transition-colors"

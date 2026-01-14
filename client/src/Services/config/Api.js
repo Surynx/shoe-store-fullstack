@@ -14,7 +14,8 @@ api.interceptors.request.use(
 
         }else if (res.url.startsWith("/user/account") || res.url.startsWith("/user/address") || res.url.startsWith("/user/cart") 
                 || res.url.startsWith("/user/checkout") || res.url.startsWith("/user/order") || res.url.startsWith("/user/wishlist") || 
-                res.url.startsWith("/user/coupon") || res.url.startsWith("/user/wallet") || res.url.startsWith("/user/payment")) {
+                res.url.startsWith("/user/coupon") || res.url.startsWith("/user/wallet") || res.url.startsWith("/user/payment") || 
+                res.url.startsWith("/user/navbar")) {
 
             const token= localStorage.getItem("userToken");
             res.headers.authorization= `Bearer ${token}`
@@ -29,6 +30,7 @@ api.interceptors.request.use(
 
 
 api.interceptors.response.use(
+    
     (response)=>{
 
         if(response.data?.isBlock) {

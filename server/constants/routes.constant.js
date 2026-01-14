@@ -109,7 +109,6 @@ const ROUTES= {
             REMOVE:"/cart/remove/:id",
             QUANTITY_INC:"/cart/increase/:id",
             QUANTITY_DEC:"/cart/decrease/:id",
-            FETCH_COUNT:"/cart/count",
             VALIDATE_CART_ITEMS:"/cart/validate"
         },
         CHECKOUT:{
@@ -145,6 +144,10 @@ const ROUTES= {
         },
         HOME:{
             FETCH:"/home"
+        },
+        NAVBAR:{
+            INFO:"/navbar",
+            SEARCH:"/search"
         }
     }
 }

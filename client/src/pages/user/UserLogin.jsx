@@ -20,7 +20,7 @@ export default function UserLogin() {
       if(res.data.success) {
 
         localStorage.setItem("userToken",res.data.token);
-        toast.success(res.data.message);
+        toast("Welcome to comet website!");
         nav("/",{replace:true});
 
       }

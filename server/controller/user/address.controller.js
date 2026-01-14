@@ -7,6 +7,7 @@ const addNewAddress= async (req,res) => {
     try{
 
     const {  name,type,line1,line2,city,state,pin_code,phone,isDefault }= req.body;
+
     const email=req.email;
 
     const user = await User.findOne({ email });
@@ -24,7 +25,7 @@ const addNewAddress= async (req,res) => {
       city,
       state,
       pin_code,
-      phone,
+      phone
     });
 
     if(isDefault) {

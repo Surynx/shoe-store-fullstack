@@ -1,17 +1,17 @@
 import { NavLink, replace, useNavigate } from "react-router-dom";
 import { User, MapPin, Package, LogOut, Edit, Wallet } from "lucide-react";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
-import Loading from "./Loading";
-import { BiMoney } from "react-icons/bi";
+
 
 export default function Sidebar({ name, email,avatar }) {
   const nav = useNavigate();
 
   const handleLogout = () => {
-    toast.success("Logout");
+
+    toast("You have successfully logged out of your account.");
     localStorage.removeItem("userToken");
     nav("/", { replace: true });
+
   };
 
 
@@ -42,7 +42,7 @@ export default function Sidebar({ name, email,avatar }) {
           to="/account/profile"
           end
           className={({ isActive }) =>
-            `flex items-center gap-3 px-4 py-2 rounded-md transition ${
+            `flex items-center gap-3 px-3 py-2 rounded-md transition ${
               isActive ? "bg-gray-100 font-semibold" : "hover:bg-gray-100"
             }`
           }

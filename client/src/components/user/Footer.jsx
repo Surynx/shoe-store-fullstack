@@ -61,6 +61,7 @@ export default function Footer() {
 
       <p className="text-center text-gray-500 text-xs mt-3 font-semibold">
         © 2024 COMET. All rights reserved.
+        <p className="text-xs mt-3">Designed & developed by Sooryanarayanan</p>
       </p>
     </footer>
   );

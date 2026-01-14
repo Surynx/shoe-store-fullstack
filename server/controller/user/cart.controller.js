@@ -138,17 +138,6 @@ const decQuantity= async(req,res)=> {
    
 }
 
-const countCartItems= async(req,res)=> {
-
-    const email=req.email;
-
-    const user= await User.findOne({email});
-    
-    const cartDoc= await Cart.findOne({user_id:user._id});
-
-    return res.status(STATUS.SUCCESS.OK).send({count:cartDoc?.items?.length,username:user.name});
-}
-
 const validateCartItems= async(req,res)=> {
 
     const email= req.email;
@@ -183,4 +172,4 @@ const validateCartItems= async(req,res)=> {
 
 }
 
-export { addToCart,fetchCartInfo,removeItemFromCart,incQuantity,decQuantity,countCartItems,validateCartItems }
+export { addToCart,fetchCartInfo,removeItemFromCart,incQuantity,decQuantity,validateCartItems }

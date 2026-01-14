@@ -8,7 +8,7 @@ import ROUTES from "../constants/routes.constant.js";
 import { isUser } from "../middleware/isUser.js";
 import upload from "../middleware/multer.js";
 import { addNewAddress, editAddress, fetchAddress, removeAddress } from "../controller/user/address.controller.js";
-import { addToCart, countCartItems, decQuantity, fetchCartInfo, incQuantity, removeItemFromCart, validateCartItems } from "../controller/user/cart.controller.js";
+import { addToCart, decQuantity, fetchCartInfo, incQuantity, removeItemFromCart, validateCartItems } from "../controller/user/cart.controller.js";
 import { getCheckoutData } from "../controller/user/checkout.controller.js";
 import { fetchAllOrders, generateInvoice, getOrderDetails, handleCancelItem, handleCancelOrder, handleReturnProduct, placeNewOrder } from "../controller/user/order.controller.js";
 import { addProductToWishlist, fetchWishlistInfo, removeItemFromWishlist } from "../controller/user/wishlist.controller.js";
@@ -16,6 +16,7 @@ import { createWalletOrder, fetchWalletInfo, verifyWalletPayment } from "../cont
 import { createCheckoutOrder, createPaymentRetryOrder, markPaymentFailed, verifyCheckoutPayment } from "../controller/user/payment.controller.js";
 import { validateCoupon } from "../controller/user/coupon.controller.js";
 import { getHomeInfo } from "../controller/user/home.controller.js";
+import { navbarInfo, searchProducts } from "../controller/user/navbar.controller.js";
 
 
 const route=express.Router();
@@ -79,7 +80,7 @@ route.patch(ROUTES.USER.CART.QUANTITY_INC,isUser,incQuantity);
 
 route.patch(ROUTES.USER.CART.QUANTITY_DEC,isUser,decQuantity);
 
-route.get(ROUTES.USER.CART.FETCH_COUNT,isUser,countCartItems);
+route.get(ROUTES.USER.NAVBAR.INFO,isUser,navbarInfo);
 
 route.get(ROUTES.USER.CART.VALIDATE_CART_ITEMS,isUser,validateCartItems);
 
@@ -122,5 +123,7 @@ route.post(ROUTES.USER.PAYMENT.FAILED_PAYMENT,isUser,markPaymentFailed);
 route.post(ROUTES.USER.PAYMENT.RETRY_PAYMENT,isUser,createPaymentRetryOrder);
 
 route.get(ROUTES.USER.HOME.FETCH,getHomeInfo);
+
+route.get(ROUTES.USER.NAVBAR.SEARCH,searchProducts);
 
 export default route;

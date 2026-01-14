@@ -247,7 +247,7 @@ export default function AddressForm() {
 
             <button
               type="submit"
-              className="flex-1 px-3 py-2 border text-white bg-gray-700 hover:bg-gray-800 font-medium"
+              className="flex-1 px-3 py-2 border text-white bg-gray-700 hover:bg-gray-800 font-medium cursor-pointer"
             >
               {id ? "Update Address" : "Add Address"}
             </button>

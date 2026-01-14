@@ -14,7 +14,7 @@ function AuthSuccess() {
 
         nav("/",{replace:true});
 
-        toast.success("Login");
+        toast("Welcome to comet website!");
 
     },[]);
 

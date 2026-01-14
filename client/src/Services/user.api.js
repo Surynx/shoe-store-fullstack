@@ -160,7 +160,7 @@ export const decreaseQty= async(id)=> {
 
 export const getCartCount= async()=> {
 
-    const res= await api.get("/user/cart/count");
+    const res= await api.get("/user/navbar");
     return res;
 }
 
@@ -287,5 +287,15 @@ export const getHomeInfo = async () => {
     
     const res = await api.get("/user/home");
     return res;
+}
+
+export const searchProducts = async (search) => {
+    
+    const res= await api.get("/user/search",{
+        params:{
+            search: search
+        }
+    });
+    return res;  
 }
  
