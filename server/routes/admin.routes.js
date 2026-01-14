@@ -6,7 +6,7 @@ import { addVariant, fetchVariant, removeVariant, updateVariant } from "../contr
 import ROUTES from "../constants/routes.constant.js";
 import { addcategory, editCategory, fetchCategory } from "../controller/admin/category.contoller.js";
 import { addProduct, editProduct, fetchProduct } from "../controller/admin/product.controller.js";
-import { addBrand, editBrand, fetchBrands } from "../controller/Admin/brand.controller.js";
+import { addBrand, editBrand, fetchBrands } from "../controller/admin/brand.controller.js";
 import { approveReturn, changeOrderStatus, completeReturn, fetchOrdersInfo, getDetailsOfOrder, rejectReturn } from "../controller/admin/order.controller.js";
 import { addNewOfferForCategory, addNewOfferForProduct, getAllOfferOfCategory, getAllOfferOfProduct, removeOffer } from "../controller/admin/offer.controller.js";
 import { addNewCoupon, changeCouponStatus, getAllCoupon } from "../controller/admin/coupon.controller.js";
