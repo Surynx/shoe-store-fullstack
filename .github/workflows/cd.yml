@@ -1,0 +1,58 @@
+name: CD - Deploy Backend to EC2
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - "server/**"
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Copy backend code to EC2
+        uses: appleboy/scp-action@v0.1.4
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          source: "server"
+          target: "/home/ubuntu/backend"
+
+      - name: Build & Run Docker container on EC2
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            cd /home/ubuntu/backend/server
+
+            docker build -t real-backend .
+
+            docker stop real-backend || true
+            docker rm real-backend || true
+
+            docker run -d \
+              -p 8080:8080 \
+              --name real-backend \
+              -e PORT=${{ secrets.PORT }} \
+              -e ATLAS_URL=${{ secrets.ATLAS_URL }} \
+              -e JWT_KEY_ADMIN=${{ secrets.JWT_KEY_ADMIN }} \
+              -e JWT_KEY_USER=${{ secrets.JWT_KEY_USER }} \
+              -e GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }} \
+              -e GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }} \
+              -e CLOUDINARY_CLOUD_NAME=${{ secrets.CLOUDINARY_CLOUD_NAME }} \
+              -e CLOUDINARY_API_KEY=${{ secrets.CLOUDINARY_API_KEY }} \
+              -e CLOUDINARY_API_SECRET=${{ secrets.CLOUDINARY_API_SECRET }} \
+              -e CLIENT_URL=${{ secrets.CLIENT_URL }} \
+              -e SERVER_URL=${{ secrets.SERVER_URL }} \
+              -e EMAIL_USER=${{ secrets.EMAIL_USER }} \
+              -e EMAIL_PASS=${{ secrets.EMAIL_PASS }} \
+              -e RAZORPAY_KEY_ID=${{ secrets.RAZORPAY_KEY_ID }} \
+              -e RAZORPAY_KEY_SECRET=${{ secrets.RAZORPAY_KEY_SECRET }} \
+              real-backend
