@@ -1,5 +1,5 @@
-import { RefreshCw, Mail, Package } from "lucide-react";
-import { useLocation, useNavigate, useParams } from "react-router-dom";
+import { RefreshCw, Package } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
 import { createPaymentRetryOrder,verifyCheckoutPayment } from "../../Services/user.api";
 import toast from "react-hot-toast";
 import { useEffect, useState } from "react";

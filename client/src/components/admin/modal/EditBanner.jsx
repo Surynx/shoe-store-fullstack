@@ -1,7 +1,6 @@
 import { useForm } from 'react-hook-form';
 import { X } from 'lucide-react';
 import ErrorMessage from '../ErrorMessage';
-// import { updateBanner } from '../../../Services/admin.api';
 import { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useQueryClient } from '@tanstack/react-query';

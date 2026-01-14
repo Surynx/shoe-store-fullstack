@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { X, AlertCircle } from "lucide-react";
 
 const ConfirmModal = ({ isOpen, onClose, orderDetails, placeOrder }) => {

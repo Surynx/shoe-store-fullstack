@@ -4,7 +4,6 @@ import { useLocation, useNavigate, useParams } from "react-router-dom"
 import { addCategory, editCategory } from "../../Services/admin.api";
 import { toast } from 'react-toastify';
 import { useEffect } from "react";
-import { values } from "lodash";
 import ErrorMessage from "../../components/admin/ErrorMessage";
 
 

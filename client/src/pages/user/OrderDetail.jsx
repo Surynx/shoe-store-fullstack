@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React from "react";
 import {
   ArrowLeft,
   Package,
@@ -72,7 +72,7 @@ const OrderDetail = () => {
 
   const handleDownloadInvoice = () => {
     
-    window.open(`${import.meta.env.VITE_BASE_URL}/user/order/invoice/${order._id}`,"_blank");
+    window.open(`${import.meta.env.VITE_API_URL}/user/order/invoice/${order._id}`,"_blank");
   };
 
   if (!order) return <div className="text-center py-12">Loading...</div>;

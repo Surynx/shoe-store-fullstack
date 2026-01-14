@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { X, Copy, Check, Gift, Users, Wallet } from 'lucide-react';
+import { useState } from 'react';
+import { X, Copy, Check, Gift, Users } from 'lucide-react';
 
 const ReferralModal = ({ isOpen, onClose, referralCode, totalReferrals }) => {
 

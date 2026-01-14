@@ -1,7 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { nav } from "framer-motion/client";
 import { ArrowDownCircle, ArrowUpCircle, Plus } from "lucide-react";
-import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getWalletInfo } from "../../Services/user.api";
 

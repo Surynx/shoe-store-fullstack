@@ -1,5 +1,4 @@
-import { CheckCircle } from 'lucide-react'
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import toast from 'react-hot-toast';
 import { useNavigate, useParams } from 'react-router-dom';
 

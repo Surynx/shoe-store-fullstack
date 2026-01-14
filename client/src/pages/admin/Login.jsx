@@ -3,7 +3,7 @@ import toast, { Toaster } from "react-hot-toast";
 import { verifyAdmin } from "../../Services/admin.api";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import { FaExclamationCircle, FaExclamationTriangle } from "react-icons/fa";
+import { FaExclamationCircle } from "react-icons/fa";
 import ErrorMessage from "../../components/admin/ErrorMessage";
 
 export default function Login() {

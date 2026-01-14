@@ -1,7 +1,5 @@
-
 import { Edit, X } from "lucide-react";
 import { removeVariant } from "../../Services/admin.api";
-import { QueryClient } from "@tanstack/react-query";
 import { toast } from "react-toastify";
 
 function VarientsList({data,QueryClient,setEditVarient}) {

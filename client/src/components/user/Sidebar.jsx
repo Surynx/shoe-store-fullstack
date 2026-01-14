@@ -1,4 +1,4 @@
-import { NavLink, replace, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { User, MapPin, Package, LogOut, Edit, Wallet } from "lucide-react";
 import toast from "react-hot-toast";
 

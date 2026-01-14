@@ -6,7 +6,6 @@ import { useLocation, useParams } from "react-router-dom";
 import RelatedProducts from "../../components/user/RelatedProducts";
 import Breadcrumb from "../../components/user/Breadcrumb";
 import Loading from "../../components/user/Loading";
-import ProductReview from "../../components/user/ProductReview";
 import OfferBanner from "../../components/user/OfferBanner";
 import { useState } from "react";
 import { useEffect } from "react";

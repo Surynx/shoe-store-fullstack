@@ -1,4 +1,3 @@
-import React, { useState } from "react";
 import { Trash2, Tag, ShoppingBag, Check, Truck } from "lucide-react";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

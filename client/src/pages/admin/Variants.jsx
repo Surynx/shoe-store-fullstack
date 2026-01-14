@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { FaArrowLeft, FaPlus } from "react-icons/fa";
+import { FaArrowLeft } from "react-icons/fa";
 import VariantsList from "../../components/admin/VariantsList";
 import { addVariant, updateVariant } from "../../Services/admin.api";
 import { useQuery, useQueryClient } from "@tanstack/react-query";

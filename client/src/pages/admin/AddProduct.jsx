@@ -1,7 +1,7 @@
 import { FaArrowLeft } from "react-icons/fa";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
-import { get, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
 import { addProduct, editProduct, getAllbrand, getAllCategory } from "../../Services/admin.api";
 import { Cropper } from "react-cropper";

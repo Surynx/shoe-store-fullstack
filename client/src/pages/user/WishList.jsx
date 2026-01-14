@@ -1,5 +1,4 @@
-import React, { useState } from "react";
-import { Heart, ShoppingBag } from "lucide-react";
+import { Heart } from "lucide-react";
 import {
   addToCart,
   fetchWishListInfo,

@@ -1,5 +1,4 @@
 import { Search, X } from 'lucide-react'
-import React, { useState } from 'react'
 
 function SearchBox({text,setText}) {
 

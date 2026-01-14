@@ -46,7 +46,7 @@ export default function UserLogin() {
 
   const handleGoogleAuth= async()=>{
 
-     window.location.href = `${import.meta.env.VITE_BASE_URL}/user/auth/google`;
+    window.location.href = `${import.meta.env.VITE_API_URL}/user/auth/google`;
 
   }
 

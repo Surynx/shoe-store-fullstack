@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { Plus, Check, X, Edit, Tag, Gift } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Plus, Check, X, Edit, Tag } from "lucide-react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   addNewAddress,

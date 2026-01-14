@@ -5,7 +5,7 @@ console.log(order);
         acc += curr.original_price * curr.quantity;
         return acc;
     }, 0);
-console.log(subtotal)
+
     return subtotal;
 }
 

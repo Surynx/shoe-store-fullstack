@@ -1,4 +1,3 @@
-import { Search } from "lucide-react";
 import api from "./config/Api";
 
 export const registerApi=async (data) => {

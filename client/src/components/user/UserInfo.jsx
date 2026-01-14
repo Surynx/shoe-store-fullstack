@@ -1,4 +1,4 @@
-import { Edit, Wallet, Users, Lock, Mail, LoaderPinwheel } from "lucide-react";
+import { Edit, Wallet, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import ReferralModal from "./modal/Referal";
