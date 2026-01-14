@@ -41,5 +41,7 @@ connectDb();
 //port
 const port = process.env.PORT;
 
+// trigger deployment
+
 app.listen(port,()=>console.log(`server is running at ${port}...✅`));
 
