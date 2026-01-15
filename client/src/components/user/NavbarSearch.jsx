@@ -7,7 +7,7 @@ import { useNavigate } from "react-router-dom";
 
 function NavbarSearch() {
 
-  const { register, watch } = useForm({
+  const { register, watch,reset } = useForm({
     defaultValues: {
       search: ""
     }
@@ -50,6 +50,8 @@ function NavbarSearch() {
   const handleProductClick = (product) => {
 
     nav(`/product/${product._id}`);
+    setIsOpen(false);
+    reset({search:""});
   };
 
   const filteredProducts = data?.data?.productDoc || [];
