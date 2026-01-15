@@ -33,7 +33,7 @@ const OrderDetailPage = () => {
 
   const [subtotal, setSubtotal] = useState(0);
 
-  const { data } = useQuery({
+  const { data,isLoading } = useQuery({
     queryKey: ["order-details-admin", id],
     queryFn: () => getOrderDetailsForAdmin(id),
   });
@@ -173,6 +173,15 @@ const OrderDetailPage = () => {
       toast.error("Error rejecting return", err);
     }
   };
+
+  if(isLoading) {
+
+    return (<div className="flex items-center justify-center h-screen space-x-2">
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-.2s]"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-.4s]"></div>
+      </div>)
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 p-10">

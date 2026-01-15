@@ -3,14 +3,17 @@ import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useQuery } from "@tanstack/react-query";
 import { searchProducts } from "../../Services/user.api";
+import { useNavigate } from "react-router-dom";
 
 function NavbarSearch() {
 
-  const { register, watch, setValue } = useForm({
+  const { register, watch } = useForm({
     defaultValues: {
       search: ""
     }
   });
+
+  const nav = useNavigate();
 
   const [isOpen, setIsOpen] = useState(false);
 
@@ -45,9 +48,8 @@ function NavbarSearch() {
   }, [searchValue]);
 
   const handleProductClick = (product) => {
-    console.log("Selected product:", product);
-    setValue("search", "");
-    setIsOpen(false);
+
+    nav(`/product/${product._id}`);
   };
 
   const filteredProducts = data?.data?.productDoc || [];

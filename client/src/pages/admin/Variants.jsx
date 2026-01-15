@@ -69,6 +69,15 @@ export default function AddVariant() {
     }
   };
 
+  if(isLoading) {
+
+    return (<div className="flex items-center justify-center h-screen space-x-2">
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-.2s]"></div>
+        <div className="w-3 h-3 bg-blue-500 rounded-full animate-bounce [animation-delay:-.4s]"></div>
+      </div>)
+  }
+
   return (
     <div className="p-8 bg-gray-50 min-h-screen">
       <div className="flex justify-between items-center mb-10">
