@@ -35,7 +35,7 @@ app.get("/",(req,res)=>{
 app.use("/admin",adminRoute);
 app.use("/user",userRoute);
 
-
+//db-connect
 connectDb();
 
 const port = process.env.PORT;
