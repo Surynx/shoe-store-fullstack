@@ -1,0 +1,12 @@
+{
+  "routes": [
+    {
+      "src": "^/admin/login$",
+      "dest": "/index.html"
+    },
+    {
+      "src": ".*",
+      "status": 404
+    }
+  ]
+}
