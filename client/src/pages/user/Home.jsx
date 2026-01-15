@@ -146,7 +146,7 @@ export default function HomePage() {
             </div>
             <div className="relative h-64 rounded-xl overflow-hidden shadow-lg">
               <img 
-                src="public/shoes.png"
+                src="https://res.cloudinary.com/dnmsl87uu/image/upload/v1768465776/shoes_zwuioo.png"
                 alt="Quality products" 
                 className="w-full h-full object-cover"
               />
