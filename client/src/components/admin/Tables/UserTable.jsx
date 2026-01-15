@@ -27,14 +27,17 @@ function UserTable({data,isLoading}) {
         });
 
         if(isConfirmed) {
+
             let res= await blockUser({id:user._id,isBlock:user.isBlock});
 
             if(res.data.success) {
+
               console.log(res);
               QueryClient.invalidateQueries("UsersInfo");
 
               let message = (!user.isBlock) ? `${user.name}-blocked` : `${user.name}-unblocked`;
               toast.warn(message);
+              
             }
         }
   }

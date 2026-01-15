@@ -87,6 +87,7 @@ const fetchUsers = async (req, res) => {
 }
 
 const blockUser = async (req, res) => {
+    
     const { id, isBlock } = req.body;
 
     await User.updateOne({ _id: id }, { isBlock: !isBlock });

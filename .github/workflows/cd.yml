@@ -3,6 +3,8 @@ name: CD - Backend Deployment
 on:
   push:
     branches: [ main ]
+    paths:
+      - "server/**"
 
 jobs:
   deploy:

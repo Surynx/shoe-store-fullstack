@@ -1,4 +1,5 @@
 import axios from "axios";
+import toast from "react-hot-toast";
 
 const api=axios.create({
     baseURL: import.meta.env.VITE_API_URL
@@ -29,20 +30,35 @@ api.interceptors.request.use(
 )
 
 
-api.interceptors.response.use(
-    
-    (response)=>{
+api.interceptors.response.use((response) => {
 
-        if(response.data?.isBlock) {
-            localStorage.removeItem("userToken");
-        }
-        return response;
-        
-    },
-    (error)=>{
+    return response;
 
-        return Promise.reject(error);
+  },(error) => {
+
+    const status = error.response?.status;
+    const data = error.response?.data;
+
+  
+    if (status === 403 && data?.blocked) {
+
+      localStorage.removeItem("userToken");
+      
+      toast.error("Your account has been blocked");
+
+      window.location.href = "/login";
     }
-)
+
+    if (status === 401) {
+
+      localStorage.removeItem("userToken");
+      
+      window.location.href = "/login";
+
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export default api;
