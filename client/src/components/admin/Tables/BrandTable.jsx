@@ -1,3 +1,4 @@
+import { FaEdit } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 
 function BrandTable({ data, isLoading }) {
@@ -55,7 +56,7 @@ function BrandTable({ data, isLoading }) {
                       onClick={() => navigate(`/admin/brand/edit/${brand._id}`,{state:brand})}
                       className="text-blue-600 hover:text-blue-800 text-lg cursor-pointer"
                     >
-                      <i className="fa-solid fa-pen-to-square"></i>
+                    <FaEdit/>
                     </button>
                   </td>
                 </tr>

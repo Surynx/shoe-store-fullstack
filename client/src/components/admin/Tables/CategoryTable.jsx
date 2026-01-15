@@ -4,6 +4,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { OfferModal } from "../modal/Offer";
+import { FaEdit } from "react-icons/fa";
 
 
 function CategoryTable({ docs, isLoading }) {
@@ -130,7 +131,7 @@ function CategoryTable({ docs, isLoading }) {
                       nav(`/admin/category/edit/${cat._id}`, { state: cat })
                     }
                   >
-                    <i className="fa-solid fa-pen-to-square"></i>
+                    <FaEdit/>
                   </button>
                 </td>
               </tr>

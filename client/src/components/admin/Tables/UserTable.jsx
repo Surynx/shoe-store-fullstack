@@ -3,6 +3,8 @@ import { useQueryClient } from '@tanstack/react-query';
 import Swal from 'sweetalert2';
 import { toast } from 'react-toastify';
 import { blockUser } from "../../../Services/admin.api";
+import { BiLock } from "react-icons/bi";
+import { Unlock } from "lucide-react";
 
 
 function UserTable({data,isLoading}) {
@@ -110,9 +112,9 @@ function UserTable({data,isLoading}) {
                   <td className="py-4 px-6 text-center">
                     <button className='text-lg cursor-pointer' onClick={()=>handleBlock(user)}>
                       {user.isBlock ? (
-                        <i className="fa-solid fa-check text-green-500 cursor-pointer"></i>
+                        <BiLock className="h-6 w-6"/>
                       ) : (
-                        <i className="fa-solid fa-ban text-red-500"></i>
+                        <Unlock className="h-5 w-5"/>
                       )}
                     </button>
                   </td>
