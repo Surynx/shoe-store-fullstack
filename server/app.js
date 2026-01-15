@@ -18,11 +18,7 @@ app.use(urlencoded({extended:true}));
 app.use("/uploads",express.static("uploads"));
 app.use("/sound",express.static("sound"));
 
-app.use(cors({
-    origin:process.env.CLIENT_URL,
-    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-    allowedHeaders: ["Content-Type", "Authorization"]
-}));
+app.use(cors());
 
 app.use(morgan("dev"));
 
