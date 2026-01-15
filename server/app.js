@@ -18,7 +18,13 @@ app.use(urlencoded({extended:true}));
 app.use("/uploads",express.static("uploads"));
 app.use("/sound",express.static("sound"));
 
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://shop.sooryacode.site",
+    credentials: true
+  })
+);
+
 
 app.use(morgan("dev"));
 
