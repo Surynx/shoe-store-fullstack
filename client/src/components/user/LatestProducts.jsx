@@ -25,7 +25,7 @@ export default function Latestproducts() {
 
   return (
     <div className="bg-white min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-4 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-10 py-20">
         <h2 className="text-4xl font-sans font-semibold text-black mb-2 text-center">
           Latest Products
         </h2>
