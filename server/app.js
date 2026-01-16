@@ -20,7 +20,7 @@ app.use("/sound",express.static("sound"));
 
 app.use(
   cors({
-    origin: "https://shop.sooryacode.site",
+    origin: process.env.CLIENT_URL,
     credentials: true
   })
 );
