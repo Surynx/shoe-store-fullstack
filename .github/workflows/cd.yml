@@ -1,42 +1,28 @@
-name: CD - Backend Deployment
+name: CD - Deploy Backend to EC2
 
 on:
-  push:
-    branches: [ main ]
-    paths:
-      - "server/**"
+  workflow_run:
+    workflows: ["CI - Build & Push Backend Image"]
+    types: [completed]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Copy backend to EC2
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "server"
-          target: "/home/ubuntu/backend"
-
-      - name: Run container (direct env test)
+      - name: Deploy to EC2
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
-            cd /home/ubuntu/backend/server
-
-            docker build -t real-backend .
+            docker pull ${{ secrets.DOCKER_USERNAME }}/real-backend:latest
 
             docker rm -f real-backend || true
 
-            docker run -d -p 8080:8080 --name real-backend \
+            docker run -d -p 8080:8080 \
+              --name real-backend \
               -e PORT=8080 \
               -e ATLAS_URL="${{ secrets.ATLAS_URL }}" \
               -e JWT_KEY_ADMIN="${{ secrets.JWT_KEY_ADMIN }}" \
@@ -52,4 +38,4 @@ jobs:
               -e EMAIL_PASS="${{ secrets.EMAIL_PASS }}" \
               -e RAZORPAY_KEY_ID="${{ secrets.RAZORPAY_KEY_ID }}" \
               -e RAZORPAY_KEY_SECRET="${{ secrets.RAZORPAY_KEY_SECRET }}" \
-              real-backend
+              ${{ secrets.DOCKER_USERNAME }}/real-backend:latest
