@@ -37,7 +37,7 @@ app.get("/",(req,res)=>{
 app.use("/admin",adminRoute);
 app.use("/user",userRoute);
 
-
+//atlas-connect
 connectDb();
 
 const port = process.env.PORT;
