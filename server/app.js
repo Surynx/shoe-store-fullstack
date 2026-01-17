@@ -31,7 +31,7 @@ app.use(morgan("dev"));
 app.use(passport.initialize());
 
 app.get("/",(req,res)=>{
-    res.send("Welcome to COMET server...⏳");
+    res.send("Welcome to COMET server...");
 });
 
 app.use("/admin",adminRoute);

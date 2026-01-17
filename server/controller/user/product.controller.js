@@ -54,16 +54,15 @@ const fetchShopProducts = async (req, res) => {
       search
     } = req.body;
 
-    const query = {};
-    let sortOrder = {};
+    const actual_price = price ? (10000 - price) : null;
 
-    /* -------------------- SORT -------------------- */
+    let sortOrder = {};
     switch (sort) {
       case "priceHtoL":
-        sortOrder = { min_price: -1 };
+        sortOrder = { display_price: -1 };
         break;
       case "priceLtoH":
-        sortOrder = { min_price: 1 };
+        sortOrder = { display_price: 1 };
         break;
       case "atoz":
         sortOrder = { name: 1 };
@@ -71,40 +70,19 @@ const fetchShopProducts = async (req, res) => {
       case "ztoa":
         sortOrder = { name: -1 };
         break;
+      default:
+        break;
     }
 
-    /* -------------------- FILTERS -------------------- */
-    if (category?.length) {
-      query.category_name = { $in: category };
-    }
+    const matchQuery = {};
 
-    if (gender?.length) {
-      query.gender = { $in: gender };
-    }
+    if (category?.length) matchQuery.category_name = { $in: category };
+    if (gender?.length) matchQuery.gender = { $in: gender };
+    if (brand?.length) matchQuery.brand_name = { $in: brand };
+    if (type?.length) matchQuery.type = { $in: type };
+    if (search?.length)
+      matchQuery.name = { $regex: search, $options: "i" };
 
-    if (brand?.length) {
-      query.brand_name = { $in: brand };
-    }
-
-    if (type?.length) {
-      query.type = { $in: type };
-    }
-
-    /* -------------------- VARIANT FILTER -------------------- */
-    if (price || size) {
-      query.variants = {
-        $elemMatch: {
-          ...(price && { sales_price: { $lte: price } }),
-          ...(size && { size })
-        }
-      };
-    }
-
-    if (search?.trim()) {
-      query.name = { $regex: search, $options: "i" };
-    }
-
-    /* -------------------- AGGREGATION -------------------- */
     const pipeline = [
       {
         $lookup: {
@@ -135,31 +113,64 @@ const fetchShopProducts = async (req, res) => {
         }
       },
 
-      /* ---------- COMPUTED FIELDS ---------- */
+      /* 🔥 FILTER VARIANTS FIRST */
       {
         $addFields: {
           category_name: "$category.name",
           brand_name: "$brand.name",
-          total_stock: { $sum: "$variants.stock" },
-          min_price: { $min: "$variants.sales_price" },
-          variant_array: {
-            $sortArray: {
+          filtered_variants: {
+            $filter: {
               input: "$variants",
-              sortBy: { sales_price: 1 }
+              as: "v",
+              cond: {
+                $and: [
+                  actual_price !== null
+                    ? { $lte: ["$$v.sales_price", actual_price] }
+                    : true,
+                  size ? { $eq: ["$$v.size", size] } : true
+                ]
+              }
             }
           }
         }
       },
 
-      /* ---------- APPLY FILTERS ---------- */
-      { $match: query },
+      /* ❌ REMOVE PRODUCTS WITH NO VALID VARIANTS */
+      {
+        $match: {
+          "filtered_variants.0": { $exists: true }
+        }
+      },
 
-      /* ---------- CLEAN RESPONSE ---------- */
+      /* ✅ PICK DISPLAY VARIANT (CHEAPEST) */
+      {
+        $addFields: {
+          filtered_variants: {
+            $sortArray: {
+              input: "$filtered_variants",
+              sortBy: { sales_price: 1 }
+            }
+          },
+          display_variant: { $arrayElemAt: ["$filtered_variants", 0] }
+        }
+      },
+
+      /* ✅ SINGLE SOURCE OF TRUTH */
+      {
+        $addFields: {
+          display_price: "$display_variant.sales_price",
+          total_stock: { $sum: "$filtered_variants.stock" }
+        }
+      },
+
+      { $match: matchQuery },
+
       {
         $project: {
           category: 0,
           brand: 0,
-          variants: 0
+          variants: 0,
+          filtered_variants: 0
         }
       }
     ];
@@ -168,47 +179,46 @@ const fetchShopProducts = async (req, res) => {
       pipeline.push({ $sort: sortOrder });
     }
 
-    const products = await Product.aggregate(pipeline);
+    const docs = await Product.aggregate(pipeline);
 
-    /* -------------------- OFFERS -------------------- */
-    const now = new Date();
-
+    /* OFFER LOGIC (UNCHANGED) */
     const categoryOffers = await Offer.find({
       apply_for: "category",
-      start_date: { $lte: now },
-      end_date: { $gte: now }
+      start_date: { $lte: new Date() },
+      end_date: { $gte: new Date() }
     });
 
     const productOffers = await Offer.find({
       apply_for: "product",
-      start_date: { $lte: now },
-      end_date: { $gte: now }
+      start_date: { $lte: new Date() },
+      end_date: { $gte: new Date() }
     });
 
-    const offerProducts = products.map(product => {
-      const catOffers = categoryOffers.filter(
+    const offerProducts = docs.map(product => {
+      const categoryOff = categoryOffers.filter(
         o => String(o.category_id) === String(product.category_id)
       );
 
-      const prodOffers = productOffers.filter(
+      const productOff = productOffers.filter(
         o => String(o.product_id) === String(product._id)
       );
 
       const bestOffer = findBestOffer(
-        [...catOffers, ...prodOffers],
-        product.min_price
+        [...categoryOff, ...productOff],
+        product.display_price
       );
 
       return { ...product, bestOffer };
     });
 
-    return res.status(200).json({ offerProducts });
+    res.status(200).json({ offerProducts });
 
   } catch (error) {
     console.error("Error in fetchShopProducts:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 
 
 const fetchProductData= async(req,res)=> {
