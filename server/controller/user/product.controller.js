@@ -41,141 +41,175 @@ const fetchLatestProduct= async(req,res)=>{
     }
 }
 
-const fetchShopProducts= async(req,res)=> {
+const fetchShopProducts = async (req, res) => {
+  try {
 
-    try{
+    const { brand, gender, type, price, size, category, sort, search } = req.body;
 
-        const { brand,gender,type,price,size,category,sort,search }= req.body;
-        
-        const actual_price= (10000-price)
-        
-        const query= {} 
+    const actual_price = (10000 - price);
 
-        let sortOrder;
+    const query = {};
+    let sortOrder;
 
-        switch(sort) {
-
-            case "priceHtoL":
-                sortOrder={min_price:-1}
-                break;
-            case "priceLtoH":
-                sortOrder={min_price:1}
-                break;
-            case "atoz":
-                sortOrder={name:1}
-                break;
-            case "ztoa":
-                sortOrder={name:-1}
-                break;
-            default:
-                sortOrder={}
-                break;
-        }
-
-        if(category && category.length > 0) {
-            query.category_name={$in:[...category]}
-        }
-
-        if(gender && gender.length > 0) {
-            query.gender={$in:[...gender]}
-        }
-
-        if(brand && brand.length > 0) {
-            query.brand_name={$in:[...brand]}
-        }
-
-        if(type && type.length > 0) {
-            query.type= {$in:[...type]}
-        }
-
-        if(size && price) {
-
-            query.variant_array={$elemMatch:{sales_price:{$lte:actual_price},size:{$eq:size}}}
-
-        }else if(price) {
-
-            query.variant_array={$elemMatch:{sales_price:{$lte:actual_price}}}
-
-        }else if(size) {
-
-            query.variant_array={$elemMatch:{size:{$eq:size}}}
-
-        }
-
-        if(search && search.length > 0) {
-            query.name={$regex:search,$options:"i"}
-        }
-
-        const pipeline=[{
-            $lookup:{
-                from:"categories",
-                localField:"category_id",
-                foreignField:"_id",
-                as:"category"
-            }},{
-                $unwind:"$category"
-            },{
-                $lookup:{
-                    from:"brands",
-                    localField:"brand_id",
-                    foreignField:"_id",
-                    as:"brand"
-                }
-            },{
-                $unwind:"$brand"
-            },{
-                $lookup:{
-                    from:"variants",
-                    localField:"_id",
-                    foreignField:"product_id",
-                    as:"variants"
-                }
-            },{
-                $addFields:{
-                    category_name:"$category.name",
-                    brand_name:"$brand.name",
-                    total_stock:{$sum:"$variants.stock"},
-                    variant_array:{$sortArray:{input:"$variants" ,sortBy:{sales_price:1}}},
-                    min_price:{$min:"$variants.sales_price"}
-                }
-            },{
-                $match:query
-            },{
-                $project:{category:0,brand:0,variants:0}
-            }
-        ]
-
-        if(Object.keys(sortOrder).length > 0) {
-
-            pipeline.push({$sort:sortOrder});
-        }
-
-        const docs= await Product.aggregate(pipeline);
-
-        const categoryOffers= await Offer.find({apply_for:"category",start_date:{ $lte:new Date() },end_date:{ $gte:new Date() }});
-        const productOffers= await Offer.find({apply_for:"product", start_date:{ $lte:new Date() },end_date:{ $gte:new Date() } })
- 
-        const offerProducts= docs.map((product)=> {
-
-            const categoryOff = categoryOffers.filter((offer)=> String(offer.category_id) == String(product.category_id));
-            const productOff = productOffers.filter((offer)=> String(offer.product_id) == String(product._id));
-
-            let offers=[...categoryOff,...productOff];
-
-            const bestOffer= findBestOffer(offers,product.min_price);
-    
-            return {...product,bestOffer}
-
-        });
-
-        res.status(STATUS.SUCCESS.OK).send({offerProducts});
-
-    }catch(error) {
-
-        console.log("Error in fetchShopProducts",error);
+    switch (sort) {
+      case "priceHtoL":
+        sortOrder = { min_price: -1 };
+        break;
+      case "priceLtoH":
+        sortOrder = { min_price: 1 };
+        break;
+      case "atoz":
+        sortOrder = { name: 1 };
+        break;
+      case "ztoa":
+        sortOrder = { name: -1 };
+        break;
+      default:
+        sortOrder = {};
+        break;
     }
-    
-}
+
+    if (category && category.length > 0) {
+      query.category_name = { $in: [...category] };
+    }
+
+    if (gender && gender.length > 0) {
+      query.gender = { $in: [...gender] };
+    }
+
+    if (brand && brand.length > 0) {
+      query.brand_name = { $in: [...brand] };
+    }
+
+    if (type && type.length > 0) {
+      query.type = { $in: [...type] };
+    }
+
+    if (size && price) {
+      query.variant_array = {
+        $elemMatch: {
+          sales_price: { $lte: actual_price },
+          size: { $eq: size }
+        }
+      };
+    } else if (price) {
+      query.variant_array = {
+        $elemMatch: {
+          sales_price: { $lte: actual_price }
+        }
+      };
+    } else if (size) {
+      query.variant_array = {
+        $elemMatch: {
+          size: { $eq: size }
+        }
+      };
+    }
+
+    if (search && search.length > 0) {
+      query.name = { $regex: search, $options: "i" };
+    }
+
+    const pipeline = [
+      {
+        $lookup: {
+          from: "categories",
+          localField: "category_id",
+          foreignField: "_id",
+          as: "category"
+        }
+      },
+      { $unwind: "$category" },
+
+      {
+        $lookup: {
+          from: "brands",
+          localField: "brand_id",
+          foreignField: "_id",
+          as: "brand"
+        }
+      },
+      { $unwind: "$brand" },
+
+      {
+        $lookup: {
+          from: "variants",
+          localField: "_id",
+          foreignField: "product_id",
+          as: "variants"
+        }
+      },
+
+      {
+        $addFields: {
+          category_name: "$category.name",
+          brand_name: "$brand.name",
+          total_stock: { $sum: "$variants.stock" },
+          variant_array: {
+            $sortArray: {
+              input: "$variants",
+              sortBy: { sales_price: 1 }
+            }
+          },
+
+          min_price: { $min: "$variant_array.sales_price" }
+        }
+      },
+
+      {
+        $match: query
+      },
+
+      {
+        $project: {
+          category: 0,
+          brand: 0,
+          variants: 0
+        }
+      }
+    ];
+
+    if (Object.keys(sortOrder).length > 0) {
+      pipeline.push({ $sort: sortOrder });
+    }
+
+    const docs = await Product.aggregate(pipeline);
+
+    const categoryOffers = await Offer.find({
+      apply_for: "category",
+      start_date: { $lte: new Date() },
+      end_date: { $gte: new Date() }
+    });
+
+    const productOffers = await Offer.find({
+      apply_for: "product",
+      start_date: { $lte: new Date() },
+      end_date: { $gte: new Date() }
+    });
+
+    const offerProducts = docs.map((product) => {
+      const categoryOff = categoryOffers.filter(
+        (offer) => String(offer.category_id) === String(product.category_id)
+      );
+
+      const productOff = productOffers.filter(
+        (offer) => String(offer.product_id) === String(product._id)
+      );
+
+      const offers = [...categoryOff, ...productOff];
+      const bestOffer = findBestOffer(offers, product.min_price);
+
+      return { ...product, bestOffer };
+    });
+
+    res.status(200).json({ offerProducts });
+
+  } catch (error) {
+    console.log("Error in fetchShopProducts", error);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 
 const fetchProductData= async(req,res)=> {
 
