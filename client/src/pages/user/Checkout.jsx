@@ -66,9 +66,7 @@ export default function CheckoutPage() {
   const coupons = data?.data?.coupon || [];
 
   useEffect(() => {
-    
     if (addresses.length > 0) {
-
       const defaultAddress = addresses.find((address) => address.isDefault);
 
       setSelectedAddress(defaultAddress?._id || addresses[0]._id);
@@ -89,33 +87,25 @@ export default function CheckoutPage() {
   }, 0);
 
   const sales_price_total = cartItems.reduce((acc, curr) => {
-    acc += curr.sales_price * curr.quantity;
+    const priceAfterOffer = curr.bestOffer
+      ? curr.sales_price - curr.bestOffer.discount_price
+      : curr.sales_price;
+
+    acc += priceAfterOffer * curr.quantity;
     return acc;
   }, 0);
 
-  const offerDiscount = cartItems.reduce((acc, curr) => {
-    if (curr.bestOffer) {
-      acc += curr.bestOffer.discount_price * curr.quantity;
-    }
-    return acc;
-  }, 0);
-
-  const discount = subtotal - sales_price_total + offerDiscount;
+  const discount = subtotal - sales_price_total;
 
   const shipping = selectedPayment == "cod" ? "₹ 7" : "Free";
+
   const shipping_charge = selectedPayment == "cod" ? 7 : 0;
 
-  const taxableAmount = cartItems.reduce((acc, curr) => {
-    acc += curr.bestOffer
-      ? curr.sales_price * curr.quantity - curr.bestOffer.discount_price
-      : curr.sales_price * curr.quantity;
-
-    return acc;
-  }, 0);
+  const taxableAmount = sales_price_total - couponDiscount;
 
   const tax = Math.round(taxableAmount * 0.18);
 
-  const total = subtotal - discount - couponDiscount + shipping_charge + tax;
+  const total = sales_price_total - couponDiscount + tax + shipping_charge;
 
   const handleEditAddress = (addressId) => {
     setIsEditing(true);
@@ -175,7 +165,9 @@ export default function CheckoutPage() {
         setAppliedCoupon(coupon);
 
         const discount_value =
-          coupon.type == "flat" ? coupon.value : (total * coupon.value) / 100;
+          coupon.type === "flat"
+            ? coupon.value
+            : (sales_price_total * coupon.value) / 100;
 
         setCouponDiscount(discount_value);
       }
@@ -328,9 +320,8 @@ export default function CheckoutPage() {
     }
   };
 
-  if( isLoading ) {
-
-    return <Loading/>
+  if (isLoading) {
+    return <Loading />;
   }
 
   return (
@@ -658,10 +649,13 @@ export default function CheckoutPage() {
                               ₹{" "}
                               {item.bestOffer
                                 ? (
-                                    item.sales_price * item.quantity -
-                                    item.bestOffer.discount_price
+                                    (item.sales_price -
+                                      item.bestOffer.discount_price) *
+                                    item.quantity
                                   ).toLocaleString("en-IN")
-                                : item.sales_price * item.quantity}
+                                : (
+                                    item.sales_price * item.quantity
+                                  ).toLocaleString("en-IN")}
                             </p>
                             {item.original_price && (
                               <p className="text-orange-700 line-through text-xs ml-2">
