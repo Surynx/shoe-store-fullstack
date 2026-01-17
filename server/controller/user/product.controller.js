@@ -43,14 +43,21 @@ const fetchLatestProduct= async(req,res)=>{
 
 const fetchShopProducts = async (req, res) => {
   try {
-
-    const { brand, gender, type, price, size, category, sort, search } = req.body;
-
-    const actual_price = (10000 - price);
+    const {
+      brand,
+      gender,
+      type,
+      price,
+      size,
+      category,
+      sort,
+      search
+    } = req.body;
 
     const query = {};
-    let sortOrder;
+    let sortOrder = {};
 
+    /* -------------------- SORT -------------------- */
     switch (sort) {
       case "priceHtoL":
         sortOrder = { min_price: -1 };
@@ -64,52 +71,40 @@ const fetchShopProducts = async (req, res) => {
       case "ztoa":
         sortOrder = { name: -1 };
         break;
-      default:
-        sortOrder = {};
-        break;
     }
 
-    if (category && category.length > 0) {
-      query.category_name = { $in: [...category] };
+    /* -------------------- FILTERS -------------------- */
+    if (category?.length) {
+      query.category_name = { $in: category };
     }
 
-    if (gender && gender.length > 0) {
-      query.gender = { $in: [...gender] };
+    if (gender?.length) {
+      query.gender = { $in: gender };
     }
 
-    if (brand && brand.length > 0) {
-      query.brand_name = { $in: [...brand] };
+    if (brand?.length) {
+      query.brand_name = { $in: brand };
     }
 
-    if (type && type.length > 0) {
-      query.type = { $in: [...type] };
+    if (type?.length) {
+      query.type = { $in: type };
     }
 
-    if (size && price) {
-      query.variant_array = {
+    /* -------------------- VARIANT FILTER -------------------- */
+    if (price || size) {
+      query.variants = {
         $elemMatch: {
-          sales_price: { $lte: actual_price },
-          size: { $eq: size }
-        }
-      };
-    } else if (price) {
-      query.variant_array = {
-        $elemMatch: {
-          sales_price: { $lte: actual_price }
-        }
-      };
-    } else if (size) {
-      query.variant_array = {
-        $elemMatch: {
-          size: { $eq: size }
+          ...(price && { sales_price: { $lte: price } }),
+          ...(size && { size })
         }
       };
     }
 
-    if (search && search.length > 0) {
+    if (search?.trim()) {
       query.name = { $regex: search, $options: "i" };
     }
 
+    /* -------------------- AGGREGATION -------------------- */
     const pipeline = [
       {
         $lookup: {
@@ -140,26 +135,26 @@ const fetchShopProducts = async (req, res) => {
         }
       },
 
+      /* ---------- COMPUTED FIELDS ---------- */
       {
         $addFields: {
           category_name: "$category.name",
           brand_name: "$brand.name",
           total_stock: { $sum: "$variants.stock" },
+          min_price: { $min: "$variants.sales_price" },
           variant_array: {
             $sortArray: {
               input: "$variants",
               sortBy: { sales_price: 1 }
             }
-          },
-
-          min_price: { $min: "$variant_array.sales_price" }
+          }
         }
       },
 
-      {
-        $match: query
-      },
+      /* ---------- APPLY FILTERS ---------- */
+      { $match: query },
 
+      /* ---------- CLEAN RESPONSE ---------- */
       {
         $project: {
           category: 0,
@@ -169,43 +164,48 @@ const fetchShopProducts = async (req, res) => {
       }
     ];
 
-    if (Object.keys(sortOrder).length > 0) {
+    if (Object.keys(sortOrder).length) {
       pipeline.push({ $sort: sortOrder });
     }
 
-    const docs = await Product.aggregate(pipeline);
+    const products = await Product.aggregate(pipeline);
+
+    /* -------------------- OFFERS -------------------- */
+    const now = new Date();
 
     const categoryOffers = await Offer.find({
       apply_for: "category",
-      start_date: { $lte: new Date() },
-      end_date: { $gte: new Date() }
+      start_date: { $lte: now },
+      end_date: { $gte: now }
     });
 
     const productOffers = await Offer.find({
       apply_for: "product",
-      start_date: { $lte: new Date() },
-      end_date: { $gte: new Date() }
+      start_date: { $lte: now },
+      end_date: { $gte: now }
     });
 
-    const offerProducts = docs.map((product) => {
-      const categoryOff = categoryOffers.filter(
-        (offer) => String(offer.category_id) === String(product.category_id)
+    const offerProducts = products.map(product => {
+      const catOffers = categoryOffers.filter(
+        o => String(o.category_id) === String(product.category_id)
       );
 
-      const productOff = productOffers.filter(
-        (offer) => String(offer.product_id) === String(product._id)
+      const prodOffers = productOffers.filter(
+        o => String(o.product_id) === String(product._id)
       );
 
-      const offers = [...categoryOff, ...productOff];
-      const bestOffer = findBestOffer(offers, product.min_price);
+      const bestOffer = findBestOffer(
+        [...catOffers, ...prodOffers],
+        product.min_price
+      );
 
       return { ...product, bestOffer };
     });
 
-    res.status(200).json({ offerProducts });
+    return res.status(200).json({ offerProducts });
 
   } catch (error) {
-    console.log("Error in fetchShopProducts", error);
+    console.error("Error in fetchShopProducts:", error);
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
