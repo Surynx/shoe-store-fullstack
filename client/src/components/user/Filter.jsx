@@ -1,43 +1,48 @@
 import { useEffect, useState } from "react";
-import { useForm,useWatch } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import brandQuery from "../../utils/user/brandQuery";
 
-export default function FilterSidebar({setFilterValue}) {
-
-
-  const { register,control } = useForm({defaultValues: {
+export default function FilterSidebar({ setFilterValue }) {
+  const { register, control } = useForm({
+    defaultValues: {
       gender: [],
       brand: [],
       type: [],
       price: 0,
-      size: "",
-    },
+      size: ""
+    }
   });
 
-  //fetching brand.
   const { data, isLoading } = brandQuery();
   const brandList = data?.data?.data || [];
-  const active_brands= brandList.filter((brand)=>brand.status == true);
+  const active_brands = brandList.filter(b => b.status === true);
 
-  const filterObject = useWatch({control});
+  const filterObject = useWatch({ control });
+  const [priceRange, setPriceRange] = useState(0);
 
-  useEffect(()=> {
-    setFilterValue(filterObject);
-    setPriceRange(10000-(filterObject.price));
-  },[filterObject]);
+  /* 🔥 FIX: MERGE instead of overwrite */
+  useEffect(() => {
+    setFilterValue(prev => ({
+      ...prev,
+      ...filterObject
+    }));
 
-  const [priceRange,setPriceRange] = useState(0);
+    setPriceRange(10000 - filterObject.price);
+  }, [filterObject, setFilterValue]);
+
+  if (isLoading) return null;
 
   return (
-    <div className="w-60 h-220 bg-white border rounded-xl p-5 space-y-6 text-gray-900 sticky top-5">
+    <div className="w-60 bg-white border rounded-xl p-5 space-y-3 text-gray-900 sticky top-5 h-200">
+      {/* Gender */}
       <div>
         <h3 className="text-sm font-semibold mb-3">Gender</h3>
         <div className="space-y-3">
-          {["Male", "Female", "Unisex"].map((g) => (
+          {["Male", "Female", "Unisex"].map(g => (
             <label key={g} className="flex items-center gap-3 cursor-pointer">
               <input
-                value={g}
                 type="checkbox"
+                value={g}
                 className="custom-checkbox"
                 {...register("gender")}
               />
@@ -47,10 +52,11 @@ export default function FilterSidebar({setFilterValue}) {
         </div>
       </div>
 
+      {/* Brand */}
       <div>
         <h3 className="text-sm font-semibold mb-3">Brand</h3>
         <div className="space-y-3">
-          {active_brands.map((b) => (
+          {active_brands.map(b => (
             <label key={b._id} className="flex items-center gap-3 cursor-pointer">
               <input
                 type="checkbox"
@@ -64,9 +70,9 @@ export default function FilterSidebar({setFilterValue}) {
         </div>
       </div>
 
+      {/* Price */}
       <div>
         <h3 className="text-sm font-semibold mb-3">Price</h3>
-
         <input
           type="range"
           min={0}
@@ -74,42 +80,46 @@ export default function FilterSidebar({setFilterValue}) {
           className="w-full accent-black cursor-pointer"
           {...register("price")}
         />
-
         <div className="flex justify-between text-xs text-gray-700 mt-1">
-          <span className="font-semibold">Price Range : <span className="text-red-700">₹{priceRange}</span></span>
+          <span className="font-semibold">
+            Price Range :{" "}
+            <span className="text-red-700">₹{priceRange}</span>
+          </span>
         </div>
       </div>
 
+      {/* Types */}
       <div>
         <h3 className="text-sm font-semibold mb-3">Types</h3>
         <div className="space-y-3">
-          {["Sneakers", "Loafers", "Sports", "Lifestyle", "Running"].map(
-            (c) => (
-              <label key={c} className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="checkbox"
-                  value={c}
-                  className="custom-checkbox"
-                  {...register("type")}
-                />
-                <span className="text-sm">{c}</span>
-              </label>
-            )
-          )}
+          {["Sneakers", "Loafers", "Sports", "Lifestyle", "Running"].map(t => (
+            <label key={t} className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                value={t}
+                className="custom-checkbox"
+                {...register("type")}
+              />
+              <span className="text-sm">{t}</span>
+            </label>
+          ))}
         </div>
       </div>
 
+      {/* Size */}
       <div>
         <h3 className="text-sm font-semibold mb-3">Size</h3>
-        <select {...register("size")} className="px-2 py-1.5 rounded-2xl w-full bg-gray-600 text-white text-sm outline-none">
+        <select
+          {...register("size")}
+          className="px-2 py-1.5 rounded-2xl w-full bg-gray-600 text-white text-sm outline-none"
+        >
           <option value="">Select Size</option>
-          {["UK 3", "UK 4", "UK 5", "UK 6", "UK 7", "UK 10"].map((size) => (
+          {["UK 3", "UK 4", "UK 5", "UK 6", "UK 7", "UK 10"].map(size => (
             <option key={size} value={size}>
               {size}
             </option>
           ))}
         </select>
-        
       </div>
     </div>
   );

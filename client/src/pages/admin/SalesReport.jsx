@@ -83,7 +83,7 @@ const Dashboard = () => {
 
   const handleCoustomeDateFilter = async () => {
 
-    if(new Date(customStartDate) > new Date(customEndDate)) {
+    if(new Date(customStartDate) > new Date(customEndDate) || new Date(customStartDate) > new Date()) {
 
       return toast.error("Invalid End Date!");
     }

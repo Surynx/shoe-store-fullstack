@@ -3,6 +3,7 @@ import Breadcrumb from "./Breadcrumb";
 import Loading from "./Loading";
 
 function ShopProducts({ data, isLoading }) {
+  
   const nav = useNavigate();
 
   const productsList = data?.data?.offerProducts || [];
@@ -23,7 +24,7 @@ function ShopProducts({ data, isLoading }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 mt-15 p-6">
         {active_products.map((product) => (
           <div
-            key={product.id}
+            key={product._id}
             className="group cursor-pointer"
             onClick={() => nav(`/shop/product/${product._id}`)}
           >

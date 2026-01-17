@@ -95,7 +95,7 @@ export default function Signup() {
                 {...register("password", {
                   required: "Field is required",
                   pattern: {
-                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,20}$/,
+                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
                     message: "Not Strong One..!",
                   },
                 })}
@@ -114,7 +114,7 @@ export default function Signup() {
                 {...register("confirmPassword", {
                   required: "Field is required",
                   pattern: {
-                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{6,20}$/,
+                    value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,20}$/,
                     message: "Not Strong One..!",
                   },
                 })}
