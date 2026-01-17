@@ -17,6 +17,7 @@ import ErrorMessage from "../../components/admin/ErrorMessage";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import ConfirmModal from "../../components/user/modal/ConfirmOrder";
+import Loading from "../../components/user/Loading";
 
 export default function CheckoutPage() {
   useEffect(() => {
@@ -326,6 +327,11 @@ export default function CheckoutPage() {
       toast.error(error.response.data.message);
     }
   };
+
+  if( isLoading ) {
+
+    return <Loading/>
+  }
 
   return (
     <div className="py-6 px-4">

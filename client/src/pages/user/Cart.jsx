@@ -4,6 +4,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { decreaseQty,fetchCartInfo,increaseQty,removeProductFromCart,validateCartItems } from "../../Services/user.api";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
+import Loading from "../../components/user/Loading";
 
 export default function Cart() {
   const nav = useNavigate();
@@ -80,6 +81,11 @@ export default function Cart() {
       toast.error(error.response.data.message);
     }
   };
+
+  if(isLoading) {
+
+    return <Loading/>
+  }
 
   return (
     <div className="max-w-7xl mx-auto mb-40 px-4 sm:px-6 lg:px-8 py-8">
